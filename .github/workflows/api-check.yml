@@ -1,0 +1,26 @@
+name: API Check
+
+on:
+  workflow_call:
+
+jobs:
+  checkstyle:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Change Severity
+      working-directory: ./api
+      run: sed -i.bak 's/<property name="severity" value="[^"]*"/<property name="severity" value="error"/' "checkstyle.xml"
+
+    - name: Checkstyle
+      working-directory: ./api
+      run: ./mvnw -B checkstyle:check

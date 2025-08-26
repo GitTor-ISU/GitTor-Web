@@ -1,0 +1,47 @@
+name: Main
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - '**'
+
+jobs:
+  api-cache:
+    uses: ./.github/workflows/api-cache.yml
+
+  api-check:
+    needs:
+      - api-cache
+    uses: ./.github/workflows/api-check.yml
+
+  api-test:
+    needs:
+      - api-cache
+    uses: ./.github/workflows/api-test.yml
+
+  api-build:
+    needs:
+      - api-cache
+    uses: ./.github/workflows/api-build.yml
+
+  ui-check:
+    uses: ./.github/workflows/ui-check.yml
+
+  ui-test:
+    needs:
+      - api-build
+      - api-build
+    uses: ./.github/workflows/ui-test.yml
+
+  ui-build:
+    needs: api-build
+    uses: ./.github/workflows/ui-build.yml
+
+  deploy:
+    needs:
+      - api-build
+      - api-test
+      - ui-build
+      - ui-test
+    uses: ./.github/workflows/deploy.yml

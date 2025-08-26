@@ -1,0 +1,14 @@
+<p-menubar [model]="items">
+  <ng-template #start>
+    <a routerLink="/">
+      <img alt="logo" src="favicon.svg" style="width: 2rem" />
+    </a>
+  </ng-template>
+  <ng-template #end>
+    <div class="flex items-center gap-2">
+      <app-theme-switcher />
+      <p-avatar (click)="menu.toggle($event)" icon="pi pi-user" shape="circle" />
+      <p-menu #menu [model]="userItems" [popup]="true" />
+    </div>
+  </ng-template>
+</p-menubar>

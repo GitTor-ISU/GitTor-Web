@@ -1,0 +1,12 @@
+{
+    "recommendations": [
+        "vmware.vscode-boot-dev-pack",
+        "vscjava.vscode-java-pack",
+        "angular.ng-template",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "william-voyek.vscode-nginx",
+        "docker.docker",
+        "editorconfig.editorconfig",
+    ],
+}

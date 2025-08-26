@@ -1,0 +1,40 @@
+name: UI Test
+
+on:
+  workflow_call:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Cache Node Modules
+      id: cache-npm
+      uses: actions/cache@v4
+      env:
+        cache-name: cache-node-modules
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-ci-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-ci-${{ env.cache-name }}-
+          ${{ runner.os }}-ci-
+          ${{ runner.os }}-
+
+    - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+      working-directory: ./ui
+      name: List State of Node Modules
+      continue-on-error: true
+      run: npm list
+
+    - name: Install Dependencies
+      working-directory: ./ui
+      run: |
+        npm install -g @angular/cli
+        npm install
+
+    - name: Lint
+      working-directory: ./ui
+      run: ng lint

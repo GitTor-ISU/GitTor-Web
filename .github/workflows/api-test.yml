@@ -1,0 +1,97 @@
+name: API Test
+
+on:
+  workflow_call:
+
+jobs:
+  dev:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Test API Development
+      working-directory: ./api
+      run: ./mvnw -B test --file pom.xml
+
+  prod:
+    runs-on: ubuntu-latest
+
+    services:
+      db:
+        image: postgres:17
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: fullstack
+          POSTGRES_USER: db_user
+          POSTGRES_PASSWORD: db_password
+        options: >-
+          --health-cmd "bash -c 'pg_isready -h localhost -U $POSTGRES_USER'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Start S3
+      run: |
+        docker run -d \
+          --name s3 \
+          -p 9000:9000 \
+          -e MINIO_ROOT_USER=s3_user \
+          -e MINIO_ROOT_PASSWORD=s3_password \
+          quay.io/minio/minio server /data --console-address ":9001"
+        for i in {1..10}; do
+          if docker exec s3 mc ready local >/dev/null 2>&1; then
+            echo "MinIO is ready!"
+            exit 0
+          fi
+          echo "Waiting for MinIO..."
+          sleep 5
+        done
+        echo "MinIO did not become ready in time" >&2
+        exit 1
+
+    - name: Test API Production
+      working-directory: ./api
+      run: |
+        ./mvnw -B test site --file pom.xml -Pprod
+        cp -r target/spring-test-profiler target/site/
+      env:
+        SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/fullstack
+        SPRING_DATASOURCE_USERNAME: db_user
+        SPRING_DATASOURCE_PASSWORD: db_password
+        SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+        SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+        SPRING_PROFILES_ACTIVE: prod
+        S3_URL: http://localhost:9000
+        S3_USERNAME: s3_user
+        S3_PASSWORD: s3_password
+
+    - name: Upload Site
+      uses: actions/upload-artifact@v4
+      with:
+        name: api-site-partial
+        path: api/target/site
+
+    - name: Upload Flight Record
+      uses: actions/upload-artifact@v4
+      with:
+        name: api-flight-record
+        path: api/target/flight.jfr

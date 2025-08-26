@@ -1,0 +1,51 @@
+name: Deploy pages
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  site:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download OpenAPI HTML
+        uses: actions/download-artifact@v4
+        with:
+          name: openapi-html
+          path: ./site
+
+      - name: Download Site
+        uses: actions/download-artifact@v4
+        with:
+          name: api-site-partial
+          path: ./site
+
+      - name: Download UI Test Report
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-test-report
+          path: ./site
+
+      - name: Download UI Stats
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-stats
+          path: ./site
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site
+
+      - name: Deploy GitHub Pages
+        if: github.ref == 'refs/heads/main'
+        id: deployment
+        uses: actions/deploy-pages@v4
