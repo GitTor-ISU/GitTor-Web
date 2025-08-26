@@ -25,7 +25,7 @@ $API_DIR/mvnw --file $API_DIR/pom.xml \
 API_PID=$!
 
 sleep 1
-until curl -fsS http://localhost:8080 | grep -q true; do sleep 1; done
+until curl -fs http://localhost:8080 | grep -q true; do sleep 1; done
 
 cd "$UI_DIR"
 npm run e2e

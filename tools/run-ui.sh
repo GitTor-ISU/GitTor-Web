@@ -15,7 +15,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-if curl -fsS http://localhost:8080 | grep -q true; then
+if curl -fs http://localhost:8080 | grep -q true; then
     echo "Backend is already running."
 else
     $API_DIR/mvnw --file $API_DIR/pom.xml \
@@ -29,7 +29,7 @@ else
     sleep 1
 fi
 
-until curl -fsS http://localhost:8080 | grep -q true; do sleep 1; done
+until curl -fs http://localhost:8080 | grep -q true; do sleep 1; done
 
 curl -sf http://localhost:8080/v3/api-docs -o /tmp/openapi.json
 rm -rf $UI_DIR/src/app/api
@@ -39,4 +39,4 @@ npx @openapitools/openapi-generator-cli generate \
     -o $UI_DIR/src/app/api \
     --openapitools $UI_DIR/openapitools.json
 
-( cd "$UI_DIR" && npm start )
+( cd "$UI_DIR" && npm install && npm start )
