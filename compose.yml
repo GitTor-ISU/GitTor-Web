@@ -45,7 +45,7 @@ services:
       JWT_TOKEN_SECRET: ${JWT_TOKEN_SECRET}
       API_ADMIN_USERNAME: ${API_ADMIN_USERNAME}
       API_ADMIN_PASSWORD: ${API_ADMIN_PASSWORD}
-      S3_URL: http://pg:9000
+      S3_URL: http://s3:9000
       S3_USERNAME: s3_user
       S3_PASSWORD: s3_password
     links:
