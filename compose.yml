@@ -1,0 +1,85 @@
+services:
+  db:
+    image: postgres:17
+    restart: always
+    environment:
+      POSTGRES_DB: fullstack
+      POSTGRES_USER: db_user
+      POSTGRES_PASSWORD: db_password
+    healthcheck:
+      test: pg_isready -h localhost -U $$POSTGRES_USER
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  s3:
+    image: minio/minio:latest
+    restart: always
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: s3_user
+      MINIO_ROOT_PASSWORD: s3_password
+    ports:
+      - "9000:9000"
+    volumes:
+      - s3_data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
+  api:
+    build:
+      context: ./api
+      dockerfile: containerfile
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/fullstack
+      SPRING_DATASOURCE_USERNAME: db_user
+      SPRING_DATASOURCE_PASSWORD: db_password
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_PROFILES_ACTIVE: prod
+      JWT_TOKEN_SECRET: ${JWT_TOKEN_SECRET}
+      API_ADMIN_USERNAME: ${API_ADMIN_USERNAME}
+      API_ADMIN_PASSWORD: ${API_ADMIN_PASSWORD}
+      S3_URL: http://pg:9000
+      S3_USERNAME: s3_user
+      S3_PASSWORD: s3_password
+    links:
+      - db
+      - s3
+    depends_on:
+      db:
+        condition: service_healthy
+      s3:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ui:
+    build:
+      context: ./ui
+      dockerfile: containerfile
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    links:
+      - api
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  s3_data:

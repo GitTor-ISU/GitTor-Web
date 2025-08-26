@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "api",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/api",
+            "mainClass": "api.Application",
+            "projectName": "api",
+            "args": "",
+        },
+        {
+            "command": "npm start",
+            "name": "ui",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/ui",
+            "type": "node-terminal",
+        },
+    ],
+}

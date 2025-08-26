@@ -1,0 +1,24 @@
+name: API Cache
+
+on:
+  workflow_call:
+
+jobs:
+  maven:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      id: setup-maven
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Full Run
+      if: steps.setup-maven.outputs.cache-hit != 'true'
+      working-directory: ./api
+      run: ./mvnw -B verify test package site

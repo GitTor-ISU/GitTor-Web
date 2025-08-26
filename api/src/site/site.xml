@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project xmlns="http://maven.apache.org/DECORATION/1.8.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/DECORATION/1.8.0 https://maven.apache.org/xsd/decoration-1.8.0.xsd"
+  name="Maven">
+  <bannerLeft>
+    <src>https://maven.apache.org/images/apache-maven-project.png</src>
+    <href>https://www.apache.org/</href>
+  </bannerLeft>
+  <bannerRight>
+    <src>https://maven.apache.org/images/maven-logo-black-on-white.png</src>
+    <href>https://maven.apache.org/</href>
+  </bannerRight>
+  <skin>
+    <groupId>org.apache.maven.skins</groupId>
+    <artifactId>maven-fluido-skin</artifactId>
+    <version>2.1.0</version>
+  </skin>
+  <body>
+    <links>
+      <item name="Apache" href="http://www.apache.org/" />
+      <item name="Maven" href="https://maven.apache.org/"/>
+    </links>
+    <menu name="Reports">
+      <item name="OpenAPI" href="openapi.html"/>
+      <item name="Cypress" href="cypress.html"/>
+      <item name="JaCoCo" href="jacoco/index.html"/>
+      <item name="Spring Test Profiler" href="spring-test-profiler/latest.html"/>
+      <item name="EsBuild" href="stats.html"/>
+      <item name="Surefire" href="surefire.html"/>
+    </menu>
+    <menu ref="reports"/>
+  </body>
+</project>

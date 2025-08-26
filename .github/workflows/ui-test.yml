@@ -1,0 +1,111 @@
+name: UI Test
+
+on:
+  workflow_call:
+
+jobs:
+  cypress:
+    runs-on: ubuntu-latest
+
+    services:
+      db:
+        image: postgres:17
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: db_user
+          POSTGRES_PASSWORD: db_password
+        options: >-
+          --health-cmd "bash -c 'pg_isready -h localhost -U $POSTGRES_USER'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Cache Node Modules
+      id: cache-npm
+      uses: actions/cache@v4
+      env:
+        cache-name: cache-node-modules
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-ci-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-ci-${{ env.cache-name }}-
+          ${{ runner.os }}-ci-
+          ${{ runner.os }}-
+
+    - if: ${{ steps.cache-npm.outputs.cache-hit != 'true' }}
+      working-directory: ./ui
+      name: List State of Node Modules
+      continue-on-error: true
+      run: npm list
+
+    - name: Install Dependencies
+      working-directory: ./ui
+      run: |
+        npm install -g @angular/cli
+        npm install
+
+    - name: OpenAPI typescript
+      uses: actions/download-artifact@v4
+      with:
+        name: openapi-typescript
+        path: ui/src/app/api
+
+    - name: Download API jar
+      uses: actions/download-artifact@v4
+      with:
+        name: api-jar
+        path: ./target
+
+    - name: Start S3
+      run: |
+        docker run -d \
+          --name s3 \
+          -p 9000:9000 \
+          -e MINIO_ROOT_USER=s3_user \
+          -e MINIO_ROOT_PASSWORD=s3_password \
+          quay.io/minio/minio server /data --console-address ":9001"
+        for i in {1..10}; do
+          if docker exec s3 mc ready local >/dev/null 2>&1; then
+            echo "MinIO is ready!"
+            exit 0
+          fi
+          echo "Waiting for MinIO..."
+          sleep 5
+        done
+        echo "MinIO did not become ready in time" >&2
+        exit 1
+
+    - name: Start API
+      run: |
+        nohup java -jar ./target/api-1.jar &
+        until curl -fsS http://localhost:8080 | grep -q true; do sleep 1; done
+      env:
+        SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/
+        SPRING_DATASOURCE_USERNAME: db_user
+        SPRING_DATASOURCE_PASSWORD: db_password
+        SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+        SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+        SPRING_PROFILES_ACTIVE: prod
+        S3_URL: http://localhost:9000
+        S3_USERNAME: s3_user
+        S3_PASSWORD: s3_password
+
+    - name: Test UI
+      working-directory: ./ui
+      run: |
+        ng e2e
+
+    - name: Generate Test Report
+      working-directory: ./ui
+      run: npm run cypress:report
+
+    - name: Upload Test Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: ui-test-report
+        path: ui/cypress/results/html

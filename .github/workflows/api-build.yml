@@ -1,0 +1,57 @@
+name: API Build
+
+on:
+  workflow_call:
+
+jobs:
+  jar:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Build API
+      working-directory: ./api
+      run: ./mvnw -B package --file pom.xml -Pprod -DskipTests -DskipITs
+
+    - name: Upload API jar
+      uses: actions/upload-artifact@v4
+      with:
+        name: api-jar
+        path: api/target/api-1.jar
+
+  openapi:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Update OpenAPI
+      working-directory: ./tools
+      run: ./update-openapi.sh
+
+    - name: Upload OpenAPI HTML
+      uses: actions/upload-artifact@v4
+      with:
+        name: openapi-html
+        path: api/target/site/openapi.html
+
+    - name: Upload OpenAPI typescript
+      uses: actions/upload-artifact@v4
+      with:
+        name: openapi-typescript
+        path: ui/src/app/api

@@ -1,0 +1,11 @@
+{
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.format.settings.url": "file:///api/src/main/resources/checkstyle.xml",
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "always"
+    },
+    "editor.insertSpaces": true,
+    "editor.rulers": [120],
+    "scss.lint.unknownAtRules": "ignore",
+}
