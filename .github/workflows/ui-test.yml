@@ -83,7 +83,7 @@ jobs:
     - name: Start API
       run: |
         nohup java -jar ./target/api-1.jar &
-        until curl -fsS http://localhost:8080 | grep -q true; do sleep 1; done
+        until curl -fs http://localhost:8080 | grep -q true; do sleep 1; done
       env:
         SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/
         SPRING_DATASOURCE_USERNAME: db_user
