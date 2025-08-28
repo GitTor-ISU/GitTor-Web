@@ -22,7 +22,10 @@ import api.services.TokenService;
 /**
  * Baseline configurations for all controller tests.
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    properties = "api.avatar.max=1024"
+)
 public abstract class BasicControllerTest {
     @Autowired
     private TokenService tokenService;

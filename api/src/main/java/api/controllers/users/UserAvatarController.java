@@ -148,7 +148,7 @@ public class UserAvatarController {
             throw new IllegalArgumentException("File must not be empty.");
         }
         if (file.getSize() > maxSize) {
-            throw new IllegalArgumentException("File size exceeds limit (5MB).");
+            throw new IllegalArgumentException("File size exceeds limit (" + maxSize + " bytes).");
         }
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_TYPES.contains(MediaType.parseMediaType(contentType))) {
@@ -311,7 +311,7 @@ public class UserAvatarController {
             throw new IllegalArgumentException("File must not be empty.");
         }
         if (file.getSize() > maxSize) {
-            throw new IllegalArgumentException("File size exceeds limit (5MB).");
+            throw new IllegalArgumentException("File size exceeds limit (" + maxSize + " bytes).");
         }
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_TYPES.contains(MediaType.parseMediaType(contentType))) {
