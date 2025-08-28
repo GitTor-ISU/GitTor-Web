@@ -45,11 +45,12 @@ public class AuthorityController {
      */
     @Transactional(readOnly = true)
     @GetMapping("")
+    @PreAuthorize("hasAuthority('AUTHORITY_READ')")
+    // region
     @Operation(
         summary = "Get Authorities",
         description = "Get list of all authorities."
     )
-    @PreAuthorize("hasAuthority('AUTHORITY_READ')")
     @ApiResponses({
         @ApiResponse(
             responseCode = "200",
@@ -66,6 +67,7 @@ public class AuthorityController {
             )
         ),
     })
+    // endregion
     public List<AuthorityDto> getAuthorities() {
         return authorityService.getAll().stream()
             .map(authorityMapper::toDto)
@@ -80,11 +82,12 @@ public class AuthorityController {
      */
     @Transactional(readOnly = true)
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('AUTHORITY_READ')")
+    // region
     @Operation(
         summary = "Get Authority",
         description = "Get specific authority."
     )
-    @PreAuthorize("hasAuthority('AUTHORITY_READ')")
     @ApiResponses({
         @ApiResponse(
             responseCode = "200",
@@ -108,6 +111,7 @@ public class AuthorityController {
             )
         ),
     })
+    // endregion
     public AuthorityDto getAuthority(@PathVariable int id) {
         return authorityMapper.toDto(authorityService.get(id));
     }

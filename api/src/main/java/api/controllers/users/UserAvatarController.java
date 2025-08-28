@@ -68,6 +68,7 @@ public class UserAvatarController {
      */
     @Transactional(readOnly = true)
     @GetMapping("/me/avatar")
+    // region
     @Operation(
         summary = "Get My Avatar",
         description = "Gets the current user's avatar."
@@ -90,6 +91,7 @@ public class UserAvatarController {
             )
         ),
     })
+    // endregion
     public ResponseEntity<Resource> getMyAvatar(@AuthenticationPrincipal User user) throws IOException {
         S3Object s3Object = user.getAvatar();
         if (s3Object == null) {
@@ -116,6 +118,7 @@ public class UserAvatarController {
      */
     @Transactional
     @PutMapping("/me/avatar")
+    // region
     @Operation(
         summary = "Update My Avatar",
         description = "Updates the current user's avatar."
@@ -136,6 +139,7 @@ public class UserAvatarController {
             )
         ),
     })
+    // endregion
     public void updateMyAvatar(
         @AuthenticationPrincipal User user,
         @RequestParam("file") MultipartFile file
@@ -174,6 +178,7 @@ public class UserAvatarController {
      */
     @Transactional
     @DeleteMapping("/me/avatar")
+    // region
     @Operation(
         summary = "Delete My Avatar",
         description = "Deletes the current user's avatar."
@@ -194,6 +199,7 @@ public class UserAvatarController {
             )
         ),
     })
+    // endregion
     public void deleteMyAvatar(@AuthenticationPrincipal User user) {
         S3Object s3Object = user.getAvatar();
         if (s3Object == null) {
@@ -216,6 +222,7 @@ public class UserAvatarController {
     @Transactional(readOnly = true)
     @GetMapping("/{userId}/avatar")
     @PreAuthorize("hasAuthority('USER_READ')")
+    // region
     @Operation(
         summary = "Get User's Avatar",
         description = "Gets specified user's avatar."
@@ -238,6 +245,7 @@ public class UserAvatarController {
             )
         ),
     })
+    // endregion
     public ResponseEntity<Resource> getUserAvatar(@PathVariable int userId) throws IOException {
         User user = userService.get(userId);
         S3Object s3Object = user.getAvatar();
@@ -266,6 +274,7 @@ public class UserAvatarController {
     @Transactional
     @PutMapping("/{userId}/avatar")
     @PreAuthorize("hasAuthority('USER_WRITE')")
+    // region
     @Operation(
         summary = "Update User's Avatar",
         description = "Updates specified user's avatar."
@@ -293,6 +302,7 @@ public class UserAvatarController {
             )
         ),
     })
+    // endregion
     public void updateUserAvatar(
         @PathVariable int userId,
         @RequestParam("file") MultipartFile file
@@ -333,6 +343,7 @@ public class UserAvatarController {
     @Transactional
     @DeleteMapping("/{userId}/avatar")
     @PreAuthorize("hasAuthority('USER_WRITE')")
+    // region
     @Operation(
         summary = "Delete User's Avatar",
         description = "Deletes specified user's avatar."
@@ -355,6 +366,7 @@ public class UserAvatarController {
             )
         ),
     })
+    // endregion
     public void deleteUserAvatar(@PathVariable int userId) {
         User user = userService.get(userId);
         S3Object s3Object = user.getAvatar();

@@ -64,6 +64,7 @@ public class UserController {
      */
     @Transactional(readOnly = true)
     @GetMapping("/me")
+    // region
     @Operation(
         summary = "Get Me",
         description = "Get the current user's information."
@@ -77,6 +78,7 @@ public class UserController {
             )
         ),
     })
+    // endregion
     public UserDto getMe(@AuthenticationPrincipal User user) {
         return userMapper.toDto(user);
     }
@@ -90,6 +92,7 @@ public class UserController {
      */
     @Transactional
     @PutMapping("/me")
+    // region
     @Operation(
         summary = "Update Me",
         description = "Update the current user's information."
@@ -121,6 +124,7 @@ public class UserController {
             )
         ),
     })
+    // endregion
     public UserDto updateMe(@AuthenticationPrincipal User user, @RequestBody UserDto userDto) {
         if (userDto.getUsername() != null && !StringUtils.hasText(userDto.getUsername())) {
             throw new IllegalArgumentException("Username must not be empty.");
@@ -145,6 +149,7 @@ public class UserController {
      */
     @Transactional
     @PutMapping("/me/password")
+    // region
     @Operation(
         summary = "Update My Password",
         description = "Updates the current user's password."
@@ -161,6 +166,7 @@ public class UserController {
             )
         ),
     })
+    // endregion
     public void updateMyPassword(@AuthenticationPrincipal User user, @RequestBody String password) {
         if (encoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("New password matches existing password.");
@@ -177,6 +183,7 @@ public class UserController {
      */
     @Transactional
     @DeleteMapping("/me")
+    // region
     @Operation(
         summary = "Delete Me",
         description = "Deletes the current user."
@@ -186,6 +193,7 @@ public class UserController {
             responseCode = "200"
         ),
     })
+    // endregion
     public void deleteMe(@AuthenticationPrincipal User user) {
         userService.delete(user);
     }
@@ -200,6 +208,7 @@ public class UserController {
     @Transactional(readOnly = true)
     @GetMapping("")
     @PreAuthorize("hasAuthority('USER_READ')")
+    // region
     @Operation(
         summary = "Get Users",
         description = "Get paginated list of user's information."
@@ -223,6 +232,7 @@ public class UserController {
             )
         ),
     })
+    // endregion
     public List<UserDto> getUsers(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(required = false) Integer size
@@ -245,6 +255,7 @@ public class UserController {
     @Transactional(readOnly = true)
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('USER_READ')")
+    // region
     @Operation(
         summary = "Get User",
         description = "Get specific user's information."
@@ -272,6 +283,7 @@ public class UserController {
             )
         ),
     })
+    // endregion
     public UserDto getUser(@PathVariable int id) {
         User user = userService.get(id);
         Hibernate.initialize(user);
@@ -288,6 +300,7 @@ public class UserController {
     @Transactional
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('USER_READ') and hasAuthority('USER_WRITE')")
+    // region
     @Operation(
         summary = "Update User",
         description = "Update specific user's information.<br>"
@@ -326,6 +339,7 @@ public class UserController {
             )
         ),
     })
+    // endregion
     public UserDto updateUser(@PathVariable int id, @RequestBody UserDto userDto) {
         if (userDto.getUsername() != null && !StringUtils.hasText(userDto.getUsername())) {
             throw new IllegalArgumentException("Username must not be empty.");
@@ -352,6 +366,7 @@ public class UserController {
     @Transactional
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('USER_WRITE')")
+    // region
     @Operation(
         summary = "Delete User",
         description = "Deletes specific user."
@@ -375,6 +390,7 @@ public class UserController {
             )
         ),
     })
+    // endregion
     public void deleteUser(@PathVariable int id) {
         userService.delete(id);
     }
