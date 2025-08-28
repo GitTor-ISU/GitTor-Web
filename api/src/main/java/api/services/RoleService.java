@@ -66,9 +66,9 @@ public class RoleService {
     }
 
     /**
-     * Get all authorities.
+     * Get all roles.
      *
-     * @return All authorities
+     * @return All roles
      */
     @Transactional(readOnly = true)
     public List<Role> getAll() {

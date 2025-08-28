@@ -2,11 +2,11 @@ package api.controllers.users;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import api.dtos.ErrorDto;
 import api.dtos.RoleDto;
+import api.entities.Role;
 import api.entities.User;
 import api.mapper.RoleMapper;
 import api.services.RoleService;
@@ -79,11 +80,11 @@ public class UserRoleController {
         ),
     })
     // endregion
-    @Transactional(readOnly = true)
     @GetMapping("")
     @PreAuthorize("hasAuthority('USER_READ') and hasAuthority('ROLE_READ')")
     public List<RoleDto> getUserRoles(@PathVariable int userId) {
-        return userService.get(userId).getRoles().stream()
+        Set<Role> roles = userService.getRoles(userId);
+        return roles.stream()
             .map(roleMapper::toDto)
             .collect(Collectors.toList());
     }
@@ -128,13 +129,14 @@ public class UserRoleController {
         ),
     })
     // endregion
-    @Transactional(readOnly = true)
     @PostMapping("")
     @PreAuthorize("hasAuthority('USER_WRITE') and hasAuthority('ROLE_READ')")
     public List<RoleDto> setUserRoles(@PathVariable int userId, @RequestBody List<Integer> roleIds) {
         User user = userService.get(userId);
         user.setRoles(new HashSet<>(roleService.get(roleIds)));
-        return userService.save(user).getRoles().stream()
+        userService.save(user);
+
+        return userService.getRoles(userId).stream()
             .map(roleMapper::toDto)
             .collect(Collectors.toList());
     }
@@ -181,13 +183,17 @@ public class UserRoleController {
         ),
     })
     // endregion
-    @Transactional(readOnly = true)
     @PutMapping("")
     @PreAuthorize("hasAuthority('USER_READ') and hasAuthority('USER_WRITE') and hasAuthority('ROLE_READ')")
     public List<RoleDto> addUserRoles(@PathVariable int userId, @RequestBody List<Integer> roleIds) {
+        Set<Role> roles = userService.getRoles(userId);
+        roles.addAll(roleService.get(roleIds));
+
         User user = userService.get(userId);
-        user.getRoles().addAll(roleService.get(roleIds));
-        return userService.save(user).getRoles().stream()
+        user.setRoles(roles);
+        userService.save(user);
+
+        return userService.getRoles(userId).stream()
             .map(roleMapper::toDto)
             .collect(Collectors.toList());
     }
@@ -232,13 +238,17 @@ public class UserRoleController {
         ),
     })
     // endregion
-    @Transactional(readOnly = true)
     @DeleteMapping("")
     @PreAuthorize("hasAuthority('USER_READ') and hasAuthority('USER_WRITE') and hasAuthority('ROLE_READ')")
     public List<RoleDto> removeUserRoles(@PathVariable int userId, @RequestBody List<Integer> roleIds) {
+        Set<Role> roles = userService.getRoles(userId);
+        roles.removeAll(roleService.get(roleIds));
+
         User user = userService.get(userId);
-        user.getRoles().removeAll(roleService.get(roleIds));
-        return userService.save(user).getRoles().stream()
+        user.setRoles(roles);
+        userService.save(user);
+
+        return userService.getRoles(userId).stream()
             .map(roleMapper::toDto)
             .collect(Collectors.toList());
     }

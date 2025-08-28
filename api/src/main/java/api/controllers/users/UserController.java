@@ -1,7 +1,6 @@
 package api.controllers.users;
 
 import java.util.List;
-import java.util.Objects;
 
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +11,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import api.dtos.ErrorDto;
 import api.dtos.UserDto;
 import api.entities.User;
-import api.exceptions.DuplicateEntityException;
 import api.mapper.UserMapper;
 import api.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -77,7 +73,6 @@ public class UserController {
         ),
     })
     // endregion
-    @Transactional(readOnly = true)
     @GetMapping("/me")
     public UserDto getMe(@AuthenticationPrincipal User user) {
         return userMapper.toDto(user);
@@ -123,22 +118,9 @@ public class UserController {
         ),
     })
     // endregion
-    @Transactional
     @PutMapping("/me")
     public UserDto updateMe(@AuthenticationPrincipal User user, @RequestBody UserDto userDto) {
-        if (userDto.getUsername() != null && !StringUtils.hasText(userDto.getUsername())) {
-            throw new IllegalArgumentException("Username must not be empty.");
-        }
-
-        if (StringUtils.hasText(userDto.getUsername())
-            && !Objects.equals(userDto.getUsername(), user.getUsername())
-            && userService.exists(userDto.getUsername())
-        ) {
-            throw new DuplicateEntityException("Username '" + userDto.getUsername() + "' already exists.");
-        }
-
-        userMapper.update(user, userDto);
-        return userMapper.toDto(userService.save(user));
+        return userMapper.toDto(userService.update(user, userDto));
     }
 
     /**
@@ -165,7 +147,6 @@ public class UserController {
         ),
     })
     // endregion
-    @Transactional
     @PutMapping("/me/password")
     public void updateMyPassword(@AuthenticationPrincipal User user, @RequestBody String password) {
         if (encoder.matches(password, user.getPassword())) {
@@ -192,7 +173,6 @@ public class UserController {
         ),
     })
     // endregion
-    @Transactional
     @DeleteMapping("/me")
     public void deleteMe(@AuthenticationPrincipal User user) {
         userService.delete(user);
@@ -230,7 +210,6 @@ public class UserController {
         ),
     })
     // endregion
-    @Transactional(readOnly = true)
     @GetMapping("")
     @PreAuthorize("hasAuthority('USER_READ')")
     public List<UserDto> getUsers(
@@ -281,7 +260,6 @@ public class UserController {
         ),
     })
     // endregion
-    @Transactional(readOnly = true)
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('USER_READ')")
     public UserDto getUser(@PathVariable int id) {
@@ -337,25 +315,10 @@ public class UserController {
         ),
     })
     // endregion
-    @Transactional
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('USER_READ') and hasAuthority('USER_WRITE')")
     public UserDto updateUser(@PathVariable int id, @RequestBody UserDto userDto) {
-        if (userDto.getUsername() != null && !StringUtils.hasText(userDto.getUsername())) {
-            throw new IllegalArgumentException("Username must not be empty.");
-        }
-
-        User user = userService.get(id);
-        if (StringUtils.hasText(userDto.getUsername())
-            && !Objects.equals(userDto.getUsername(), user.getUsername())
-            && userService.exists(userDto.getUsername())
-        ) {
-            throw new DuplicateEntityException("Username '" + userDto.getUsername() + "' already exists.");
-        }
-
-        userMapper.update(user, userDto);
-        userService.save(user);
-        return userMapper.toDto(user);
+        return userMapper.toDto(userService.update(id, userDto));
     }
 
     /**
@@ -388,7 +351,6 @@ public class UserController {
         ),
     })
     // endregion
-    @Transactional
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('USER_WRITE')")
     public void deleteUser(@PathVariable int id) {

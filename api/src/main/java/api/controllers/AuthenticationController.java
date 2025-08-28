@@ -7,7 +7,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -70,7 +69,6 @@ public class AuthenticationController {
         ),
     })
     // endregion
-    @Transactional(readOnly = true)
     @PostMapping("/login")
     public AuthenticationDto login(@RequestBody LoginDto login) {
         Authentication authentication = authenticationManager.authenticate(
@@ -114,7 +112,6 @@ public class AuthenticationController {
         ),
     })
     // endregion
-    @Transactional
     @PostMapping("/register")
     public AuthenticationDto register(@RequestBody RegisterDto register) {
         if (!StringUtils.hasText(register.getUsername())) {

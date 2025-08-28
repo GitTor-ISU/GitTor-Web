@@ -2,8 +2,6 @@ package api.controllers.users;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Set;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,7 +11,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -52,13 +49,6 @@ public class UserAvatarController {
     @Value("${api.avatar.max:5000000}")
     private long maxSize;
 
-    private static final Set<MediaType> ALLOWED_TYPES = Set.of(
-        MediaType.IMAGE_PNG,
-        MediaType.IMAGE_JPEG,
-        MediaType.parseMediaType("image/svg+xml"),
-        MediaType.IMAGE_GIF
-    );
-
     /**
      * Get my avatar.
      *
@@ -90,7 +80,6 @@ public class UserAvatarController {
         ),
     })
     // endregion
-    @Transactional(readOnly = true)
     @GetMapping("/me/avatar")
     public ResponseEntity<Resource> getMyAvatar(@AuthenticationPrincipal User user) throws IOException {
         S3Object s3Object = user.getAvatar();
@@ -138,37 +127,12 @@ public class UserAvatarController {
         ),
     })
     // endregion
-    @Transactional
     @PutMapping("/me/avatar")
     public void updateMyAvatar(
         @AuthenticationPrincipal User user,
         @RequestParam("file") MultipartFile file
     ) throws IOException {
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("File must not be empty.");
-        }
-        if (file.getSize() > maxSize) {
-            throw new IllegalArgumentException("File size exceeds limit (" + maxSize + " bytes).");
-        }
-        String contentType = file.getContentType();
-        if (contentType == null || !ALLOWED_TYPES.contains(MediaType.parseMediaType(contentType))) {
-            throw new IllegalArgumentException("Only PNG, JPEG, SVG and GIF images are allowed.");
-        }
-
-        final S3Object oldAvatar = user.getAvatar();
-        S3Object newAvatar = S3Object.builder()
-            .key(S3ObjectService.AVATAR_DIR + user.getId() + "_" + UUID.randomUUID())
-            .size(file.getSize())
-            .mediaType(contentType)
-            .build();
-
-        s3ObjectService.save(newAvatar, file.getInputStream());
-        user.setAvatar(newAvatar);
-        userService.save(user);
-
-        if (oldAvatar != null) {
-            s3ObjectService.delete(oldAvatar);
-        }
+        userService.updateAvatar(user, file);
     }
 
     /**
@@ -198,17 +162,9 @@ public class UserAvatarController {
         ),
     })
     // endregion
-    @Transactional
     @DeleteMapping("/me/avatar")
     public void deleteMyAvatar(@AuthenticationPrincipal User user) {
-        S3Object s3Object = user.getAvatar();
-        if (s3Object == null) {
-            throw new EntityNotFoundException("User '" + user.getUsername() +  "' avatar not found.");
-        }
-
-        user.setAvatar(null);
-        userService.save(user);
-        s3ObjectService.delete(s3Object);
+        userService.deleteAvatar(user);
     }
 
 
@@ -243,7 +199,6 @@ public class UserAvatarController {
         ),
     })
     // endregion
-    @Transactional(readOnly = true)
     @GetMapping("/{userId}/avatar")
     @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<Resource> getUserAvatar(@PathVariable int userId) throws IOException {
@@ -300,39 +255,13 @@ public class UserAvatarController {
         ),
     })
     // endregion
-    @Transactional
     @PutMapping("/{userId}/avatar")
     @PreAuthorize("hasAuthority('USER_WRITE')")
     public void updateUserAvatar(
         @PathVariable int userId,
         @RequestParam("file") MultipartFile file
     ) throws IOException {
-        if (file.isEmpty()) {
-            throw new IllegalArgumentException("File must not be empty.");
-        }
-        if (file.getSize() > maxSize) {
-            throw new IllegalArgumentException("File size exceeds limit (" + maxSize + " bytes).");
-        }
-        String contentType = file.getContentType();
-        if (contentType == null || !ALLOWED_TYPES.contains(MediaType.parseMediaType(contentType))) {
-            throw new IllegalArgumentException("Only PNG, JPEG, SVG and GIF images are allowed.");
-        }
-
-        User user = userService.get(userId);
-        final S3Object oldAvatar = user.getAvatar();
-        S3Object newAvatar = S3Object.builder()
-            .key(S3ObjectService.AVATAR_DIR + user.getId() + "_" + UUID.randomUUID())
-            .size(file.getSize())
-            .mediaType(contentType)
-            .build();
-
-        s3ObjectService.save(newAvatar, file.getInputStream());
-        user.setAvatar(newAvatar);
-        userService.save(user);
-
-        if (oldAvatar != null) {
-            s3ObjectService.delete(oldAvatar);
-        }
+        userService.updateAvatar(userId, file);
     }
 
     /**
@@ -364,18 +293,9 @@ public class UserAvatarController {
         ),
     })
     // endregion
-    @Transactional
     @DeleteMapping("/{userId}/avatar")
     @PreAuthorize("hasAuthority('USER_WRITE')")
     public void deleteUserAvatar(@PathVariable int userId) {
-        User user = userService.get(userId);
-        S3Object s3Object = user.getAvatar();
-        if (s3Object == null) {
-            throw new EntityNotFoundException("User '" + user.getUsername() +  "' avatar not found.");
-        }
-
-        user.setAvatar(null);
-        userService.save(user);
-        s3ObjectService.delete(s3Object);
+        userService.deleteAvatar(userId);
     }
 }
