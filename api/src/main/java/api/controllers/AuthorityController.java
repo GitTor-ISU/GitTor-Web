@@ -43,9 +43,6 @@ public class AuthorityController {
      *
      * @return {@link List} of {@link AuthorityDto}
      */
-    @Transactional(readOnly = true)
-    @GetMapping("")
-    @PreAuthorize("hasAuthority('AUTHORITY_READ')")
     // region
     @Operation(
         summary = "Get Authorities",
@@ -68,6 +65,9 @@ public class AuthorityController {
         ),
     })
     // endregion
+    @Transactional(readOnly = true)
+    @GetMapping("")
+    @PreAuthorize("hasAuthority('AUTHORITY_READ')")
     public List<AuthorityDto> getAuthorities() {
         return authorityService.getAll().stream()
             .map(authorityMapper::toDto)
@@ -80,9 +80,6 @@ public class AuthorityController {
      * @param id Authority id
      * @return {@link AuthorityDto}
      */
-    @Transactional(readOnly = true)
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('AUTHORITY_READ')")
     // region
     @Operation(
         summary = "Get Authority",
@@ -112,6 +109,9 @@ public class AuthorityController {
         ),
     })
     // endregion
+    @Transactional(readOnly = true)
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('AUTHORITY_READ')")
     public AuthorityDto getAuthority(@PathVariable int id) {
         return authorityMapper.toDto(authorityService.get(id));
     }

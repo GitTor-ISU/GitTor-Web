@@ -66,8 +66,6 @@ public class UserAvatarController {
      * @return {@link ResponseEntity} {@link Resource}
      * @throws IOException Failed to read file
      */
-    @Transactional(readOnly = true)
-    @GetMapping("/me/avatar")
     // region
     @Operation(
         summary = "Get My Avatar",
@@ -92,6 +90,8 @@ public class UserAvatarController {
         ),
     })
     // endregion
+    @Transactional(readOnly = true)
+    @GetMapping("/me/avatar")
     public ResponseEntity<Resource> getMyAvatar(@AuthenticationPrincipal User user) throws IOException {
         S3Object s3Object = user.getAvatar();
         if (s3Object == null) {
@@ -116,8 +116,6 @@ public class UserAvatarController {
      * @param file Avatar
      * @throws IOException Failed to read file
      */
-    @Transactional
-    @PutMapping("/me/avatar")
     // region
     @Operation(
         summary = "Update My Avatar",
@@ -140,6 +138,8 @@ public class UserAvatarController {
         ),
     })
     // endregion
+    @Transactional
+    @PutMapping("/me/avatar")
     public void updateMyAvatar(
         @AuthenticationPrincipal User user,
         @RequestParam("file") MultipartFile file
@@ -176,8 +176,6 @@ public class UserAvatarController {
      *
      * @param user User
      */
-    @Transactional
-    @DeleteMapping("/me/avatar")
     // region
     @Operation(
         summary = "Delete My Avatar",
@@ -200,6 +198,8 @@ public class UserAvatarController {
         ),
     })
     // endregion
+    @Transactional
+    @DeleteMapping("/me/avatar")
     public void deleteMyAvatar(@AuthenticationPrincipal User user) {
         S3Object s3Object = user.getAvatar();
         if (s3Object == null) {
@@ -219,9 +219,6 @@ public class UserAvatarController {
      * @return User's avatar
      * @throws IOException Failed to read file
      */
-    @Transactional(readOnly = true)
-    @GetMapping("/{userId}/avatar")
-    @PreAuthorize("hasAuthority('USER_READ')")
     // region
     @Operation(
         summary = "Get User's Avatar",
@@ -246,6 +243,9 @@ public class UserAvatarController {
         ),
     })
     // endregion
+    @Transactional(readOnly = true)
+    @GetMapping("/{userId}/avatar")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<Resource> getUserAvatar(@PathVariable int userId) throws IOException {
         User user = userService.get(userId);
         S3Object s3Object = user.getAvatar();
@@ -271,9 +271,6 @@ public class UserAvatarController {
      * @param file User's avatar
      * @throws IOException Failed to read file
      */
-    @Transactional
-    @PutMapping("/{userId}/avatar")
-    @PreAuthorize("hasAuthority('USER_WRITE')")
     // region
     @Operation(
         summary = "Update User's Avatar",
@@ -303,6 +300,9 @@ public class UserAvatarController {
         ),
     })
     // endregion
+    @Transactional
+    @PutMapping("/{userId}/avatar")
+    @PreAuthorize("hasAuthority('USER_WRITE')")
     public void updateUserAvatar(
         @PathVariable int userId,
         @RequestParam("file") MultipartFile file
@@ -340,9 +340,6 @@ public class UserAvatarController {
      *
      * @param userId User id
      */
-    @Transactional
-    @DeleteMapping("/{userId}/avatar")
-    @PreAuthorize("hasAuthority('USER_WRITE')")
     // region
     @Operation(
         summary = "Delete User's Avatar",
@@ -367,6 +364,9 @@ public class UserAvatarController {
         ),
     })
     // endregion
+    @Transactional
+    @DeleteMapping("/{userId}/avatar")
+    @PreAuthorize("hasAuthority('USER_WRITE')")
     public void deleteUserAvatar(@PathVariable int userId) {
         User user = userService.get(userId);
         S3Object s3Object = user.getAvatar();

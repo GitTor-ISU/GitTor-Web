@@ -23,7 +23,6 @@ public class HeartbeatController {
      *
      * @return true
      */
-    @GetMapping("")
     // region
     @Operation(
         summary = "Heartbeat",
@@ -39,6 +38,7 @@ public class HeartbeatController {
         ),
     })
     // endregion
+    @GetMapping("")
     public boolean heartbeat() {
         return true;
     }

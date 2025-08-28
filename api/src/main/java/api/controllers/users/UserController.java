@@ -62,8 +62,6 @@ public class UserController {
      * @param user User
      * @return {@link UserDto}
      */
-    @Transactional(readOnly = true)
-    @GetMapping("/me")
     // region
     @Operation(
         summary = "Get Me",
@@ -79,6 +77,8 @@ public class UserController {
         ),
     })
     // endregion
+    @Transactional(readOnly = true)
+    @GetMapping("/me")
     public UserDto getMe(@AuthenticationPrincipal User user) {
         return userMapper.toDto(user);
     }
@@ -90,8 +90,6 @@ public class UserController {
      * @param userDto Updated info
      * @return {@link UserDto}
      */
-    @Transactional
-    @PutMapping("/me")
     // region
     @Operation(
         summary = "Update Me",
@@ -125,6 +123,8 @@ public class UserController {
         ),
     })
     // endregion
+    @Transactional
+    @PutMapping("/me")
     public UserDto updateMe(@AuthenticationPrincipal User user, @RequestBody UserDto userDto) {
         if (userDto.getUsername() != null && !StringUtils.hasText(userDto.getUsername())) {
             throw new IllegalArgumentException("Username must not be empty.");
@@ -147,8 +147,6 @@ public class UserController {
      * @param user User
      * @param password New password
      */
-    @Transactional
-    @PutMapping("/me/password")
     // region
     @Operation(
         summary = "Update My Password",
@@ -167,6 +165,8 @@ public class UserController {
         ),
     })
     // endregion
+    @Transactional
+    @PutMapping("/me/password")
     public void updateMyPassword(@AuthenticationPrincipal User user, @RequestBody String password) {
         if (encoder.matches(password, user.getPassword())) {
             throw new IllegalArgumentException("New password matches existing password.");
@@ -181,8 +181,6 @@ public class UserController {
      *
      * @param user User
      */
-    @Transactional
-    @DeleteMapping("/me")
     // region
     @Operation(
         summary = "Delete Me",
@@ -194,6 +192,8 @@ public class UserController {
         ),
     })
     // endregion
+    @Transactional
+    @DeleteMapping("/me")
     public void deleteMe(@AuthenticationPrincipal User user) {
         userService.delete(user);
     }
@@ -205,9 +205,6 @@ public class UserController {
      * @param size Page size
      * @return {@link List} of {@link UserDto}
      */
-    @Transactional(readOnly = true)
-    @GetMapping("")
-    @PreAuthorize("hasAuthority('USER_READ')")
     // region
     @Operation(
         summary = "Get Users",
@@ -233,6 +230,9 @@ public class UserController {
         ),
     })
     // endregion
+    @Transactional(readOnly = true)
+    @GetMapping("")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public List<UserDto> getUsers(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(required = false) Integer size
@@ -252,9 +252,6 @@ public class UserController {
      * @param id User id
      * @return {@link UserDto}
      */
-    @Transactional(readOnly = true)
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('USER_READ')")
     // region
     @Operation(
         summary = "Get User",
@@ -284,6 +281,9 @@ public class UserController {
         ),
     })
     // endregion
+    @Transactional(readOnly = true)
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public UserDto getUser(@PathVariable int id) {
         User user = userService.get(id);
         Hibernate.initialize(user);
@@ -297,9 +297,6 @@ public class UserController {
      * @param userDto Updated info
      * @return {@link UserDto}
      */
-    @Transactional
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('USER_READ') and hasAuthority('USER_WRITE')")
     // region
     @Operation(
         summary = "Update User",
@@ -340,6 +337,9 @@ public class UserController {
         ),
     })
     // endregion
+    @Transactional
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER_READ') and hasAuthority('USER_WRITE')")
     public UserDto updateUser(@PathVariable int id, @RequestBody UserDto userDto) {
         if (userDto.getUsername() != null && !StringUtils.hasText(userDto.getUsername())) {
             throw new IllegalArgumentException("Username must not be empty.");
@@ -363,9 +363,6 @@ public class UserController {
      *
      * @param id User id
      */
-    @Transactional
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('USER_WRITE')")
     // region
     @Operation(
         summary = "Delete User",
@@ -391,6 +388,9 @@ public class UserController {
         ),
     })
     // endregion
+    @Transactional
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER_WRITE')")
     public void deleteUser(@PathVariable int id) {
         userService.delete(id);
     }
