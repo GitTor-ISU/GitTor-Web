@@ -51,9 +51,7 @@ public class RoleController {
      *
      * @return {@link List} of {@link RoleDto}
      */
-    @Transactional(readOnly = true)
-    @GetMapping("")
-    @PreAuthorize("hasAuthority('ROLE_READ')")
+    // region
     @Operation(
         summary = "Get Roles",
         description = "Get list of all role's information."
@@ -74,6 +72,10 @@ public class RoleController {
             )
         ),
     })
+    // endregion
+    @Transactional(readOnly = true)
+    @GetMapping("")
+    @PreAuthorize("hasAuthority('ROLE_READ')")
     public List<RoleDto> getRoles() {
         return roleService.getAll().stream()
             .map(roleMapper::toDto)
@@ -86,9 +88,7 @@ public class RoleController {
      * @param id Role id
      * @return {@link RoleDto}
      */
-    @Transactional(readOnly = true)
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_READ')")
+    // region
     @Operation(
         summary = "Get Role",
         description = "Get specific role's information."
@@ -116,6 +116,10 @@ public class RoleController {
             )
         ),
     })
+    // endregion
+    @Transactional(readOnly = true)
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_READ')")
     public RoleDto getRole(@PathVariable int id) {
         return roleMapper.toDto(roleService.get(id));
     }
@@ -126,9 +130,7 @@ public class RoleController {
      * @param roleDto Role
      * @return {@link RoleDto}
      */
-    @Transactional
-    @PostMapping("")
-    @PreAuthorize("hasAuthority('ROLE_WRITE')")
+    // region
     @Operation(
         summary = "Create Role",
         description = "Create a new role."
@@ -167,6 +169,10 @@ public class RoleController {
             )
         ),
     })
+    // endregion
+    @Transactional
+    @PostMapping("")
+    @PreAuthorize("hasAuthority('ROLE_WRITE')")
     public RoleDto createRole(@RequestBody RoleDto roleDto) {
         if (!StringUtils.hasText(roleDto.getName())) {
             throw new IllegalArgumentException("Role name must not be empty.");
@@ -184,9 +190,7 @@ public class RoleController {
      * @param roleDto Updated information
      * @return {@link RoleDto}
      */
-    @Transactional
-    @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_READ') and hasAuthority('ROLE_WRITE')")
+    // region
     @Operation(
         summary = "Update Role",
         description = "Update a specific role."
@@ -234,6 +238,10 @@ public class RoleController {
             )
         ),
     })
+    // endregion
+    @Transactional
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_READ') and hasAuthority('ROLE_WRITE')")
     public RoleDto updateRole(@PathVariable int id, @RequestBody RoleDto roleDto) {
         if (roleDto.getName() != null && !StringUtils.hasText(roleDto.getName())) {
             throw new IllegalArgumentException("Role name must not be empty.");
@@ -256,9 +264,7 @@ public class RoleController {
      *
      * @param id Role id
      */
-    @Transactional
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_WRITE')")
+    // region
     @Operation(
         summary = "Delete Role",
         description = "Delete a specific role."
@@ -282,6 +288,10 @@ public class RoleController {
             )
         ),
     })
+    // endregion
+    @Transactional
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_WRITE')")
     public void deleteRole(@PathVariable int id) {
         roleService.delete(id);
     }

@@ -50,9 +50,7 @@ public class UserRoleController {
      * @param userId User id
      * @return {@link List} of {@link RoleDto}
      */
-    @Transactional(readOnly = true)
-    @GetMapping("")
-    @PreAuthorize("hasAuthority('USER_READ') and hasAuthority('ROLE_READ')")
+    // region
     @Operation(
         summary = "Get User's Roles",
         description = "Get list of roles applied to a user."
@@ -80,6 +78,10 @@ public class UserRoleController {
             )
         ),
     })
+    // endregion
+    @Transactional(readOnly = true)
+    @GetMapping("")
+    @PreAuthorize("hasAuthority('USER_READ') and hasAuthority('ROLE_READ')")
     public List<RoleDto> getUserRoles(@PathVariable int userId) {
         return userService.get(userId).getRoles().stream()
             .map(roleMapper::toDto)
@@ -94,9 +96,7 @@ public class UserRoleController {
      * @return {@link List} of {@link RoleDto}
      * @apiNote Does not throw error if roles not found
      */
-    @Transactional(readOnly = true)
-    @PostMapping("")
-    @PreAuthorize("hasAuthority('USER_WRITE') and hasAuthority('ROLE_READ')")
+    // region
     @Operation(
         summary = "Set User's Roles",
         description = "Set list of roles applied to a user."
@@ -127,6 +127,10 @@ public class UserRoleController {
             )
         ),
     })
+    // endregion
+    @Transactional(readOnly = true)
+    @PostMapping("")
+    @PreAuthorize("hasAuthority('USER_WRITE') and hasAuthority('ROLE_READ')")
     public List<RoleDto> setUserRoles(@PathVariable int userId, @RequestBody List<Integer> roleIds) {
         User user = userService.get(userId);
         user.setRoles(new HashSet<>(roleService.get(roleIds)));
@@ -144,9 +148,7 @@ public class UserRoleController {
      * @apiNote Does not throw error if user already has specified role
      * @apiNote Does not throw error if roles not found
      */
-    @Transactional(readOnly = true)
-    @PutMapping("")
-    @PreAuthorize("hasAuthority('USER_READ') and hasAuthority('USER_WRITE') and hasAuthority('ROLE_READ')")
+    // region
     @Operation(
         summary = "Add User's Roles",
         description = "Add list of roles applied to a user."
@@ -178,6 +180,10 @@ public class UserRoleController {
             )
         ),
     })
+    // endregion
+    @Transactional(readOnly = true)
+    @PutMapping("")
+    @PreAuthorize("hasAuthority('USER_READ') and hasAuthority('USER_WRITE') and hasAuthority('ROLE_READ')")
     public List<RoleDto> addUserRoles(@PathVariable int userId, @RequestBody List<Integer> roleIds) {
         User user = userService.get(userId);
         user.getRoles().addAll(roleService.get(roleIds));
@@ -194,9 +200,7 @@ public class UserRoleController {
      * @return {@link List} of {@link RoleDto}
      * @apiNote Does not throw error if user does not have specified role
      */
-    @Transactional(readOnly = true)
-    @DeleteMapping("")
-    @PreAuthorize("hasAuthority('USER_READ') and hasAuthority('USER_WRITE') and hasAuthority('ROLE_READ')")
+    // region
     @Operation(
         summary = "Remove User's Roles",
         description = "Remove list of roles applied to a user."
@@ -227,6 +231,10 @@ public class UserRoleController {
             )
         ),
     })
+    // endregion
+    @Transactional(readOnly = true)
+    @DeleteMapping("")
+    @PreAuthorize("hasAuthority('USER_READ') and hasAuthority('USER_WRITE') and hasAuthority('ROLE_READ')")
     public List<RoleDto> removeUserRoles(@PathVariable int userId, @RequestBody List<Integer> roleIds) {
         User user = userService.get(userId);
         user.getRoles().removeAll(roleService.get(roleIds));

@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -26,6 +28,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import api.controllers.AuthenticationController;
 import api.controllers.BasicControllerTest;
@@ -49,99 +52,8 @@ public class UserAvatarControllerTest extends BasicControllerTest {
     @Autowired
     private S3ObjectService s3ObjectService;
 
-    /**
-     * {@link UserAvatarController#updateMyAvatar} test.
-     */
-    @Nested
-    public class UpdateMyAvatar {
-        private static final String ENDPOINT = "/users/me/avatar";
-
-        @ParameterizedTest
-        @CsvSource({".png", ".jpeg", ".jpg", ".gif", ".svg"})
-        public void shouldUpdateMyAvatar(String extension) {
-            // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
-
-            // GIVEN: JWT authentication
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(auth.getAccessToken());
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-            // GIVEN: Avatar photo
-            byte[] content = "fake-image-content".getBytes(StandardCharsets.UTF_8);
-            ByteArrayResource avatar = new ByteArrayResource(content) {
-                @Override
-                public String getFilename() {
-                    return "avatar" + extension;
-                }
-            };
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("file", avatar);
-            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
-
-            // WHEN: Update my avatar
-            ResponseEntity<String> responseEntity = testRestTemplate.exchange(
-                url + ENDPOINT, HttpMethod.PUT, request, new ParameterizedTypeReference<String>() {}
-            );
-
-            // THEN: Returns nothing and file is in storage
-            assertAll(
-                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
-                () -> assertNull(responseEntity.getBody())
-            );
-        }
-
-        @ParameterizedTest
-        @CsvSource({".csv", ".txt", ".xml"})
-        public void should400_whenMediaTypeInvalid(String extension) {
-            // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
-
-            // GIVEN: JWT authentication
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(auth.getAccessToken());
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-            // GIVEN: Avatar photo
-            byte[] content = "fake-image-content".getBytes(StandardCharsets.UTF_8);
-            ByteArrayResource avatar = new ByteArrayResource(content) {
-                @Override
-                public String getFilename() {
-                    return "avatar" + extension;
-                }
-            };
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("file", avatar);
-            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
-
-            // WHEN: Update my avatar
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                url + ENDPOINT, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
-
-            // THEN: Responds bad request
-            assertAll(
-                () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
-                () -> assertNotNull(responseEntity.getBody()),
-                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals(
-                    "Only PNG, JPEG, SVG and GIF images are allowed.", responseEntity.getBody().getMessage()
-                )
-            );
-        }
-    }
+    @Value("${api.avatar.max:5000000}")
+    private long maxSize;
 
     /**
      * {@link UserAvatarController#getMyAvatar} test.
@@ -237,14 +149,14 @@ public class UserAvatarControllerTest extends BasicControllerTest {
 
             // GIVEN: Avatar photo
             byte[] oldContent = "old-image-content".getBytes(StandardCharsets.UTF_8);
-            ByteArrayResource oldAvatar = new ByteArrayResource(oldContent) {
+            ByteArrayResource avatar = new ByteArrayResource(oldContent) {
                 @Override
                 public String getFilename() {
                     return "avatar" + extension;
                 }
             };
             MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("file", oldAvatar);
+            body.add("file", avatar);
             HttpEntity<MultiValueMap<String, Object>> putRequest = new HttpEntity<>(body, putHeaders);
 
             // GIVEN: Updated avatar to old photo
@@ -254,14 +166,14 @@ public class UserAvatarControllerTest extends BasicControllerTest {
 
             // GIVEN: Update avatar photo
             byte[] newContent = "new-image-content".getBytes(StandardCharsets.UTF_8);
-            ByteArrayResource newAvatar = new ByteArrayResource(newContent) {
+            avatar = new ByteArrayResource(newContent) {
                 @Override
                 public String getFilename() {
                     return "avatar" + extension;
                 }
             };
             body = new LinkedMultiValueMap<>();
-            body.add("file", newAvatar);
+            body.add("file", avatar);
             putRequest = new HttpEntity<>(body, putHeaders);
 
             // GIVEN: Updated avatar to new photo
@@ -318,6 +230,194 @@ public class UserAvatarControllerTest extends BasicControllerTest {
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
                 () -> assertEquals("User '" + username + "' avatar not found.", responseEntity.getBody().getMessage())
+            );
+        }
+    }
+
+    /**
+     * {@link UserAvatarController#updateMyAvatar} test.
+     */
+    @Nested
+    public class UpdateMyAvatar {
+        private static final String ENDPOINT = "/users/me/avatar";
+
+        @ParameterizedTest
+        @CsvSource({".png", ".jpeg", ".jpg", ".gif", ".svg"})
+        public void shouldUpdateMyAvatar(String extension) {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            AuthenticationDto auth = authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: JWT authentication
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(auth.getAccessToken());
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            // GIVEN: Avatar photo
+            byte[] content = "fake-image-content".getBytes(StandardCharsets.UTF_8);
+            ByteArrayResource avatar = new ByteArrayResource(content) {
+                @Override
+                public String getFilename() {
+                    return "avatar" + extension;
+                }
+            };
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", avatar);
+            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+
+            // WHEN: Update my avatar
+            ResponseEntity<String> responseEntity = testRestTemplate.exchange(
+                url + ENDPOINT, HttpMethod.PUT, request, new ParameterizedTypeReference<String>() {}
+            );
+
+            // THEN: Returns nothing and file is in storage
+            User user = userService.get(username);
+            S3Object avatarObject = user.getAvatar();
+            assertAll(
+                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                () -> assertNull(responseEntity.getBody()),
+                () -> assertArrayEquals(content, s3ObjectService.download(avatarObject).readAllBytes())
+            );
+        }
+
+        @ParameterizedTest
+        @CsvSource({".csv", ".txt", ".xml", "''"})
+        public void should400_whenMediaTypeInvalid(String extension) {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            AuthenticationDto auth = authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: JWT authentication
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(auth.getAccessToken());
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            // GIVEN: Avatar photo
+            byte[] content = "fake-image-content".getBytes(StandardCharsets.UTF_8);
+            ByteArrayResource avatar = new ByteArrayResource(content) {
+                @Override
+                public String getFilename() {
+                    return "avatar" + extension;
+                }
+            };
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", avatar);
+            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+
+            // WHEN: Update my avatar
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                url + ENDPOINT, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds bad request
+            assertAll(
+                () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals(
+                    "Only PNG, JPEG, SVG and GIF images are allowed.", responseEntity.getBody().getMessage()
+                )
+            );
+        }
+
+        @ParameterizedTest
+        @CsvSource({".png", ".jpeg", ".jpg", ".gif", ".svg"})
+        public void should400_whenFileNull(String extension) {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            AuthenticationDto auth = authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: JWT authentication
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(auth.getAccessToken());
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            // GIVEN: Empty avatar photo
+            byte[] content = "".getBytes(StandardCharsets.UTF_8);
+            ByteArrayResource avatar = new ByteArrayResource(content) {
+                @Override
+                public String getFilename() {
+                    return "avatar" + extension;
+                }
+            };
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", avatar);
+            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+
+            // WHEN: Update my avatar
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                url + ENDPOINT, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds bad request
+            assertAll(
+                () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals(
+                    "File must not be empty.", responseEntity.getBody().getMessage()
+                )
+            );
+        }
+
+        @ParameterizedTest
+        @CsvSource({".png", ".jpeg", ".jpg", ".gif", ".svg"})
+        public void should400_whenTooLarge(String extension) {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            AuthenticationDto auth = authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: JWT authentication
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(auth.getAccessToken());
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            // GIVEN: Max size avatar photo
+            int size = (int) (maxSize + 1);
+            byte[] content = new byte[size];
+            ByteArrayResource avatar = new ByteArrayResource(content) {
+                @Override
+                public String getFilename() {
+                    return "avatar" + extension;
+                }
+            };
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", avatar);
+            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+
+            // WHEN: Update my avatar
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                url + ENDPOINT, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds bad request
+            assertAll(
+                () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals(
+                    "File size exceeds limit (" + maxSize + " bytes).", responseEntity.getBody().getMessage()
+                )
             );
         }
     }
@@ -459,6 +559,759 @@ public class UserAvatarControllerTest extends BasicControllerTest {
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
                 () -> assertEquals("User '" + username + "' avatar not found.", responseEntity.getBody().getMessage())
+            );
+        }
+    }
+
+    /**
+     * {@link UserAvatarController#getUserAvatar} test.
+     */
+    @Nested
+    public class GetUserAvatar {
+        private static final String ENDPOINT = "/users/{userId}/avatar";
+
+        @ParameterizedTest
+        @CsvSource({
+            ".png, image/png",
+            ".jpeg, image/jpeg",
+            ".jpg, image/jpeg",
+            ".gif, image/gif",
+            ".svg, image/svg+xml"
+        })
+        public void shouldGetUserAvatar(String extension, String expectedMediaType) {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            AuthenticationDto auth = authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: JWT authentication
+            HttpHeaders putHeaders = new HttpHeaders();
+            putHeaders.setBearerAuth(auth.getAccessToken());
+            putHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            // GIVEN: Avatar photo
+            byte[] content = "fake-image-content".getBytes(StandardCharsets.UTF_8);
+            ByteArrayResource avatar = new ByteArrayResource(content) {
+                @Override
+                public String getFilename() {
+                    return "avatar" + extension;
+                }
+            };
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", avatar);
+            HttpEntity<MultiValueMap<String, Object>> putRequest = new HttpEntity<>(body, putHeaders);
+
+            // GIVEN: Updated avatar
+            testRestTemplate.exchange(
+                url + "/users/me/avatar", HttpMethod.PUT, putRequest, new ParameterizedTypeReference<String>() {}
+            );
+
+            // GIVEN: Admin authentication header
+            HttpHeaders getHeaders = new HttpHeaders();
+            getHeaders.setBearerAuth(adminAuth.getAccessToken());
+
+            // GIVEN: New user id in path
+            User user = userService.get(username);
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(user.getId())
+                .toUri();
+
+            // WHEN: Get avatar
+            HttpEntity<Void> getRequest = new HttpEntity<>(null, getHeaders);
+            ResponseEntity<Resource> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.GET, getRequest, new ParameterizedTypeReference<Resource>() {}
+            );
+
+            // THEN: Returns avatar photo
+            assertAll(
+                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertArrayEquals(content, responseEntity.getBody().getContentAsByteArray()),
+                () -> assertEquals(
+                    MediaType.parseMediaType(expectedMediaType),
+                    responseEntity.getHeaders().getContentType()
+                )
+            );
+        }
+
+        @Test
+        public void should403_whenUnauthorized() {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            AuthenticationDto auth = authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: User authentication
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(auth.getAccessToken());
+
+            // GIVEN: New user id in path
+            User user = userService.get(username);
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(user.getId())
+                .toUri();
+
+            // WHEN: Get avatar
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.GET, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds forbidden
+            assertAll(
+                () -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage())
+            );
+        }
+
+        @Test
+        public void should404_whenAvatarNonexistent() {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+
+            // GIVEN: New user id in path
+            User user = userService.get(username);
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(user.getId())
+                .toUri();
+
+            // WHEN: Get avatar
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.GET, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds not found
+            assertAll(
+                () -> assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals("User '" + username + "' avatar not found.", responseEntity.getBody().getMessage())
+            );
+        }
+
+        @Test
+        public void should404_whenUserNonexistent() {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+
+            // GIVEN: Wrong user id in path
+            User user = userService.get(username);
+            int wrongId = user.getId() + 1;
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(wrongId)
+                .toUri();
+
+            // WHEN: Get avatar
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.GET, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds not found
+            assertAll(
+                () -> assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals("User " + wrongId + " not found.", responseEntity.getBody().getMessage())
+            );
+        }
+    }
+
+    /**
+     * {@link UserAvatarController#updateUserAvatar} test.
+     */
+    @Nested
+    public class UpdateUserAvatar {
+        private static final String ENDPOINT = "/users/{userId}/avatar";
+
+        @ParameterizedTest
+        @CsvSource({".png", ".jpeg", ".jpg", ".gif", ".svg"})
+        public void shouldUpdateUserAvatar(String extension) {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            // GIVEN: Avatar photo
+            byte[] content = "fake-image-content".getBytes(StandardCharsets.UTF_8);
+            ByteArrayResource avatar = new ByteArrayResource(content) {
+                @Override
+                public String getFilename() {
+                    return "avatar" + extension;
+                }
+            };
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", avatar);
+            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+
+            // GIVEN: New user id in path
+            User user = userService.get(username);
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(user.getId())
+                .toUri();
+
+            // WHEN: Update user avatar
+            ResponseEntity<String> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.PUT, request, new ParameterizedTypeReference<String>() {}
+            );
+
+            // THEN: Returns nothing and file is in storage
+            user = userService.get(username);
+            S3Object avatarObject = user.getAvatar();
+            assertAll(
+                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                () -> assertNull(responseEntity.getBody()),
+                () -> assertArrayEquals(content, s3ObjectService.download(avatarObject).readAllBytes())
+            );
+        }
+
+        @ParameterizedTest
+        @CsvSource({".png", ".jpeg", ".jpg", ".gif", ".svg"})
+        public void shouldReplaceOldAvatar(String extension) {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            // GIVEN: Old avatar photo
+            byte[] oldContent = "old-image-content".getBytes(StandardCharsets.UTF_8);
+            ByteArrayResource avatar = new ByteArrayResource(oldContent) {
+                @Override
+                public String getFilename() {
+                    return "avatar" + extension;
+                }
+            };
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", avatar);
+            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+
+            // GIVEN: New user id in path
+            User user = userService.get(username);
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(user.getId())
+                .toUri();
+
+            // GIVEN: Set old avatar photo
+            testRestTemplate.exchange(
+                uri, HttpMethod.PUT, request, new ParameterizedTypeReference<String>() {}
+            );
+            user = userService.get(username);
+            final S3Object oldAvatarObject = user.getAvatar();
+
+            // GIVEN: New avatar photo
+            byte[] newContent = "new-image-content".getBytes(StandardCharsets.UTF_8);
+            avatar = new ByteArrayResource(newContent) {
+                @Override
+                public String getFilename() {
+                    return "avatar" + extension;
+                }
+            };
+            body = new LinkedMultiValueMap<>();
+            body.add("file", avatar);
+            request = new HttpEntity<>(body, headers);
+
+            // WHEN: Update user avatar
+            ResponseEntity<String> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.PUT, request, new ParameterizedTypeReference<String>() {}
+            );
+
+            // THEN: Returns nothing and file is in storage
+            user = userService.get(username);
+            S3Object newAvatarObject = user.getAvatar();
+            assertAll(
+                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                () -> assertNull(responseEntity.getBody()),
+                () -> assertArrayEquals(newContent, s3ObjectService.download(newAvatarObject).readAllBytes()),
+                () -> assertThrows(StorageException.class, () -> s3ObjectService.download(oldAvatarObject))
+            );
+        }
+
+        @ParameterizedTest
+        @CsvSource({".csv", ".txt", ".xml", "''"})
+        public void should400_whenMediaTypeInvalid(String extension) {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            // GIVEN: Avatar photo
+            byte[] content = "fake-image-content".getBytes(StandardCharsets.UTF_8);
+            ByteArrayResource avatar = new ByteArrayResource(content) {
+                @Override
+                public String getFilename() {
+                    return "avatar" + extension;
+                }
+            };
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", avatar);
+            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+
+            // GIVEN: New user id in path
+            User user = userService.get(username);
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(user.getId())
+                .toUri();
+
+            // WHEN: Update user avatar
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds bad request
+            assertAll(
+                () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals(
+                    "Only PNG, JPEG, SVG and GIF images are allowed.", responseEntity.getBody().getMessage()
+                )
+            );
+        }
+
+        @ParameterizedTest
+        @CsvSource({".png", ".jpeg", ".jpg", ".gif", ".svg"})
+        public void should400_whenFileNull(String extension) {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            // GIVEN: Avatar photo
+            byte[] content = "".getBytes(StandardCharsets.UTF_8);
+            ByteArrayResource avatar = new ByteArrayResource(content) {
+                @Override
+                public String getFilename() {
+                    return "avatar" + extension;
+                }
+            };
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", avatar);
+            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+
+            // GIVEN: New user id in path
+            User user = userService.get(username);
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(user.getId())
+                .toUri();
+
+            // WHEN: Update user avatar
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds bad request
+            assertAll(
+                () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals(
+                    "File must not be empty.", responseEntity.getBody().getMessage()
+                )
+            );
+        }
+
+        @ParameterizedTest
+        @CsvSource({".png", ".jpeg", ".jpg", ".gif", ".svg"})
+        public void should400_whenTooLarge(String extension) {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            // GIVEN: Avatar photo
+            int size = (int) (maxSize + 1);
+            byte[] content = new byte[size];
+            ByteArrayResource avatar = new ByteArrayResource(content) {
+                @Override
+                public String getFilename() {
+                    return "avatar" + extension;
+                }
+            };
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", avatar);
+            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+
+            // GIVEN: New user id in path
+            User user = userService.get(username);
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(user.getId())
+                .toUri();
+
+            // WHEN: Update user avatar
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds bad request
+            assertAll(
+                () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals(
+                    "File size exceeds limit (" + maxSize + " bytes).", responseEntity.getBody().getMessage()
+                )
+            );
+        }
+
+        @Test
+        public void should403_whenUnauthorized() {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            AuthenticationDto auth = authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: User authentication
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(auth.getAccessToken());
+
+            // GIVEN: Avatar photo
+            byte[] content = "fake-image-content".getBytes(StandardCharsets.UTF_8);
+            ByteArrayResource avatar = new ByteArrayResource(content) {
+                @Override
+                public String getFilename() {
+                    return "avatar.png";
+                }
+            };
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", avatar);
+            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+
+            // GIVEN: New user id in path
+            User user = userService.get(username);
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(user.getId())
+                .toUri();
+
+            // WHEN: Update user avatar
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds forbidden
+            assertAll(
+                () -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage())
+            );
+        }
+
+        @Test
+        public void should404_whenUserNonexistent() {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+
+            // GIVEN: Avatar photo
+            byte[] content = "fake-image-content".getBytes(StandardCharsets.UTF_8);
+            ByteArrayResource avatar = new ByteArrayResource(content) {
+                @Override
+                public String getFilename() {
+                    return "avatar.png";
+                }
+            };
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", avatar);
+            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+
+            // GIVEN: Wrong user id in path
+            User user = userService.get(username);
+            int wrongId = user.getId() + 1;
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(wrongId)
+                .toUri();
+
+            // WHEN: Update user avatar
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds not found
+            assertAll(
+                () -> assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals("User " + wrongId + " not found.", responseEntity.getBody().getMessage())
+            );
+        }
+    }
+
+    /**
+     * {@link UserAvatarController#deleteUserAvatar} test.
+     */
+    @Nested
+    public class DeleteUserAvatar {
+        private static final String ENDPOINT = "/users/{userId}/avatar";
+
+        @ParameterizedTest
+        @CsvSource({".png", ".jpeg", ".jpg", ".gif", ".svg"})
+        public void shouldGetUserAvatar(String extension) {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            AuthenticationDto auth = authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: JWT authentication
+            HttpHeaders putHeaders = new HttpHeaders();
+            putHeaders.setBearerAuth(auth.getAccessToken());
+            putHeaders.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+            // GIVEN: Avatar photo
+            byte[] content = "fake-image-content".getBytes(StandardCharsets.UTF_8);
+            ByteArrayResource avatar = new ByteArrayResource(content) {
+                @Override
+                public String getFilename() {
+                    return "avatar" + extension;
+                }
+            };
+            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+            body.add("file", avatar);
+            HttpEntity<MultiValueMap<String, Object>> putRequest = new HttpEntity<>(body, putHeaders);
+
+            // GIVEN: Updated avatar
+            testRestTemplate.exchange(
+                url + "/users/me/avatar", HttpMethod.PUT, putRequest, new ParameterizedTypeReference<String>() {}
+            );
+            User user = userService.get(username);
+            S3Object avatarObject = user.getAvatar();
+
+            // GIVEN: Admin authentication header
+            HttpHeaders getHeaders = new HttpHeaders();
+            getHeaders.setBearerAuth(adminAuth.getAccessToken());
+
+            // GIVEN: New user id in path
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(user.getId())
+                .toUri();
+
+            // WHEN: Delete avatar
+            HttpEntity<Void> getRequest = new HttpEntity<>(null, getHeaders);
+            ResponseEntity<Resource> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.DELETE, getRequest, new ParameterizedTypeReference<Resource>() {}
+            );
+
+            // THEN: Deletes avatar photo
+            assertAll(
+                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                () -> assertNull(responseEntity.getBody()),
+                () -> assertThrows(StorageException.class, () -> s3ObjectService.download(avatarObject))
+            );
+        }
+
+        @Test
+        public void should403_whenUnauthorized() {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            AuthenticationDto auth = authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: User authentication
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(auth.getAccessToken());
+
+            // GIVEN: New user id in path
+            User user = userService.get(username);
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(user.getId())
+                .toUri();
+
+            // WHEN: Delete avatar
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.DELETE, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds forbidden
+            assertAll(
+                () -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage())
+            );
+        }
+
+        @Test
+        public void should404_whenAvatarNonexistent() {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+
+            // GIVEN: New user id in path
+            User user = userService.get(username);
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(user.getId())
+                .toUri();
+
+            // WHEN: Delete avatar
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.DELETE, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds not found
+            assertAll(
+                () -> assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals("User '" + username + "' avatar not found.", responseEntity.getBody().getMessage())
+            );
+        }
+
+        @Test
+        public void should404_whenUserNonexistent() {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+
+            // GIVEN: Wrong user id in path
+            User user = userService.get(username);
+            int wrongId = user.getId() + 1;
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(wrongId)
+                .toUri();
+
+            // WHEN: Delete avatar
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.DELETE, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds not found
+            assertAll(
+                () -> assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals("User " + wrongId + " not found.", responseEntity.getBody().getMessage())
             );
         }
     }

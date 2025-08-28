@@ -55,8 +55,7 @@ public class AuthenticationController {
      * @param login {@link LoginDto}
      * @return {@link AuthenticationDto}
      */
-    @Transactional(readOnly = true)
-    @PostMapping("/login")
+    // region
     @Operation(
         summary = "Login",
         description = "Login to an existing user."
@@ -70,6 +69,9 @@ public class AuthenticationController {
             )
         ),
     })
+    // endregion
+    @Transactional(readOnly = true)
+    @PostMapping("/login")
     public AuthenticationDto login(@RequestBody LoginDto login) {
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword()));
@@ -83,8 +85,7 @@ public class AuthenticationController {
      * @param register {@link RegisterDto}
      * @return {@link AuthenticationDto}
      */
-    @Transactional
-    @PostMapping("/register")
+    // region
     @Operation(
         summary = "Register",
         description = "Register a new user."
@@ -112,6 +113,9 @@ public class AuthenticationController {
             )
         ),
     })
+    // endregion
+    @Transactional
+    @PostMapping("/register")
     public AuthenticationDto register(@RequestBody RegisterDto register) {
         if (!StringUtils.hasText(register.getUsername())) {
             throw new IllegalArgumentException("Username must not be empty.");

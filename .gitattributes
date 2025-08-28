@@ -1,0 +1,6 @@
+**/containerfile linguist-language=Dockerfile
+ui/.prettierrc linguist-language=JSON
+ui/default.conf linguist-language=Nginx
+ui/tsconfig.app.json linguist-language=JSON-with-Comments
+ui/tsconfig.cy.json linguist-language=JSON-with-Comments
+ui/tsconfig.spec.json linguist-language=JSON-with-Comments
