@@ -93,7 +93,7 @@ public class UserAvatarController {
         ByteArrayResource resource = new ByteArrayResource(bytes);
 
         return ResponseEntity.ok()
-            .contentType(MediaType.parseMediaType(s3Object.getMediaType()))
+            .contentType(MediaType.parseMediaType(s3Object.getMimeType().getName()))
             .contentLength(bytes.length)
             .body(resource);
     }
@@ -214,7 +214,7 @@ public class UserAvatarController {
         ByteArrayResource resource = new ByteArrayResource(bytes);
 
         return ResponseEntity.ok()
-            .contentType(MediaType.parseMediaType(s3Object.getMediaType()))
+            .contentType(MediaType.parseMediaType(s3Object.getMimeType().getName()))
             .contentLength(bytes.length)
             .body(resource);
     }
