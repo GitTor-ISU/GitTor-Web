@@ -1,8 +1,10 @@
 package api.entities;
 
+import api.components.S3ObjectEntityListener;
 import io.micrometer.common.lang.NonNull;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -22,6 +24,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners(S3ObjectEntityListener.class)
 @Table(name = "s3objects")
 public class S3Object {
     @Id
