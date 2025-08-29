@@ -2,6 +2,7 @@ package api.entities;
 
 import org.springframework.security.core.GrantedAuthority;
 
+import io.micrometer.common.lang.NonNull;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,6 +28,7 @@ public class Authority implements GrantedAuthority {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(unique = true)
+    @NonNull
+    @Column(unique = true, nullable = false)
     private String authority;
 }

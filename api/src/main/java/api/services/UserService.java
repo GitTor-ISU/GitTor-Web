@@ -20,6 +20,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import api.dtos.UserDto;
+import api.entities.MimeType;
 import api.entities.Role;
 import api.entities.S3Object;
 import api.entities.User;
@@ -41,6 +42,8 @@ public class UserService implements UserDetailsService {
     private UserMapper userMapper;
     @Autowired
     private S3ObjectService s3ObjectService;
+    @Autowired
+    private MimeTypeService mimeTypeService;
 
     @Value("${api.avatar.max:5000000}")
     private long maxAvatarSize;
@@ -277,10 +280,11 @@ public class UserService implements UserDetailsService {
         }
 
         final S3Object oldAvatar = user.getAvatar();
+        MimeType mimeType = mimeTypeService.getOrCreateByName(contentType);
         S3Object newAvatar = S3Object.builder()
             .key(S3ObjectService.AVATAR_DIR + user.getId() + "_" + UUID.randomUUID())
             .size(avatar.getSize())
-            .mediaType(contentType)
+            .mimeType(mimeType)
             .build();
 
         s3ObjectService.save(newAvatar, avatar.getInputStream());

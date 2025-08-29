@@ -3,6 +3,7 @@ package api.entities;
 import java.util.HashSet;
 import java.util.Set;
 
+import io.micrometer.common.lang.NonNull;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -33,7 +34,8 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(unique = true)
+    @NonNull
+    @Column(unique = true, nullable = false)
     private String name;
 
     @Default
