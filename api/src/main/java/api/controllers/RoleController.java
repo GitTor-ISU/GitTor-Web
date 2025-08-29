@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -73,7 +72,6 @@ public class RoleController {
         ),
     })
     // endregion
-    @Transactional(readOnly = true)
     @GetMapping("")
     @PreAuthorize("hasAuthority('ROLE_READ')")
     public List<RoleDto> getRoles() {
@@ -117,7 +115,6 @@ public class RoleController {
         ),
     })
     // endregion
-    @Transactional(readOnly = true)
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_READ')")
     public RoleDto getRole(@PathVariable int id) {
@@ -170,7 +167,6 @@ public class RoleController {
         ),
     })
     // endregion
-    @Transactional
     @PostMapping("")
     @PreAuthorize("hasAuthority('ROLE_WRITE')")
     public RoleDto createRole(@RequestBody RoleDto roleDto) {
@@ -239,7 +235,6 @@ public class RoleController {
         ),
     })
     // endregion
-    @Transactional
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_READ') and hasAuthority('ROLE_WRITE')")
     public RoleDto updateRole(@PathVariable int id, @RequestBody RoleDto roleDto) {
@@ -289,7 +284,6 @@ public class RoleController {
         ),
     })
     // endregion
-    @Transactional
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_WRITE')")
     public void deleteRole(@PathVariable int id) {
