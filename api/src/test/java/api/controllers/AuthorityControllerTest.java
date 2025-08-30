@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import api.BasicContext;
 import api.dtos.AuthenticationDto;
 import api.dtos.AuthorityDto;
 import api.dtos.ErrorDto;
@@ -31,7 +32,7 @@ import api.services.AuthorityService;
 /**
  * {@link AuthorityController} test.
  */
-public class AuthorityControllerTest extends BasicControllerTest {
+public class AuthorityControllerTest extends BasicContext {
     @Autowired
     private AuthorityService authorityService;
     @Autowired

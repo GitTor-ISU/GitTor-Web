@@ -30,8 +30,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import api.BasicContext;
 import api.controllers.AuthenticationController;
-import api.controllers.BasicControllerTest;
 import api.dtos.AuthenticationDto;
 import api.dtos.ErrorDto;
 import api.dtos.RegisterDto;
@@ -44,7 +44,7 @@ import api.services.UserService;
 /**
  * {@link UserAvatarController} test.
  */
-public class UserAvatarControllerTest extends BasicControllerTest {
+public class UserAvatarControllerTest extends BasicContext {
     @Autowired
     private AuthenticationController authenticationController;
     @Autowired
@@ -52,7 +52,7 @@ public class UserAvatarControllerTest extends BasicControllerTest {
     @Autowired
     private S3ObjectService s3ObjectService;
 
-    @Value("${api.avatar.max:5000000}")
+    @Value("${api.avatar.max}")
     private long maxSize;
 
     /**
