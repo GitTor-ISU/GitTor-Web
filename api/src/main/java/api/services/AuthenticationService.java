@@ -43,7 +43,7 @@ public class AuthenticationService {
             throw new DuplicateEntityException("Username '" + registerDto.getUsername() + "' already exists.");
         }
 
-        Role userRole = roleService.get("USER");
+        Role userRole = roleService.get(RoleService.USER_ROLE_NAME);
 
         User user = User.builder()
             .username(registerDto.getUsername())

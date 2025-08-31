@@ -269,6 +269,13 @@ public class RoleController {
             responseCode = "200"
         ),
         @ApiResponse(
+            responseCode = "400",
+            content = @Content(
+                schema = @Schema(implementation = ErrorDto.class),
+                mediaType = "application/json"
+            )
+        ),
+        @ApiResponse(
             responseCode = "403",
             content = @Content(
                 schema = @Schema(implementation = ErrorDto.class),

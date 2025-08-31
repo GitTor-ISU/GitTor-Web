@@ -873,6 +873,70 @@ public class RoleControllerTest extends BasicContext {
         }
 
         @Test
+        public void should400_whenDeleteAdminRole() {
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // GIVEN: Admin role (change the local versions name for good measure)
+            Role role = roleService.get(RoleService.ADMIN_ROLE_NAME);
+            role.setName("NEW_NAME");
+
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(role.getId())
+                .toUri();
+
+            // WHEN: Delete role
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.DELETE, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds bad request
+            assertAll(
+                () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals(
+                    "Cannot delete " + role.getId() + " role.", responseEntity.getBody().getMessage()
+                )
+            );
+        }
+
+        @Test
+        public void should400_whenDeleteUserRole() {
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // GIVEN: User role (change the local versions name for good measure)
+            Role role = roleService.get(RoleService.USER_ROLE_NAME);
+            role.setName("NEW_NAME");
+
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(role.getId())
+                .toUri();
+
+            // WHEN: Delete role
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.DELETE, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds bad request
+            assertAll(
+                () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals(
+                    "Cannot delete " + role.getId() + " role.", responseEntity.getBody().getMessage()
+                )
+            );
+        }
+
+        @Test
         public void should403_whenUnauthorized() {
             // GIVEN: New role exists
             String roleName = "role_" + UUID.randomUUID();
