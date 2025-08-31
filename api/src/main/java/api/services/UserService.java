@@ -125,6 +125,18 @@ public class UserService implements UserDetailsService {
     }
 
     /**
+     * Get all users with a given role.
+     *
+     * @param role Role
+     * @return {@link Set} of {@link User}
+     */
+    @Transactional(readOnly = true)
+    public Set<User> getAllContainingRole(Role role) {
+        Set<User> user = userRepository.findAllByRolesContaining(role);
+        return user;
+    }
+
+    /**
      * Get user.
      *
      * @param id User id
@@ -232,7 +244,9 @@ public class UserService implements UserDetailsService {
      */
     @Transactional(readOnly = true)
     public Set<Role> getRoles(int id) {
-        return getRoles(get(id));
+        Set<Role> roles = get(id).getRoles();
+        Hibernate.initialize(roles);
+        return roles;
     }
 
     /**
@@ -243,8 +257,7 @@ public class UserService implements UserDetailsService {
      */
     @Transactional(readOnly = true)
     public Set<Role> getRoles(User user) {
-        Hibernate.initialize(user.getRoles());
-        return user.getRoles();
+        return getRoles(user.getId());
     }
 
     /**

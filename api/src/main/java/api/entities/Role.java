@@ -43,5 +43,5 @@ public class Role {
     @JoinTable(name = "roleAuthorities",
         joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
-    private Set<Authority> authorities  = new HashSet<>();
+    private Set<Authority> authorities = new HashSet<>();
 }

@@ -1,13 +1,9 @@
 package api.controllers;
 
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,12 +13,9 @@ import api.dtos.AuthenticationDto;
 import api.dtos.ErrorDto;
 import api.dtos.LoginDto;
 import api.dtos.RegisterDto;
-import api.entities.Role;
 import api.entities.User;
-import api.exceptions.DuplicateEntityException;
-import api.services.RoleService;
+import api.services.AuthenticationService;
 import api.services.TokenService;
-import api.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -38,13 +31,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Authentication", description = "Handles user login and registration.")
 public class AuthenticationController {
     @Autowired
+    private AuthenticationService authenticationService;
+    @Autowired
     private TokenService tokenService;
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private RoleService roleService;
-    @Autowired
-    private PasswordEncoder encoder;
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -80,7 +69,7 @@ public class AuthenticationController {
     /**
      * Register.
      *
-     * @param register {@link RegisterDto}
+     * @param registerDto {@link RegisterDto}
      * @return {@link AuthenticationDto}
      */
     // region
@@ -113,29 +102,11 @@ public class AuthenticationController {
     })
     // endregion
     @PostMapping("/register")
-    public AuthenticationDto register(@RequestBody RegisterDto register) {
-        if (!StringUtils.hasText(register.getUsername())) {
-            throw new IllegalArgumentException("Username must not be empty.");
-        }
-        if (!StringUtils.hasText(register.getPassword())) {
-            throw new IllegalArgumentException("Password must not be empty.");
-        }
-        if (userService.exists(register.getUsername())) {
-            throw new DuplicateEntityException("Username '" + register.getUsername() + "' already exists.");
-        }
-
-        Role userRole = roleService.get("USER");
-
-        User user = User.builder()
-            .username(register.getUsername())
-            .password(encoder.encode(register.getPassword()))
-            .roles(Set.of(userRole))
-            .build();
-
-        userService.save(user);
+    public AuthenticationDto register(@RequestBody RegisterDto registerDto) {
+        User user = authenticationService.register(registerDto);
 
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(register.getUsername(), register.getPassword()));
+            new UsernamePasswordAuthenticationToken(user.getUsername(), registerDto.getPassword()));
 
         return tokenService.generateToken(authentication);
     }

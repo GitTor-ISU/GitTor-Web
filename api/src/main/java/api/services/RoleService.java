@@ -2,12 +2,14 @@ package api.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import api.entities.Role;
+import api.entities.User;
 import api.exceptions.EntityNotFoundException;
 import api.repositories.RoleRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 public class RoleService {
     @Autowired
     private RoleRepository roleRepository;
+    @Autowired
+    private UserService userService;
 
     /**
      * Find role.
@@ -124,17 +128,28 @@ public class RoleService {
     }
 
     /**
+     * Detatches this role from all users.
+     *
+     * @param role Role
+     */
+    @Transactional
+    public void detatchUsers(Role role) {
+        for (User user : userService.getAllContainingRole(role)) {
+            Set<Role> roles = user.getRoles();
+            roles.remove(role);
+            user.setRoles(roles);
+            userService.save(user);
+        }
+    }
+
+    /**
      * Delete role.
      *
      * @param id Role id
      */
     @Transactional
     public void delete(int id) {
-        if (!exists(id)) {
-            throw new EntityNotFoundException("Role " + id + " not found.");
-        }
-        roleRepository.deleteById(id);
-        log.info("Role deleted: " + id);
+        delete(get(id));
     }
 
     /**
@@ -144,6 +159,7 @@ public class RoleService {
      */
     @Transactional
     public void delete(Role role) {
+        detatchUsers(role);
         roleRepository.delete(role);
         log.info("Role deleted: " + role);
     }
