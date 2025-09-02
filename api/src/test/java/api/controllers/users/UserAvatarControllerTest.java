@@ -52,8 +52,8 @@ public class UserAvatarControllerTest extends BasicContext {
     @Autowired
     private S3ObjectService s3ObjectService;
 
-    @Value("${api.avatar.max}")
-    private long maxSize;
+    @Value("${api.s3.avatar.max}")
+    private long maxAvatarSize;
 
     /**
      * {@link UserAvatarController#getMyAvatar} test.
@@ -393,7 +393,7 @@ public class UserAvatarControllerTest extends BasicContext {
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
             // GIVEN: Max size avatar photo
-            int size = (int) (maxSize + 1);
+            int size = (int) (maxAvatarSize + 1);
             byte[] content = new byte[size];
             ByteArrayResource avatar = new ByteArrayResource(content) {
                 @Override
@@ -416,7 +416,7 @@ public class UserAvatarControllerTest extends BasicContext {
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
                 () -> assertEquals(
-                    "File size exceeds limit (" + maxSize + " bytes).", responseEntity.getBody().getMessage()
+                    "File size exceeds limit (" + maxAvatarSize + " bytes).", responseEntity.getBody().getMessage()
                 )
             );
         }
@@ -1003,7 +1003,7 @@ public class UserAvatarControllerTest extends BasicContext {
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
             // GIVEN: Avatar photo
-            int size = (int) (maxSize + 1);
+            int size = (int) (maxAvatarSize + 1);
             byte[] content = new byte[size];
             ByteArrayResource avatar = new ByteArrayResource(content) {
                 @Override
@@ -1033,7 +1033,7 @@ public class UserAvatarControllerTest extends BasicContext {
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
                 () -> assertEquals(
-                    "File size exceeds limit (" + maxSize + " bytes).", responseEntity.getBody().getMessage()
+                    "File size exceeds limit (" + maxAvatarSize + " bytes).", responseEntity.getBody().getMessage()
                 )
             );
         }

@@ -3,6 +3,7 @@ package api.services;
 import java.io.InputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,9 @@ public class S3ObjectService {
     private SimpleStorageService simpleStorageService;
 
     public static final String AVATAR_DIR = "avatar/";
+
+    @Value("${api.s3.max:50000000}")
+    private long maxObjectSize;
 
     /**
      * Download S3 object from storage.
@@ -41,6 +45,9 @@ public class S3ObjectService {
      */
     @Transactional
     public void save(S3Object object, InputStream in) {
+        if (object.getSize() > maxObjectSize) {
+            throw new IllegalArgumentException("File size exceeds limit (" + maxObjectSize + " bytes).");
+        }
         simpleStorageService.uploadObject(object.getKey(), in, object.getSize());
         s3ObjectRepository.save(object);
     }
