@@ -128,12 +128,12 @@ public class RoleService {
     }
 
     /**
-     * Detatches this role from all users.
+     * Detaches this role from all users.
      *
      * @param role Role
      */
     @Transactional
-    public void detatchUsers(Role role) {
+    public void detachFromUsers(Role role) {
         for (User user : userService.getAllContainingRole(role)) {
             Set<Role> roles = user.getRoles();
             roles.remove(role);
@@ -159,7 +159,7 @@ public class RoleService {
      */
     @Transactional
     public void delete(Role role) {
-        detatchUsers(role);
+        detachFromUsers(role);
         roleRepository.delete(role);
         log.info("Role deleted: " + role);
     }
