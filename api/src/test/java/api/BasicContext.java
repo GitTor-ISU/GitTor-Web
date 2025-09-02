@@ -1,4 +1,4 @@
-package api.controllers;
+package api;
 
 import static org.mockito.Mockito.when;
 
@@ -24,9 +24,12 @@ import api.services.TokenService;
  */
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = "api.avatar.max=1024"
+    properties = """
+        api.s3.max=2048
+        api.s3.avatar.max=1024
+    """
 )
-public abstract class BasicControllerTest {
+public abstract class BasicContext {
     @Autowired
     private TokenService tokenService;
 

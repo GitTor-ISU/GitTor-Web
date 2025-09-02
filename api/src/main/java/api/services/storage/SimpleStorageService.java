@@ -1,11 +1,27 @@
 package api.services.storage;
 
 import java.io.InputStream;
+import java.util.regex.Pattern;
 
 /**
  * {@link SimpleStorageService}.
  */
 public interface SimpleStorageService {
+    Pattern VALID_KEY = Pattern.compile("^(?!/)(?!.*\\./)[a-zA-Z0-9_./\\-]+$");
+
+    /**
+     * Validate key matches required pattern.
+     *
+     * @param key S3 key
+     */
+    default void validateKey(String key) {
+        if (key == null || !VALID_KEY.matcher(key).matches()) {
+            throw new IllegalArgumentException(
+                "Invalid key: '" + key + "'. " + VALID_KEY.pattern()
+            );
+        }
+    }
+
     /**
      * Upload object to the storage system.
      *

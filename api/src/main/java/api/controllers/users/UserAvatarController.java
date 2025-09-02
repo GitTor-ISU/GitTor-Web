@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -45,9 +44,6 @@ public class UserAvatarController {
     private S3ObjectService s3ObjectService;
     @Autowired
     private UserService userService;
-
-    @Value("${api.avatar.max:5000000}")
-    private long maxSize;
 
     /**
      * Get my avatar.

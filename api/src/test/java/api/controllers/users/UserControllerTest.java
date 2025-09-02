@@ -30,8 +30,8 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import api.BasicContext;
 import api.controllers.AuthenticationController;
-import api.controllers.BasicControllerTest;
 import api.dtos.AuthenticationDto;
 import api.dtos.ErrorDto;
 import api.dtos.LoginDto;
@@ -45,7 +45,7 @@ import io.jsonwebtoken.Jwts;
 /**
  * {@link UserController} test.
  */
-public class UserControllerTest extends BasicControllerTest {
+public class UserControllerTest extends BasicContext {
     @Autowired
     private UserService userService;
     @Autowired

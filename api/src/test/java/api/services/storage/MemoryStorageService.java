@@ -23,8 +23,18 @@ public class MemoryStorageService implements SimpleStorageService {
 
     @Override
     public void uploadObject(String key, InputStream stream, long size) {
+        validateKey(key);
+        if (size < 0) {
+            throw new IllegalArgumentException("Size must not be negative.");
+        }
+
         try {
-            byte[] data = stream.readAllBytes();
+            byte[] data = stream.readNBytes((int) size);
+
+            if (data.length < size) {
+                throw new StorageException("unexpected EOF.");
+            }
+
             storage.put(key, data);
             log.info("S3 object uploaded: " + key);
         } catch (IOException e) {
@@ -34,6 +44,7 @@ public class MemoryStorageService implements SimpleStorageService {
 
     @Override
     public InputStream downloadObject(String key) {
+        validateKey(key);
         byte[] data = storage.get(key);
         if (data == null) {
             throw new StorageException("No file found for key: " + key);
@@ -43,6 +54,8 @@ public class MemoryStorageService implements SimpleStorageService {
 
     @Override
     public void deleteObject(String key) {
+        validateKey(key);
         storage.remove(key);
+        log.info("S3 object deleted: " + key);
     }
 }

@@ -24,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import api.BasicContext;
 import api.dtos.AuthenticationDto;
 import api.dtos.ErrorDto;
 import api.dtos.RegisterDto;
@@ -37,7 +38,7 @@ import api.services.RoleService;
 /**
  * {@link RoleController} test.
  */
-public class RoleControllerTest extends BasicControllerTest {
+public class RoleControllerTest extends BasicContext {
     @Autowired
     private RoleService roleService;
     @Autowired

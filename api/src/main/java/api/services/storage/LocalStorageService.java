@@ -2,7 +2,6 @@ package api.services.storage;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import api.exceptions.StorageException;
 import jakarta.annotation.PostConstruct;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @Profile({"dev", "default"})
 public class LocalStorageService implements SimpleStorageService {
 
+    @Setter
     @Value("${s3.url:./temp/s3/}")
     private String rootPath;
 
@@ -43,18 +44,23 @@ public class LocalStorageService implements SimpleStorageService {
 
     @Override
     public void uploadObject(String key, InputStream stream, long size) {
+        validateKey(key);
+        if (size < 0) {
+            throw new IllegalArgumentException("Size must not be negative.");
+        }
+
         Path target = root.resolve(key);
         try {
-            Files.createDirectories(target.getParent());
-            try (
-                OutputStream out = Files.newOutputStream(
-                    target,
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.TRUNCATE_EXISTING
-                )
-            ) {
-                stream.transferTo(out);
+            byte[] data = stream.readNBytes((int) size);
+
+            if (data.length < size) {
+                throw new StorageException("unexpected EOF.");
             }
+
+            Files.createDirectories(target.getParent());
+            Files.write(target, data,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING);
             log.info("S3 object uploaded: " + target.toAbsolutePath());
         } catch (IOException e) {
             throw new StorageException(e);
@@ -63,6 +69,7 @@ public class LocalStorageService implements SimpleStorageService {
 
     @Override
     public InputStream downloadObject(String key) {
+        validateKey(key);
         Path target = root.resolve(key);
         if (!Files.exists(target)) {
             throw new StorageException("No file found for key: " + key);
@@ -76,6 +83,7 @@ public class LocalStorageService implements SimpleStorageService {
 
     @Override
     public void deleteObject(String key) {
+        validateKey(key);
         Path target = root.resolve(key);
         try {
             Files.deleteIfExists(target);

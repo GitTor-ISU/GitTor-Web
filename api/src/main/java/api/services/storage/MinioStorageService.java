@@ -53,6 +53,11 @@ public class MinioStorageService implements SimpleStorageService {
     }
 
     private void uploadObject(String bucket, String key, InputStream stream, long size) {
+        validateKey(key);
+        if (size < 0) {
+            throw new IllegalArgumentException("Size must not be negative.");
+        }
+
         try {
             minioClient.putObject(
                 PutObjectArgs.builder()
@@ -75,6 +80,7 @@ public class MinioStorageService implements SimpleStorageService {
     }
 
     private InputStream downloadObject(String bucket, String key) {
+        validateKey(key);
         try {
             return minioClient.getObject(GetObjectArgs.builder()
                 .bucket(bucket)
@@ -94,6 +100,7 @@ public class MinioStorageService implements SimpleStorageService {
     }
 
     private void deleteObject(String bucket, String key) {
+        validateKey(key);
         try {
             minioClient.removeObject(RemoveObjectArgs.builder()
                 .bucket(bucket)

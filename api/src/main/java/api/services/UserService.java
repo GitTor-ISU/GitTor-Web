@@ -45,7 +45,7 @@ public class UserService implements UserDetailsService {
     @Autowired
     private MimeTypeService mimeTypeService;
 
-    @Value("${api.avatar.max:5000000}")
+    @Value("${api.s3.avatar.max:5000000}")
     private long maxAvatarSize;
 
     private static final Set<MediaType> ALLOWED_AVATAR_TYPES = Set.of(

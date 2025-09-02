@@ -16,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import api.BasicContext;
 import api.dtos.AuthenticationDto;
 import api.dtos.ErrorDto;
 import api.dtos.LoginDto;
@@ -24,7 +25,7 @@ import api.dtos.RegisterDto;
 /**
  * {@link AuthenticationController} test.
  */
-public class AuthenticationControllerTest extends BasicControllerTest {
+public class AuthenticationControllerTest extends BasicContext {
     @Value("${api.admin.username:admin}")
     private String adminUsername;
     @Value("${api.admin.password:password}")
