@@ -31,9 +31,11 @@ import api.dtos.RegisterDto;
 import api.dtos.RoleDto;
 import api.entities.Authority;
 import api.entities.Role;
+import api.entities.User;
 import api.mapper.RoleMapper;
 import api.services.AuthorityService;
 import api.services.RoleService;
+import api.services.UserService;
 
 /**
  * {@link RoleController} test.
@@ -43,6 +45,8 @@ public class RoleControllerTest extends BasicContext {
     private RoleService roleService;
     @Autowired
     private AuthorityService authorityService;
+    @Autowired
+    private UserService userService;
     @Autowired
     private AuthenticationController authenticationController;
     @Autowired
@@ -791,6 +795,56 @@ public class RoleControllerTest extends BasicContext {
             // GIVEN: New role exists with new authority
             String roleName = "role_" + UUID.randomUUID();
             Role role = roleService.save(Role.builder().name(roleName).authorities(Set.of(authority)).build());
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(role.getId())
+                .toUri();
+
+            // WHEN: Delete role
+            ResponseEntity<String> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.DELETE, request, new ParameterizedTypeReference<String>() {}
+            );
+
+            // THEN: Returns nothing and role doesn't exist
+            assertAll(
+                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                () -> assertNull(responseEntity.getBody()),
+                () -> assertFalse(
+                    roleService.exists(roleName),
+                    "Unexpected user '" + roleName + "' found"
+                )
+            );
+        }
+
+        @Test
+        public void shouldDeleteRole_whenUsed() {
+            // GIVEN: New authority exists
+            String authorityName = "authority_" + UUID.randomUUID();
+            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+
+            // GIVEN: New role exists with new authority
+            String roleName = "role_" + UUID.randomUUID();
+            Role role = roleService.save(Role.builder().name(roleName).authorities(Set.of(authority)).build());
+
+            // GIVEN: New user exists with role
+            String username = "user_" + UUID.randomUUID();
+            authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+            User user = userService.get(username);
+            Set<Role> roles = userService.getRoles(user);
+            roles.add(role);
+            user.setRoles(roles);
+            userService.save(user);
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();

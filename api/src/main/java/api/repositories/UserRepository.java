@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import api.entities.Role;
 import api.entities.User;
 
 /**
@@ -44,4 +45,12 @@ public interface UserRepository extends JpaRepository<User, Integer> {
      */
     @Query("SELECT u.id FROM User u")
     public Set<Integer> findAllUserIds();
+
+    /**
+     * Find all users with a given role.
+     *
+     * @param role Role
+     * @return {@link Set} of {@link User}
+     */
+    Set<User> findAllByRolesContaining(Role role);
 }
