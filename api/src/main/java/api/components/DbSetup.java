@@ -39,7 +39,7 @@ public class DbSetup {
     @Value("${api.admin.password:password}")
     private String adminPassword;
 
-    private String[] authorityNames = {
+    private static String[] authorityNames = {
         "AUTHORITY_READ",
         "ROLE_READ",
         "ROLE_WRITE",
