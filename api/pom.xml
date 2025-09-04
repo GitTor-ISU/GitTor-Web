@@ -69,7 +69,7 @@
     <profile>
       <id>prod</id>
       <activation>
-        <activeByDefault>false</activeByDefault>
+        <activeByDefault>true</activeByDefault>
       </activation>
       <dependencies>
         <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->

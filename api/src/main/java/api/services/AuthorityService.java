@@ -43,7 +43,6 @@ public class AuthorityService {
         return authorityRepository.findByAuthority(authority);
     }
 
-
     /**
      * Get all authorities.
      *

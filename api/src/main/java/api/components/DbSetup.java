@@ -21,8 +21,14 @@ import lombok.extern.slf4j.Slf4j;
  * {@link DbSetup}.
  */
 @Slf4j
-@Component
+@Component("DbSetup")
 public class DbSetup {
+    public static final String AUTHORITY_READ = "AUTHORITY_READ";
+    public static final String ROLE_READ = "ROLE_READ";
+    public static final String ROLE_WRITE = "ROLE_WRITE";
+    public static final String USER_READ = "USER_READ";
+    public static final String USER_WRITE = "USER_WRITE";
+
     @Autowired
     private UserService userService;
     @Autowired
@@ -39,14 +45,6 @@ public class DbSetup {
     @Value("${api.admin.password:password}")
     private String adminPassword;
 
-    private static String[] authorityNames = {
-        "AUTHORITY_READ",
-        "ROLE_READ",
-        "ROLE_WRITE",
-        "USER_READ",
-        "USER_WRITE"
-    };
-
     /**
      * Initialize the database with necessary fields.
      */
@@ -56,7 +54,7 @@ public class DbSetup {
 
         // Setup Authorities
         Set<Authority> authorities = new HashSet<>();
-        for (String authorityName : authorityNames) {
+        for (String authorityName : authorityNames()) {
             authorities.add(authorityService.find(authorityName)
                 .orElseGet(() -> authorityService.save(Authority.builder().authority(authorityName).build())));
         }
@@ -81,5 +79,20 @@ public class DbSetup {
                     .roles(Set.of(adminRole, userRole))
                     .build()
             ));
+    }
+
+    /**
+     * All authority names used in the system.
+     *
+     * @return {@link Set} of {@link String}
+     */
+    public Set<String> authorityNames() {
+        return Set.of(
+            AUTHORITY_READ,
+            ROLE_READ,
+            ROLE_WRITE,
+            USER_READ,
+            USER_WRITE
+        );
     }
 }

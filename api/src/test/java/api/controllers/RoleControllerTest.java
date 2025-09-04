@@ -25,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import api.BasicContext;
+import api.components.DbSetup;
 import api.dtos.AuthenticationDto;
 import api.dtos.ErrorDto;
 import api.dtos.RegisterDto;
@@ -51,6 +52,8 @@ public class RoleControllerTest extends BasicContext {
     private AuthenticationController authenticationController;
     @Autowired
     private RoleMapper roleMapper;
+    @Autowired
+    private DbSetup dbSetup;
 
     /**
      * {@link RoleController#getRoles} test.
@@ -168,6 +171,45 @@ public class RoleControllerTest extends BasicContext {
                 () -> assertTrue(
                     responseEntity.getBody().getAuthorityIds().contains(authority.getId()),
                     "Expected authority '" + authorityName + "' not found in role '" + roleName + "'"
+                )
+            );
+        }
+
+        @Test
+        public void shouldContainAllAuthorities_whenGetAdminRole() {
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // GIVEN: Admin role id
+            Role role = roleService.get(RoleService.ADMIN_ROLE_NAME);
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(role.getId())
+                .toUri();
+
+            // WHEN: Get role
+            ResponseEntity<RoleDto> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.GET, request, new ParameterizedTypeReference<RoleDto>() {}
+            );
+
+            // THEN: Admin role should be returned and contain all authorities
+            assertAll(
+                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(roleMapper.toDto(role), responseEntity.getBody()),
+                () -> assertEquals(dbSetup.authorityNames().size(), responseEntity.getBody().getAuthorityIds().size()),
+                () -> assertTrue(
+                    responseEntity
+                        .getBody()
+                        .getAuthorityIds()
+                        .stream()
+                        .map(authorityService::get)
+                        .map(Authority::getAuthority)
+                        .toList()
+                        .containsAll(dbSetup.authorityNames()),
+                    "Admin role does not contain all authorities"
                 )
             );
         }
@@ -658,6 +700,42 @@ public class RoleControllerTest extends BasicContext {
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
                 () -> assertEquals("Role name must not be empty.", responseEntity.getBody().getMessage())
+            );
+        }
+
+        @Test
+        public void should400_whenAdminRole() {
+            // GIVEN: Adim role
+            Role role = roleService.get(RoleService.ADMIN_ROLE_NAME);
+
+            // GIVEN: Update
+            RoleDto updated = RoleDto.builder()
+                .build();
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            HttpEntity<RoleDto> request = new HttpEntity<>(updated, headers);
+
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(role.getId())
+                .toUri();
+
+            // WHEN: Update role
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds bad request
+            assertAll(
+                () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals(
+                    "Role '" + RoleService.ADMIN_ROLE_NAME + "' cannot be editted.",
+                    responseEntity.getBody().getMessage()
+                )
             );
         }
 
