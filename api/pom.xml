@@ -7,7 +7,7 @@
   <version>1</version>
   <name>api</name>
   <description>Api</description>
-  <url>https://github.com/GitTor-ISU/GitTor-App</url>
+  <url>https://github.com/GitTor-ISU/GitTor-Web</url>
 
   <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-parent -->
   <parent>
@@ -41,10 +41,10 @@
   </developers>
 
   <scm>
-    <connection>scm:git:https://github.com/GitTor-ISU/GitTor-App</connection>
-    <developerConnection>scm:git:git@github.com:GitTor-ISU/GitTor-App</developerConnection>
+    <connection>scm:git:https://github.com/GitTor-ISU/GitTor-Web</connection>
+    <developerConnection>scm:git:git@github.com:GitTor-ISU/GitTor-Web</developerConnection>
     <tag>HEAD</tag>
-    <url>https://github.com/GitTor-ISU/GitTor-App</url>
+    <url>https://github.com/GitTor-ISU/GitTor-Web</url>
   </scm>
 
   <properties>
