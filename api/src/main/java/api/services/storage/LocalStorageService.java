@@ -54,7 +54,7 @@ public class LocalStorageService implements SimpleStorageService {
             byte[] data = stream.readNBytes((int) size);
 
             if (data.length < size) {
-                throw new StorageException("unexpected EOF.");
+                throw StorageException.fromEndOfFile();
             }
 
             Files.createDirectories(target.getParent());
@@ -72,7 +72,7 @@ public class LocalStorageService implements SimpleStorageService {
         validateKey(key);
         Path target = root.resolve(key);
         if (!Files.exists(target)) {
-            throw new StorageException("No file found for key: " + key);
+            throw StorageException.fromNotFound(key);
         }
         try {
             return Files.newInputStream(target, StandardOpenOption.READ);

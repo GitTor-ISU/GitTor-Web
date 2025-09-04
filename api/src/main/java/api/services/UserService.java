@@ -145,7 +145,7 @@ public class UserService implements UserDetailsService {
     @Transactional(readOnly = true)
     public User get(int id) {
         User user = find(id)
-            .orElseThrow(() -> new EntityNotFoundException("User " + id + " not found."));
+            .orElseThrow(() -> EntityNotFoundException.fromUser(id));
         return user;
     }
 
@@ -158,7 +158,7 @@ public class UserService implements UserDetailsService {
     @Transactional(readOnly = true)
     public User get(String username) {
         User user = find(username)
-            .orElseThrow(() -> new EntityNotFoundException("User '" + username + "' not found."));
+            .orElseThrow(() -> EntityNotFoundException.fromUser(username));
         return user;
     }
 
@@ -191,7 +191,7 @@ public class UserService implements UserDetailsService {
             && !Objects.equals(dto.getUsername(), user.getUsername())
             && exists(dto.getUsername())
         ) {
-            throw new DuplicateEntityException("Username '" + dto.getUsername() + "' already exists.");
+            throw DuplicateEntityException.fromUser(dto.getUsername());
         }
 
         userMapper.update(user, dto);
@@ -219,7 +219,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void delete(int id) {
         if (!exists(id)) {
-            throw new EntityNotFoundException("User " + id + " not found.");
+            throw EntityNotFoundException.fromUser(id);
         }
         userRepository.deleteById(id);
         log.info("User deleted: " + id);
@@ -328,7 +328,7 @@ public class UserService implements UserDetailsService {
     public void deleteAvatar(User user) {
         S3Object s3Object = user.getAvatar();
         if (s3Object == null) {
-            throw new EntityNotFoundException("User '" + user.getUsername() +  "' avatar not found.");
+            throw EntityNotFoundException.fromUserAvatar(user.getUsername());
         }
 
         user.setAvatar(null);

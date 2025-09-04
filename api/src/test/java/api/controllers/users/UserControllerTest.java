@@ -517,7 +517,7 @@ public class UserControllerTest extends BasicContext {
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
                 () -> assertEquals(
-                    "Username '" + username2 + "' already exists.",
+                    "User '" + username2 + "' already exists.",
                     responseEntity.getBody().getMessage()
                 )
             );
@@ -1481,7 +1481,7 @@ public class UserControllerTest extends BasicContext {
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
                 () -> assertEquals(
-                    "Username '" + username2 + "' already exists.",
+                    "User '" + username2 + "' already exists.",
                     responseEntity.getBody().getMessage()
                 )
             );

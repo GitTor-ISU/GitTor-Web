@@ -32,7 +32,7 @@ public class MemoryStorageService implements SimpleStorageService {
             byte[] data = stream.readNBytes((int) size);
 
             if (data.length < size) {
-                throw new StorageException("unexpected EOF.");
+                throw StorageException.fromEndOfFile();
             }
 
             storage.put(key, data);
@@ -47,7 +47,7 @@ public class MemoryStorageService implements SimpleStorageService {
         validateKey(key);
         byte[] data = storage.get(key);
         if (data == null) {
-            throw new StorageException("No file found for key: " + key);
+            throw StorageException.fromNotFound(key);
         }
         return new ByteArrayInputStream(data);
     }
