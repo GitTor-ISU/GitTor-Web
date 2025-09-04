@@ -21,4 +21,11 @@ jobs:
     - name: Full Run
       if: steps.setup-maven.outputs.cache-hit != 'true'
       working-directory: ./api
-      run: ./mvnw -B verify test package site
+      run: |
+        ./mvnw -B dependency:go-offline
+        ./mvnw -B dependency:resolve dependency:resolve-plugins
+        ./mvnw -B -Pdev dependency:go-offline
+        ./mvnw -B -Pdev dependency:resolve dependency:resolve-plugins
+        ./mvnw -B -Pprod dependency:go-offline
+        ./mvnw -B -Pprod dependency:resolve dependency:resolve-plugins
+        ./mvnw -B verify test package site
