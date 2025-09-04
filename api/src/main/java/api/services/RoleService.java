@@ -163,7 +163,7 @@ public class RoleService {
     @Transactional
     public void delete(Role role) {
         if (role.getId() == get(USER_ROLE_NAME).getId() || role.getId() == get(ADMIN_ROLE_NAME).getId()) {
-            throw new IllegalArgumentException("Cannot delete " + role.getId() + " role.");
+            throw new IllegalArgumentException("Role " + role.getId() + " cannot be deleted.");
         }
         detachFromUsers(role);
         roleRepository.delete(role);

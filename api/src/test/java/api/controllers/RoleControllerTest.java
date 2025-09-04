@@ -899,7 +899,7 @@ public class RoleControllerTest extends BasicContext {
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
                 () -> assertEquals(
-                    "Cannot delete " + role.getId() + " role.", responseEntity.getBody().getMessage()
+                    "Role " + role.getId() + " cannot be deleted.", responseEntity.getBody().getMessage()
                 )
             );
         }
@@ -931,7 +931,7 @@ public class RoleControllerTest extends BasicContext {
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
                 () -> assertEquals(
-                    "Cannot delete " + role.getId() + " role.", responseEntity.getBody().getMessage()
+                    "Role " + role.getId() + " cannot be deleted.", responseEntity.getBody().getMessage()
                 )
             );
         }
