@@ -174,7 +174,7 @@ public class RoleController {
             throw new IllegalArgumentException("Role name must not be empty.");
         }
         if (roleService.exists(roleDto.getName())) {
-            throw new DuplicateEntityException("Role '" + roleDto.getName() + "' already exists.");
+            throw DuplicateEntityException.fromRole(roleDto.getName());
         }
         return roleMapper.toDto(roleService.save(roleMapper.toEntity(roleDto)));
     }
@@ -247,7 +247,7 @@ public class RoleController {
             && !Objects.equals(roleDto.getName(), role.getName())
             && roleService.exists(roleDto.getName())
         ) {
-            throw new DuplicateEntityException("Role '" + roleDto.getName() + "' already exists.");
+            throw DuplicateEntityException.fromRole(roleDto.getName());
         }
 
         roleMapper.update(role, roleDto);

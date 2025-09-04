@@ -80,7 +80,7 @@ public class UserAvatarController {
     public ResponseEntity<Resource> getMyAvatar(@AuthenticationPrincipal User user) throws IOException {
         S3Object s3Object = user.getAvatar();
         if (s3Object == null) {
-            throw new EntityNotFoundException("User '" + user.getUsername() +  "' avatar not found.");
+            throw EntityNotFoundException.fromUserAvatar(user.getUsername());
         }
 
         InputStream in = s3ObjectService.download(s3Object);
@@ -201,7 +201,7 @@ public class UserAvatarController {
         User user = userService.get(userId);
         S3Object s3Object = user.getAvatar();
         if (s3Object == null) {
-            throw new EntityNotFoundException("User '" + user.getUsername() +  "' avatar not found.");
+            throw EntityNotFoundException.fromUserAvatar(user.getUsername());
         }
 
         InputStream in = s3ObjectService.download(s3Object);

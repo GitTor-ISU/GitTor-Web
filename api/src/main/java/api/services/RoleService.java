@@ -102,7 +102,7 @@ public class RoleService {
     @Transactional(readOnly = true)
     public Role get(int id) {
         return find(id)
-            .orElseThrow(() -> new EntityNotFoundException("Role " + id + " not found."));
+            .orElseThrow(() -> EntityNotFoundException.fromRole(id));
     }
 
     /**
@@ -114,7 +114,7 @@ public class RoleService {
     @Transactional(readOnly = true)
     public Role get(String role) {
         return find(role)
-            .orElseThrow(() -> new EntityNotFoundException("Role '" + role + "' not found."));
+            .orElseThrow(() -> EntityNotFoundException.fromRole(role));
     }
 
     /**

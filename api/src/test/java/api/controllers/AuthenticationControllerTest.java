@@ -202,7 +202,7 @@ public class AuthenticationControllerTest extends BasicContext {
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
                 () -> assertEquals(
-                    "Username '" + adminUsername + "' already exists.",
+                    "User '" + adminUsername + "' already exists.",
                     responseEntity.getBody().getMessage()
                 )
             );

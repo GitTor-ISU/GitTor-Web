@@ -40,7 +40,7 @@ public class AuthenticationService {
             throw new IllegalArgumentException("Password must not be empty.");
         }
         if (userService.exists(registerDto.getUsername())) {
-            throw new DuplicateEntityException("Username '" + registerDto.getUsername() + "' already exists.");
+            throw DuplicateEntityException.fromUser(registerDto.getUsername());
         }
 
         Role userRole = roleService.get(RoleService.USER_ROLE_NAME);
