@@ -1,5 +1,6 @@
 package api.components;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,14 @@ public class DbSetup {
     @Value("${api.admin.password:password}")
     private String adminPassword;
 
+    private static String[] authorityNames = {
+        "AUTHORITY_READ",
+        "ROLE_READ",
+        "ROLE_WRITE",
+        "USER_READ",
+        "USER_WRITE"
+    };
+
     /**
      * Initialize the database with necessary fields.
      */
@@ -46,29 +55,24 @@ public class DbSetup {
         log.info("Active profile: " + activeProfile);
 
         // Setup Authorities
-        Authority authorityRead = authorityService.find("AUTHORITY_READ")
-            .orElseGet(() -> authorityService.save(Authority.builder().authority("AUTHORITY_READ").build()));
-        Authority userRead = authorityService.find("USER_READ")
-            .orElseGet(() -> authorityService.save(Authority.builder().authority("USER_READ").build()));
-        Authority userWrite = authorityService.find("USER_WRITE")
-            .orElseGet(() -> authorityService.save(Authority.builder().authority("USER_WRITE").build()));
-        Authority roleRead = authorityService.find("ROLE_READ")
-            .orElseGet(() -> authorityService.save(Authority.builder().authority("ROLE_READ").build()));
-        Authority roleWrite = authorityService.find("ROLE_WRITE")
-            .orElseGet(() -> authorityService.save(Authority.builder().authority("ROLE_WRITE").build()));
+        Set<Authority> authorities = new HashSet<>();
+        for (String authorityName : authorityNames) {
+            authorities.add(authorityService.find(authorityName)
+                .orElseGet(() -> authorityService.save(Authority.builder().authority(authorityName).build())));
+        }
 
         // Setup Roles
-        Role adminRole = roleService.find("ADMIN")
+        Role adminRole = roleService.find(RoleService.ADMIN_ROLE_NAME)
             .orElseGet(() -> roleService.save(
                 Role.builder()
-                    .name("ADMIN")
-                    .authorities(Set.of(authorityRead, userRead, userWrite, roleRead, roleWrite))
+                    .name(RoleService.ADMIN_ROLE_NAME)
+                    .authorities(authorities)
                     .build()
             ));
-        Role userRole = roleService.find("USER")
-            .orElseGet(() -> roleService.save(Role.builder().name("USER").build()));
+        Role userRole = roleService.find(RoleService.USER_ROLE_NAME)
+            .orElseGet(() -> roleService.save(Role.builder().name(RoleService.USER_ROLE_NAME).build()));
 
-        // Setup Users
+        // Setup Admin
         userService.find("admin")
             .orElseGet(() -> userService.save(
                 User.builder()

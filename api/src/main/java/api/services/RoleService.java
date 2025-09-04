@@ -25,6 +25,9 @@ public class RoleService {
     @Autowired
     private UserService userService;
 
+    public static final String USER_ROLE_NAME = "USER";
+    public static final String ADMIN_ROLE_NAME = "ADMIN";
+
     /**
      * Find role.
      *
@@ -159,6 +162,9 @@ public class RoleService {
      */
     @Transactional
     public void delete(Role role) {
+        if (role.getId() == get(USER_ROLE_NAME).getId() || role.getId() == get(ADMIN_ROLE_NAME).getId()) {
+            throw new IllegalArgumentException("Role " + role.getId() + " cannot be deleted.");
+        }
         detachFromUsers(role);
         roleRepository.delete(role);
         log.info("Role deleted: " + role);
