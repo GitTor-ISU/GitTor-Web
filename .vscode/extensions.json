@@ -8,5 +8,6 @@
         "william-voyek.vscode-nginx",
         "docker.docker",
         "editorconfig.editorconfig",
+        "mermaidchart.vscode-mermaid-chart"
     ],
 }
