@@ -86,7 +86,7 @@ public class DbSetup {
      *
      * @return {@link Set} of {@link String}
      */
-    public Set<String> authorityNames() {
+    public static Set<String> authorityNames() {
         return Set.of(
             AUTHORITY_READ,
             ROLE_READ,

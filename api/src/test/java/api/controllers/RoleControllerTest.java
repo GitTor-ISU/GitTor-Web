@@ -52,8 +52,6 @@ public class RoleControllerTest extends BasicContext {
     private AuthenticationController authenticationController;
     @Autowired
     private RoleMapper roleMapper;
-    @Autowired
-    private DbSetup dbSetup;
 
     /**
      * {@link RoleController#getRoles} test.
@@ -199,7 +197,7 @@ public class RoleControllerTest extends BasicContext {
                 () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(roleMapper.toDto(role), responseEntity.getBody()),
-                () -> assertEquals(dbSetup.authorityNames().size(), responseEntity.getBody().getAuthorityIds().size()),
+                () -> assertEquals(DbSetup.authorityNames().size(), responseEntity.getBody().getAuthorityIds().size()),
                 () -> assertTrue(
                     responseEntity
                         .getBody()
@@ -208,7 +206,7 @@ public class RoleControllerTest extends BasicContext {
                         .map(authorityService::get)
                         .map(Authority::getAuthority)
                         .toList()
-                        .containsAll(dbSetup.authorityNames()),
+                        .containsAll(DbSetup.authorityNames()),
                     "Admin role does not contain all authorities"
                 )
             );
