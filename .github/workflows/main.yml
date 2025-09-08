@@ -38,10 +38,10 @@ jobs:
     needs: api-build
     uses: ./.github/workflows/ui-build.yml
 
-  deploy:
+  report:
     needs:
       - api-build
       - api-test
       - ui-build
       - ui-test
-    uses: ./.github/workflows/deploy.yml
+    uses: ./.github/workflows/report.yml
