@@ -211,7 +211,7 @@ public class UserController {
     })
     // endregion
     @GetMapping("")
-    @PreAuthorize("hasAuthority('USER_READ')")
+    @PreAuthorize("hasAuthority(@DbSetup.USER_READ)")
     public List<UserDto> getUsers(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(required = false) Integer size
@@ -261,7 +261,7 @@ public class UserController {
     })
     // endregion
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('USER_READ')")
+    @PreAuthorize("hasAuthority(@DbSetup.USER_READ)")
     public UserDto getUser(@PathVariable int id) {
         User user = userService.get(id);
         Hibernate.initialize(user);
@@ -316,7 +316,7 @@ public class UserController {
     })
     // endregion
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('USER_READ') and hasAuthority('USER_WRITE')")
+    @PreAuthorize("hasAuthority(@DbSetup.USER_READ) and hasAuthority(@DbSetup.USER_WRITE)")
     public UserDto updateUser(@PathVariable int id, @RequestBody UserDto userDto) {
         return userMapper.toDto(userService.update(id, userDto));
     }
@@ -352,7 +352,7 @@ public class UserController {
     })
     // endregion
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('USER_WRITE')")
+    @PreAuthorize("hasAuthority(@DbSetup.USER_WRITE)")
     public void deleteUser(@PathVariable int id) {
         userService.delete(id);
     }

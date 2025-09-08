@@ -81,7 +81,7 @@ public class UserRoleController {
     })
     // endregion
     @GetMapping("")
-    @PreAuthorize("hasAuthority('USER_READ') and hasAuthority('ROLE_READ')")
+    @PreAuthorize("hasAuthority(@DbSetup.USER_READ) and hasAuthority(@DbSetup.ROLE_READ)")
     public List<RoleDto> getUserRoles(@PathVariable int userId) {
         Set<Role> roles = userService.getRoles(userId);
         return roles.stream()
@@ -130,7 +130,7 @@ public class UserRoleController {
     })
     // endregion
     @PostMapping("")
-    @PreAuthorize("hasAuthority('USER_WRITE') and hasAuthority('ROLE_READ')")
+    @PreAuthorize("hasAuthority(@DbSetup.USER_WRITE) and hasAuthority(@DbSetup.ROLE_READ)")
     public List<RoleDto> setUserRoles(@PathVariable int userId, @RequestBody List<Integer> roleIds) {
         User user = userService.get(userId);
         user.setRoles(new HashSet<>(roleService.get(roleIds)));
@@ -184,7 +184,11 @@ public class UserRoleController {
     })
     // endregion
     @PutMapping("")
-    @PreAuthorize("hasAuthority('USER_READ') and hasAuthority('USER_WRITE') and hasAuthority('ROLE_READ')")
+    @PreAuthorize("""
+        hasAuthority(@DbSetup.USER_READ)
+        and hasAuthority(@DbSetup.USER_WRITE)
+        and hasAuthority(@DbSetup.ROLE_READ)
+        """)
     public List<RoleDto> addUserRoles(@PathVariable int userId, @RequestBody List<Integer> roleIds) {
         Set<Role> roles = userService.getRoles(userId);
         roles.addAll(roleService.get(roleIds));
@@ -239,7 +243,11 @@ public class UserRoleController {
     })
     // endregion
     @DeleteMapping("")
-    @PreAuthorize("hasAuthority('USER_READ') and hasAuthority('USER_WRITE') and hasAuthority('ROLE_READ')")
+    @PreAuthorize("""
+        hasAuthority(@DbSetup.USER_READ)
+        and hasAuthority(@DbSetup.USER_WRITE)
+        and hasAuthority(@DbSetup.ROLE_READ)
+        """)
     public List<RoleDto> removeUserRoles(@PathVariable int userId, @RequestBody List<Integer> roleIds) {
         Set<Role> roles = userService.getRoles(userId);
         roles.removeAll(roleService.get(roleIds));

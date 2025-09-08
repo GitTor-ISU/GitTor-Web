@@ -73,7 +73,7 @@ public class RoleController {
     })
     // endregion
     @GetMapping("")
-    @PreAuthorize("hasAuthority('ROLE_READ')")
+    @PreAuthorize("hasAuthority(@DbSetup.ROLE_READ)")
     public List<RoleDto> getRoles() {
         return roleService.getAll().stream()
             .map(roleMapper::toDto)
@@ -116,7 +116,7 @@ public class RoleController {
     })
     // endregion
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_READ')")
+    @PreAuthorize("hasAuthority(@DbSetup.ROLE_READ)")
     public RoleDto getRole(@PathVariable int id) {
         return roleMapper.toDto(roleService.get(id));
     }
@@ -236,17 +236,15 @@ public class RoleController {
     })
     // endregion
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_READ') and hasAuthority('ROLE_WRITE')")
+    @PreAuthorize("hasAuthority(@DbSetup.ROLE_READ) and hasAuthority('ROLE_WRITE')")
     public RoleDto updateRole(@PathVariable int id, @RequestBody RoleDto roleDto) {
+        Role role = roleService.get(id);
+        if (RoleService.ADMIN_ROLE_NAME.equals(role.getName())) {
+            throw new IllegalArgumentException("Role '" + RoleService.ADMIN_ROLE_NAME + "' cannot be editted.");
+        }
         if (roleDto.getName() != null && !StringUtils.hasText(roleDto.getName())) {
             throw new IllegalArgumentException("Role name must not be empty.");
-        }
-
-        Role role = roleService.get(id);
-        if (StringUtils.hasText(roleDto.getName())
-            && !Objects.equals(roleDto.getName(), role.getName())
-            && roleService.exists(roleDto.getName())
-        ) {
+        } else if (!Objects.equals(roleDto.getName(), role.getName()) && roleService.exists(roleDto.getName())) {
             throw DuplicateEntityException.fromRole(roleDto.getName());
         }
 

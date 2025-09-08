@@ -65,7 +65,7 @@ public class AuthorityController {
     })
     // endregion
     @GetMapping("")
-    @PreAuthorize("hasAuthority('AUTHORITY_READ')")
+    @PreAuthorize("hasAuthority(@DbSetup.AUTHORITY_READ)")
     public List<AuthorityDto> getAuthorities() {
         return authorityService.getAll().stream()
             .map(authorityMapper::toDto)
@@ -108,7 +108,7 @@ public class AuthorityController {
     })
     // endregion
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('AUTHORITY_READ')")
+    @PreAuthorize("hasAuthority(@DbSetup.AUTHORITY_READ)")
     public AuthorityDto getAuthority(@PathVariable int id) {
         return authorityMapper.toDto(authorityService.get(id));
     }

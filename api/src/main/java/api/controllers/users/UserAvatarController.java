@@ -196,7 +196,7 @@ public class UserAvatarController {
     })
     // endregion
     @GetMapping("/{userId}/avatar")
-    @PreAuthorize("hasAuthority('USER_READ')")
+    @PreAuthorize("hasAuthority(@DbSetup.USER_READ)")
     public ResponseEntity<Resource> getUserAvatar(@PathVariable int userId) throws IOException {
         User user = userService.get(userId);
         S3Object s3Object = user.getAvatar();
@@ -252,7 +252,7 @@ public class UserAvatarController {
     })
     // endregion
     @PutMapping("/{userId}/avatar")
-    @PreAuthorize("hasAuthority('USER_WRITE')")
+    @PreAuthorize("hasAuthority(@DbSetup.USER_WRITE)")
     public void updateUserAvatar(
         @PathVariable int userId,
         @RequestParam("file") MultipartFile file
@@ -290,7 +290,7 @@ public class UserAvatarController {
     })
     // endregion
     @DeleteMapping("/{userId}/avatar")
-    @PreAuthorize("hasAuthority('USER_WRITE')")
+    @PreAuthorize("hasAuthority(@DbSetup.USER_WRITE)")
     public void deleteUserAvatar(@PathVariable int userId) {
         userService.deleteAvatar(userId);
     }
