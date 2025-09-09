@@ -53,9 +53,6 @@ export class Navbar implements OnInit {
 
   private auth: Auth = inject(Auth);
 
-  /**
-   * Initialize.
-   */
   public ngOnInit(): void {
     this.refresh();
   }
@@ -86,17 +83,11 @@ export class Navbar implements OnInit {
     ];
   }
 
-  /**
-   * Login.
-   */
   private login(): void {
     this.auth.setToken('token');
     this.refresh();
   }
 
-  /**
-   * Logout.
-   */
   private logout(): void {
     this.auth.removeToken();
     this.refresh();

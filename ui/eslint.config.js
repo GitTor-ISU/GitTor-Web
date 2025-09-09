@@ -88,6 +88,7 @@ module.exports = [
             'ClassExpression': true,
             'MethodDefinition': true,
           },
+          'exemptEmptyFunctions': true,
         },
       ],
       'jsdoc/tag-lines': [
@@ -97,6 +98,8 @@ module.exports = [
           'startLines': 1,
         },
       ],
+      'jsdoc/require-param-type': 'off',
+      'jsdoc/require-returns-type': 'off',
       'jsdoc/require-template': 'error',
       'jsdoc/sort-tags': 'error',
       '@typescript-eslint/adjacent-overload-signatures': 'error',

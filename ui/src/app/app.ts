@@ -20,9 +20,6 @@ export class App implements OnInit {
   private messageService = inject(MessageService);
   private heartbeatService = inject(HeartbeatService);
 
-  /**
-   * Initialize.
-   */
   public ngOnInit(): void {
     this.heartbeatService.heartbeat().subscribe({
       next: () => console.log('API: Successfully connected'),

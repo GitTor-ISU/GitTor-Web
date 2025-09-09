@@ -8,10 +8,10 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class SnakeCasePipe implements PipeTransform {
   /**
-   * Transform the camelCase string to snake_case.
+   * Transform a camelCase string to snake_case.
    *
-   * @param {string | null | undefined} value camelCase string.
-   * @returns {string} snake_case string.
+   * @param value camelCase string.
+   * @returns snake_case string.
    */
   public transform(value: string | null | undefined): string {
     if (value === null || value === undefined) {
