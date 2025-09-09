@@ -14,9 +14,6 @@ import { PanelModule } from 'primeng/panel';
 export class NotFound implements OnInit {
   private title = inject(Title);
 
-  /**
-   * Initialize.
-   */
   public ngOnInit(): void {
     this.title.setTitle('UI - 404 Not Found');
   }

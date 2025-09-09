@@ -12,7 +12,7 @@ RUN curl -sf http://host.docker.internal:8080/v3/api-docs -o /tmp/openapi.json
 RUN openapi-generator-cli generate \
   -i /tmp/openapi.json \
   -g typescript-angular \
-  -o src/app/api \
+  -o src/app/core/api \
   --skip-validate-spec
 RUN ng build --configuration=production
 

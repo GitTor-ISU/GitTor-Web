@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
+import { Auth } from '@core/auth';
 import { MenuItem } from 'primeng/api';
 import { AvatarModule } from 'primeng/avatar';
 import { BadgeModule } from 'primeng/badge';
@@ -7,7 +8,6 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { MenuModule } from 'primeng/menu';
 import { Menubar } from 'primeng/menubar';
-import { Auth } from '../auth';
 import { ThemeSwitcher } from './theme-switcher/theme-switcher';
 
 export interface ThemeState {
@@ -53,9 +53,6 @@ export class Navbar implements OnInit {
 
   private auth: Auth = inject(Auth);
 
-  /**
-   * Initialize.
-   */
   public ngOnInit(): void {
     this.refresh();
   }
@@ -86,17 +83,11 @@ export class Navbar implements OnInit {
     ];
   }
 
-  /**
-   * Login.
-   */
   private login(): void {
     this.auth.setToken('token');
     this.refresh();
   }
 
-  /**
-   * Logout.
-   */
   private logout(): void {
     this.auth.removeToken();
     this.refresh();

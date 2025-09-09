@@ -256,9 +256,6 @@ export class ThemeSwitcher implements OnInit {
     this.config.ripple.set(value);
   }
 
-  /**
-   * Initialize.
-   */
   public ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.onPresetChange(this.themeState().preset);

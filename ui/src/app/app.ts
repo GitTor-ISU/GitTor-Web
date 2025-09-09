@@ -1,10 +1,10 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { HeartbeatService } from '@core/api';
+import { Navbar } from '@features/navbar/navbar';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { Toast } from 'primeng/toast';
-import { HeartbeatService } from './api';
-import { Navbar } from './navbar/navbar';
 
 /**
  * Application component.
@@ -20,9 +20,6 @@ export class App implements OnInit {
   private messageService = inject(MessageService);
   private heartbeatService = inject(HeartbeatService);
 
-  /**
-   * Initialize.
-   */
   public ngOnInit(): void {
     this.heartbeatService.heartbeat().subscribe({
       next: () => console.log('API: Successfully connected'),
