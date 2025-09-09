@@ -32,11 +32,11 @@ fi
 until curl -fs http://localhost:8080 | grep -q true; do sleep 1; done
 
 curl -sf http://localhost:8080/v3/api-docs -o /tmp/openapi.json
-rm -rf $UI_DIR/src/app/api
+rm -rf $UI_DIR/src/app/core/api
 npx @openapitools/openapi-generator-cli generate \
     -i /tmp/openapi.json \
     -g typescript-angular \
-    -o $UI_DIR/src/app/api \
+    -o $UI_DIR/src/app/core/api \
     --openapitools $UI_DIR/openapitools.json
 
 ( cd "$UI_DIR" && npm install && npm start )
