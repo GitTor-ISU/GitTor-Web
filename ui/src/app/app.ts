@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { HeartbeatService } from '@core/api';
 import { Navbar } from '@features/navbar/navbar';
+import { HeartbeatService } from '@generated/openapi/services/heartbeat';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { Toast } from 'primeng/toast';

@@ -54,4 +54,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: openapi-typescript
-        path: ui/src/app/core/api
+        path: ui/src/app/generated/openapi
