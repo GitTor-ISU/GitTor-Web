@@ -41,7 +41,7 @@ testem.log
 .DS_Store
 Thumbs.db
 
-# Open API
+# Generated files
 src/app/generated
 
 # Cypress
