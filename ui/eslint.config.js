@@ -9,7 +9,7 @@ const importPlugin = require('eslint-plugin-import');
 const jsdocPlugin = require('eslint-plugin-jsdoc');
 module.exports = [
   {
-    ignores: ['.cache/', '.git/', '.github/', 'node_modules/', 'src/app/core/api'],
+    ignores: ['.cache/', '.git/', '.github/', 'node_modules/', 'src/app/generated/'],
   },
   {
     files: ['**/*.ts'],

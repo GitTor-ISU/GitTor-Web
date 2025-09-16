@@ -43,3 +43,22 @@ It would be costly to have to run this entire architecture during development, s
 - **Nginx** -> **Angular** Angular has a built-in proxy system which replaces the proxy to the api.
 
 There is also a development configuration for the Dockerized architecture, which publicly exposes all containers and creates an extra container that hosts a website for easily viewing the database.
+
+## Frontend Architecture
+
+### Top Level folders
+Most if not all code should fall within one of these folders.
+#### Core 🌎
+- Contains app-wide services, singletons, and infrastructure.
+- Never include components or UI code.
+- All services are provided in the root.
+#### Shared 🤝
+- Contains reusable UI elements and utilities.
+- Examples: components, pipes, directives.
+- Code is always stateless.
+#### Features 🚀
+- Contains user-facing components and pages.
+- Organize functionality into domains.
+- Services are feature-specific and provided only within that feature.
+#### Generated 🤖
+- Contains auto-generated files from backend definitions.

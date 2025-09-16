@@ -5,7 +5,7 @@ import { provideRouter } from '@angular/router';
 import Aura from '@primeuix/themes/aura';
 import { providePrimeNG } from 'primeng/config';
 
-import { Configuration } from '@core/api';
+import { Configuration } from '@generated/openapi';
 import { routes } from './app.routes';
 
 /**

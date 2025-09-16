@@ -42,7 +42,7 @@ testem.log
 Thumbs.db
 
 # Open API
-src/app/core/api/
+src/app/generated
 
 # Cypress
 cypress/screenshots

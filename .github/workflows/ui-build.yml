@@ -53,7 +53,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: openapi-typescript
-        path: ui/src/app/core/api
+        path: ui/src/app/generated/openapi
 
     - name: Build UI
       working-directory: ./ui
