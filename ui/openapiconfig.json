@@ -1,4 +1,18 @@
 {
   "fileNaming": "kebab-case",
-  "serviceFileSuffix": ""
+  "serviceFileSuffix": "",
+  "providedIn": "any",
+  "apiPackage": "services",
+  "modelPackage": "models",
+  "globalProperties": {
+    "apis": "",
+    "models": "",
+    "supportingFiles": [
+      "configuration.ts",
+      "param.ts",
+      "api.base.service.ts",
+      "encoder.ts",
+      "variables.ts"
+    ]
+  }
 }

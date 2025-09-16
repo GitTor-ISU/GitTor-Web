@@ -38,7 +38,6 @@ npx @openapitools/openapi-generator-cli generate \
     -g typescript-angular \
     -o $UI_DIR/src/app/generated/openapi \
     --openapitools $UI_DIR/openapitools.json \
-    -c $UI_DIR/openapiconfig.json \
-    --additional-properties=apiPackage=services
+    -c $UI_DIR/openapiconfig.json
 
 ( cd "$UI_DIR" && npm install && npm start )
