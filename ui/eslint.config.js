@@ -25,6 +25,7 @@ module.exports = [
       prettier: prettierPlugin,
       import: importPlugin,
       jsdoc: jsdocPlugin,
+      rxjs: require('eslint-plugin-rxjs'),
     },
     rules: {
       ...angularPlugin.configs.recommended.rules,
@@ -33,6 +34,7 @@ module.exports = [
       // @ts-ignore
       ...jsdocPlugin.configs['flat/recommended-error'].rules,
       ...tsPlugin.configs.recommended.rules,
+      'rxjs/no-ignored-subscription': 'error',
       '@angular-eslint/directive-selector': [
         'warn',
         {
