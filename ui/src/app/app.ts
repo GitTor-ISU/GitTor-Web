@@ -1,10 +1,11 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { Navbar } from '@features/navbar/navbar';
 import { HeartbeatService } from '@generated/openapi/services/heartbeat';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { Toast } from 'primeng/toast';
+import { Subscription } from 'rxjs';
 
 /**
  * Application component.
@@ -16,12 +17,13 @@ import { Toast } from 'primeng/toast';
   styleUrl: './app.scss',
   providers: [MessageService],
 })
-export class App implements OnInit {
+export class App implements OnInit, OnDestroy {
   private messageService = inject(MessageService);
   private heartbeatService = inject(HeartbeatService);
+  private subscriptions: Subscription[] = [];
 
   public ngOnInit(): void {
-    this.heartbeatService.heartbeat().subscribe({
+    const sub = this.heartbeatService.heartbeat().subscribe({
       next: () => console.log('API: Successfully connected'),
       error: () =>
         this.messageService.add({
@@ -30,5 +32,11 @@ export class App implements OnInit {
           detail: 'API: Failed to connect',
         }),
     });
+
+    this.subscriptions.push(sub);
+  }
+
+  public ngOnDestroy(): void {
+    this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 }
