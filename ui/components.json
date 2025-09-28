@@ -1,0 +1,13 @@
+{
+  "style": "css",
+  "tailwind": {
+    "css": "src/styles.scss",
+    "baseColor": "stone",
+    "cssVariables": true
+  },
+  "aliases": {
+    "components": "src/app/shared/components",
+    "utils": "src/app/shared/utils"
+  },
+  "theme": "stone"
+}
