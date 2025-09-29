@@ -32,4 +32,8 @@ export class App implements OnInit {
         }),
     });
   }
+
+  protected getCurrentTheme(): 'light' | 'dark' {
+    return this.themeService.getCurrentTheme();
+  }
 }
