@@ -10,7 +10,7 @@ const jsdocPlugin = require('eslint-plugin-jsdoc');
 const rxjsXPlugin = require('eslint-plugin-rxjs-x');
 module.exports = [
   {
-    ignores: ['.cache/', '.git/', '.github/', 'node_modules/', 'src/app/generated/'],
+    ignores: ['.cache/', '.git/', '.github/', 'node_modules/', 'src/app/generated/', 'src/app/shared/**/z-*/'],
   },
   {
     files: ['**/*.ts'],

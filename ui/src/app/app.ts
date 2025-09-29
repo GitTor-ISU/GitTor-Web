@@ -1,10 +1,9 @@
-import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ThemeService } from '@core/theme';
 import { Navbar } from '@features/navbar/navbar';
 import { HeartbeatService } from '@generated/openapi/services/heartbeat';
-import { MessageService } from 'primeng/api';
-import { ButtonModule } from 'primeng/button';
-import { Toast } from 'primeng/toast';
+import { NgxSonnerToaster, toast } from 'ngx-sonner';
 import { Subscription } from 'rxjs';
 
 /**
@@ -12,24 +11,26 @@ import { Subscription } from 'rxjs';
  */
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ButtonModule, Toast, Navbar],
+  imports: [RouterOutlet, Navbar, NgxSonnerToaster],
   templateUrl: './app.html',
   styleUrl: './app.scss',
-  providers: [MessageService],
+  providers: [],
 })
 export class App implements OnInit, OnDestroy {
-  private messageService = inject(MessageService);
-  private heartbeatService = inject(HeartbeatService);
+  private readonly heartbeatService = inject(HeartbeatService);
+  private readonly themeService = inject(ThemeService);
   private subscriptions: Subscription[] = [];
 
   public ngOnInit(): void {
+    this.themeService.initTheme();
     const sub = this.heartbeatService.heartbeat().subscribe({
-      next: () => console.log('API: Successfully connected'),
+      next: () =>
+        toast.success('API: Connected', {
+          description: 'Connected to API successfully.',
+        }),
       error: () =>
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Success',
-          detail: 'API: Failed to connect',
+        toast.error('API: Failed to connect', {
+          description: 'Please check if API is running.',
         }),
     });
 
@@ -38,5 +39,9 @@ export class App implements OnInit, OnDestroy {
 
   public ngOnDestroy(): void {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
+  }
+
+  protected getCurrentTheme(): 'light' | 'dark' {
+    return this.themeService.getCurrentTheme();
   }
 }

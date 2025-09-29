@@ -1,13 +1,13 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Title } from '@angular/platform-browser';
-import { PanelModule } from 'primeng/panel';
+import { ZardAlertComponent } from '@shared/components/z-alert/alert.component';
 
 /**
  * 404 not found compnent.
  */
 @Component({
   selector: 'app-not-found',
-  imports: [PanelModule],
+  imports: [ZardAlertComponent],
   templateUrl: './not-found.html',
   styleUrl: './not-found.scss',
 })
