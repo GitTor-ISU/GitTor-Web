@@ -1,5 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ThemeService } from '@core/theme';
 import { Navbar } from '@features/navbar/navbar';
 import { HeartbeatService } from '@generated/openapi/services/heartbeat';
 import { NgxSonnerToaster, toast } from 'ngx-sonner';
@@ -15,9 +16,11 @@ import { NgxSonnerToaster, toast } from 'ngx-sonner';
   providers: [],
 })
 export class App implements OnInit {
-  private heartbeatService = inject(HeartbeatService);
+  private readonly heartbeatService = inject(HeartbeatService);
+  private readonly themeService = inject(ThemeService);
 
   public ngOnInit(): void {
+    this.themeService.initTheme();
     this.heartbeatService.heartbeat().subscribe({
       next: () =>
         toast.success('API: Connected', {

@@ -1,30 +1,39 @@
-<!-- <p-menubar [model]="items">
-  <ng-template #start>
-    <a routerLink="/">
-      <img alt="logo" src="favicon.svg" style="width: 2rem" />
-    </a>
-  </ng-template>
-  <ng-template #end>
-    <div class="flex items-center gap-2">
-      <app-theme-switcher />
-      <p-avatar (click)="menu.toggle($event)" icon="pi pi-user" shape="circle" />
-      <p-menu #menu [model]="userItems" [popup]="true" />
-    </div>
-  </ng-template>
-</p-menubar> -->
-
 <nav
-  class="fixed top-0 left-0 right-0 flex items-center justify-end p-4 pb-2 transition-transform duration-500 z-50 bg-white shadow"
+  class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 pb-2 transition-transform duration-500 shadow bg-background text-foreground"
   [ngClass]="this.isVisible() ? 'translate-y-0' : '-translate-y-full'"
 >
   <div class="flex items-center gap-4">
-    <div class="relative">
-      @for (item of items; track item) {
-        <a z-button zType="ghost" z-menu zTrigger="hover" zDisabled="true" [zMenuTriggerFor]="" href="{{ item.route }}">
-          <lucide-angular [img]="item.icon" />
-          {{ item.label }}
-        </a>
+    @for (item of items; track item) {
+      <a z-button zType="ghost" [href]="item.route">
+        <lucide-angular [img]="item.icon" />
+        {{ item.label }}
+      </a>
+    }
+  </div>
+  <div class="flex items-center">
+    @if (getCurrentTheme() === 'dark') {
+      <button z-button zType="ghost" zShape="circle" zSize="icon" (click)="toggleTheme()">
+        <lucide-angular [img]="sunIcon" />
+      </button>
+    } @else {
+      <button z-button zType="ghost" zShape="circle" zSize="icon" (click)="toggleTheme()">
+        <lucide-angular [img]="moonIcon" />
+      </button>
+    }
+    <z-divider zOrientation="vertical" class="mx-2 h-6" />
+    <button z-button z-menu zType="ghost" zShape="circle" zSize="icon" [zMenuTriggerFor]="productsMenu">
+      <lucide-angular [img]="userIcon" />
+    </button>
+  </div>
+  <ng-template #productsMenu>
+    <div z-menu-content class="w-24">
+      @if (isLoggedIn()) {
+        <button z-menu-item>Profile</button>
+        <button z-menu-item>Settings</button>
+        <button z-menu-item (click)="logout()">Logout</button>
+      } @else {
+        <button z-menu-item (click)="login()">Login</button>
       }
     </div>
-  </div>
+  </ng-template>
 </nav>
