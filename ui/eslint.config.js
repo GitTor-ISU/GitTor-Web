@@ -7,6 +7,7 @@ const angularTemplateParser = require('@angular-eslint/template-parser');
 const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommended');
 const importPlugin = require('eslint-plugin-import');
 const jsdocPlugin = require('eslint-plugin-jsdoc');
+const rxjsXPlugin = require('eslint-plugin-rxjs-x');
 module.exports = [
   {
     ignores: ['.cache/', '.git/', '.github/', 'node_modules/', 'src/app/generated/'],
@@ -25,7 +26,7 @@ module.exports = [
       prettier: prettierPlugin,
       import: importPlugin,
       jsdoc: jsdocPlugin,
-      rxjs: require('eslint-plugin-rxjs'),
+      'rxjs-x': rxjsXPlugin,
     },
     rules: {
       ...angularPlugin.configs.recommended.rules,
@@ -34,7 +35,6 @@ module.exports = [
       // @ts-ignore
       ...jsdocPlugin.configs['flat/recommended-error'].rules,
       ...tsPlugin.configs.recommended.rules,
-      'rxjs/no-ignored-subscription': 'error',
       '@angular-eslint/directive-selector': [
         'warn',
         {
@@ -111,6 +111,7 @@ module.exports = [
       '@typescript-eslint/member-ordering': 'error',
       '@typescript-eslint/explicit-member-accessibility': ['error', { 'accessibility': 'explicit' }],
       '@typescript-eslint/explicit-function-return-type': 'error',
+      'rxjs-x/no-ignored-subscription': 'error',
     },
   },
   {
