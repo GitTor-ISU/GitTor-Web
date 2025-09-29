@@ -1,10 +1,9 @@
 /** @type {import('tailwindcss').Config} */
-import PrimeUI from 'tailwindcss-primeui';
 
 export default {
   darkMode: ['selector', '[class="p-dark"]'],
   content: ['./src/**/*.{html,ts,scss}'],
-  plugins: [PrimeUI],
+  plugins: [require('tailwindcss-animate')],
   theme: {
     screens: {
       sm: '576px',
