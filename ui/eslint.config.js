@@ -3,6 +3,7 @@ const prettierPlugin = require('eslint-plugin-prettier');
 const typescriptParser = require('@typescript-eslint/parser');
 const tsPlugin = require('@typescript-eslint/eslint-plugin');
 const angularPlugin = require('@angular-eslint/eslint-plugin');
+const angularTemplatePlugin = require('@angular-eslint/eslint-plugin-template');
 const angularTemplateParser = require('@angular-eslint/template-parser');
 const eslintPluginPrettierRecommended = require('eslint-plugin-prettier/recommended');
 const importPlugin = require('eslint-plugin-import');
@@ -121,11 +122,23 @@ module.exports = [
     },
     plugins: {
       '@angular-eslint': angularPlugin,
-      '@angular-eslint/template': angularPlugin,
+      '@angular-eslint/template': angularTemplatePlugin,
       prettier: prettierPlugin,
     },
     rules: {
       'prettier/prettier': ['error', { parser: 'angular' }],
+      '@angular-eslint/template/prefer-control-flow': 'error',
+      '@angular-eslint/template/banana-in-box': 'error',
+      '@angular-eslint/template/eqeqeq': 'error',
+      '@angular-eslint/template/no-negated-async': 'error',
+      '@angular-eslint/template/conditional-complexity': ['error', { maxComplexity: 5 }],
+      '@angular-eslint/template/no-duplicate-attributes': ['error', { allowStylePrecedenceDuplicates: true }],
+      '@angular-eslint/template/prefer-self-closing-tags': 'error',
+      '@angular-eslint/template/attributes-order': 'error',
+      '@angular-eslint/template/no-interpolation-in-attributes': 'error',
+      '@angular-eslint/template/prefer-ngsrc': 'error',
+      '@angular-eslint/template/prefer-template-literal': 'error',
+      '@angular-eslint/template/prefer-static-string-properties': 'error',
     },
   },
   eslintPluginPrettierRecommended,
