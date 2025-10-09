@@ -13,9 +13,10 @@ import {
   HouseIcon,
   InfoIcon,
   LucideAngularModule,
-  Moon,
-  Sun,
-  UserCog,
+  MenuIcon,
+  MoonIcon,
+  SunIcon,
+  UserCogIcon,
 } from 'lucide-angular';
 
 /**
@@ -31,9 +32,10 @@ export class Navbar implements OnInit {
   protected readonly isLoggedIn = signal(false);
   protected readonly isVisible = signal(true);
 
-  protected userIcon = UserCog;
-  protected sunIcon = Sun;
-  protected moonIcon = Moon;
+  protected userIcon = UserCogIcon;
+  protected sunIcon = SunIcon;
+  protected moonIcon = MoonIcon;
+  protected menuIcon = MenuIcon;
   protected items: MenuItem[] = [
     {
       label: 'Home',
