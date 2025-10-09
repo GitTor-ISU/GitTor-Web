@@ -1,24 +1,37 @@
 <nav
-  class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 pb-2 transition-transform duration-500 shadow bg-background text-foreground"
+  class="fixed top-0 left-0 right-enter justify-between p-4 pb-2 transition-transform duration-500 shadow bg-background text-foreground"
   [ngClass]="this.isVisible() ? 'translate-y-0' : '-translate-y-full'"
 >
-  <div class="flex items-center gap-4">
-    @for (item of items; track item) {
-      <a z-button zType="ghost" [href]="item.route">
-        <lucide-angular [img]="item.icon" />
-        {{ item.label }}
-      </a>
-    }
+  <div class="md:hidden items-center gap-4">
+    <button z-button zType="ghost" z-menu zTrigger="hover" [zMenuTriggerFor]="navMenu">
+      <lucide-angular [img]="menuIcon" />
+    </button>
   </div>
+  <div class="md:flex hidden items-center gap-4">
+    <ng-container *ngTemplateOutlet="buttons"></ng-container>
+  </div>
+  <ng-template #navMenu>
+    <div z-menu-content class="w-48">
+      <ng-container *ngTemplateOutlet="buttons"></ng-container>
+    </div>
+  </ng-template>
+  <ng-template #buttons>
+    @for (item of items; track item) {
+    <a z-button zType="ghost" [href]="item.route">
+      <lucide-angular [img]="item.icon" />
+      {{ item.label }}
+    </a>
+    }
+  </ng-template>
   <div class="flex items-center">
     @if (getCurrentTheme() === 'dark') {
-      <button z-button zType="ghost" zShape="circle" zSize="icon" (click)="toggleTheme()">
-        <lucide-angular [img]="sunIcon" />
-      </button>
+    <button z-button zType="ghost" zShape="circle" zSize="icon" (click)="toggleTheme()">
+      <lucide-angular [img]="sunIcon" />
+    </button>
     } @else {
-      <button z-button zType="ghost" zShape="circle" zSize="icon" (click)="toggleTheme()">
-        <lucide-angular [img]="moonIcon" />
-      </button>
+    <button z-button zType="ghost" zShape="circle" zSize="icon" (click)="toggleTheme()">
+      <lucide-angular [img]="moonIcon" />
+    </button>
     }
     <z-divider zOrientation="vertical" class="mx-2 h-6" />
     <button z-button z-menu zType="ghost" zShape="circle" zSize="icon" [zMenuTriggerFor]="productsMenu">
@@ -28,11 +41,11 @@
   <ng-template #productsMenu>
     <div z-menu-content class="w-24">
       @if (isLoggedIn()) {
-        <button z-menu-item>Profile</button>
-        <button z-menu-item>Settings</button>
-        <button z-menu-item (click)="logout()">Logout</button>
+      <button z-menu-item>Profile</button>
+      <button z-menu-item>Settings</button>
+      <button z-menu-item (click)="logout()">Logout</button>
       } @else {
-        <button z-menu-item (click)="login()">Login</button>
+      <button z-menu-item (click)="login()">Login</button>
       }
     </div>
   </ng-template>
