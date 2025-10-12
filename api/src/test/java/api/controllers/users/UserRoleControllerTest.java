@@ -1,15 +1,16 @@
 package api.controllers.users;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,7 @@ public class UserRoleControllerTest extends BasicContext {
     @Nested
     public class GetUserRoles {
         private static final String ENDPOINT = "/users/{id}/roles";
-        private final Role USER_ROLE = roleService.get(RoleService.USER_ROLE_NAME);
+        private final Role userRole = roleService.get(RoleService.USER_ROLE_NAME);
 
         @Test
         public void shouldGetUserRoles() {
@@ -67,7 +68,7 @@ public class UserRoleControllerTest extends BasicContext {
 
             // GIVEN: New user exists with new role
             String username = "user_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(role, USER_ROLE)).build());
+            User user = userService.save(User.builder().username(username).roles(Set.of(role, userRole)).build());
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -139,7 +140,7 @@ public class UserRoleControllerTest extends BasicContext {
         public void should404_whenNonexistentUser() {
             // GIVEN: New user exists
             String username = "user_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(USER_ROLE)).build());
+            User user = userService.save(User.builder().username(username).roles(Set.of(userRole)).build());
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -173,7 +174,7 @@ public class UserRoleControllerTest extends BasicContext {
     @Nested
     public class SetUserRoles {
         private static final String ENDPOINT = "/users/{id}/roles";
-        private final Role USER_ROLE = roleService.get(RoleService.USER_ROLE_NAME);
+        private final Role userRole = roleService.get(RoleService.USER_ROLE_NAME);
 
         @Test
         public void shouldSetUserRoles() {
@@ -189,7 +190,7 @@ public class UserRoleControllerTest extends BasicContext {
 
             // GIVEN: New user exists with new role
             String username = "user_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(role1, USER_ROLE)).build());
+            User user = userService.save(User.builder().username(username).roles(Set.of(role1, userRole)).build());
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -234,7 +235,7 @@ public class UserRoleControllerTest extends BasicContext {
 
             // GIVEN: New user exists with new role
             String username = "user_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(role, USER_ROLE)).build());
+            User user = userService.save(User.builder().username(username).roles(Set.of(role, userRole)).build());
 
             // GIVEN: Admin authentication header with wrong role id
             HttpHeaders headers = new HttpHeaders();
@@ -298,7 +299,7 @@ public class UserRoleControllerTest extends BasicContext {
         public void should404_whenNonexistentUser() {
             // GIVEN: New user exists
             String username = "user_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(USER_ROLE)).build());
+            User user = userService.save(User.builder().username(username).roles(Set.of(userRole)).build());
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -332,7 +333,7 @@ public class UserRoleControllerTest extends BasicContext {
     @Nested
     public class AddUserRoles {
         private static final String ENDPOINT = "/users/{id}/roles";
-        private final Role USER_ROLE = roleService.get(RoleService.USER_ROLE_NAME);
+        private final Role userRole = roleService.get(RoleService.USER_ROLE_NAME);
 
         @Test
         public void shouldAddUserRoles() {
@@ -348,7 +349,7 @@ public class UserRoleControllerTest extends BasicContext {
 
             // GIVEN: New user exists with new role
             String username = "user_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(role1, USER_ROLE)).build());
+            User user = userService.save(User.builder().username(username).roles(Set.of(role1, userRole)).build());
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -397,7 +398,7 @@ public class UserRoleControllerTest extends BasicContext {
 
             // GIVEN: New user exists with new role
             String username = "user_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(role, USER_ROLE)).build());
+            User user = userService.save(User.builder().username(username).roles(Set.of(role, userRole)).build());
 
             // GIVEN: Admin authentication header with wrong role id
             HttpHeaders headers = new HttpHeaders();
@@ -442,7 +443,7 @@ public class UserRoleControllerTest extends BasicContext {
 
             // GIVEN: New user exists with new role
             String username = "user_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(role, USER_ROLE)).build());
+            User user = userService.save(User.builder().username(username).roles(Set.of(role, userRole)).build());
 
             // GIVEN: Admin authentication header with wrong role id
             HttpHeaders headers = new HttpHeaders();
@@ -514,7 +515,7 @@ public class UserRoleControllerTest extends BasicContext {
         public void should404_whenNonexistentUser() {
             // GIVEN: New user exists
             String username = "user_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(USER_ROLE)).build());
+            User user = userService.save(User.builder().username(username).roles(Set.of(userRole)).build());
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -548,7 +549,7 @@ public class UserRoleControllerTest extends BasicContext {
     @Nested
     public class RemoveUserRoles {
         private static final String ENDPOINT = "/users/{id}/roles";
-        private final Role USER_ROLE = roleService.get(RoleService.USER_ROLE_NAME);
+        private final Role userRole = roleService.get(RoleService.USER_ROLE_NAME);
 
         @Test
         public void shouldRemoveUserRoles() {
@@ -565,7 +566,7 @@ public class UserRoleControllerTest extends BasicContext {
             // GIVEN: New user exists with new role
             String username = "user_" + UUID.randomUUID();
             User user = userService
-                    .save(User.builder().username(username).roles(Set.of(role1, role2, USER_ROLE)).build());
+                    .save(User.builder().username(username).roles(Set.of(role1, role2, userRole)).build());
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -610,7 +611,7 @@ public class UserRoleControllerTest extends BasicContext {
 
             // GIVEN: New user exists with new role
             String username = "user_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(role, USER_ROLE)).build());
+            User user = userService.save(User.builder().username(username).roles(Set.of(role, userRole)).build());
 
             // GIVEN: Admin authentication header with wrong role id
             HttpHeaders headers = new HttpHeaders();
@@ -682,7 +683,7 @@ public class UserRoleControllerTest extends BasicContext {
         public void should404_whenNonexistentUser() {
             // GIVEN: New user exists
             String username = "user_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(USER_ROLE)).build());
+            User user = userService.save(User.builder().username(username).roles(Set.of(userRole)).build());
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
