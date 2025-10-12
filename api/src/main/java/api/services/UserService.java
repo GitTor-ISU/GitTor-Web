@@ -206,6 +206,9 @@ public class UserService implements UserDetailsService {
      */
     @Transactional
     public User save(User user) {
+        if (!user.getRoles().stream().anyMatch(role -> role.getName().equals(RoleService.USER_ROLE_NAME))) {
+            throw new IllegalStateException("User must have user role.");
+        }
         User saved = userRepository.save(user);
         log.info("User saved: " + user);
         return saved;
