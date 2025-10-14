@@ -195,6 +195,53 @@ public class UserRoleControllerTest extends BasicContext {
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(adminAuth.getAccessToken());
+            HttpEntity<List<Integer>> request = new HttpEntity<>(List.of(role2.getId(), userRole.getId()), headers);
+
+            // GIVEN: New user id in path
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                    .path(ENDPOINT)
+                    .buildAndExpand(user.getId())
+                    .toUri();
+
+            // WHEN: Set user roles
+            ResponseEntity<List<RoleDto>> responseEntity = testRestTemplate.exchange(
+                    uri, HttpMethod.POST, request, new ParameterizedTypeReference<List<RoleDto>>() {
+                    });
+
+            // THEN: Returns user roles, including 'USER' role
+            assertAll(
+                    () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                    () -> assertNotNull(responseEntity.getBody()),
+                    () -> assertEquals(2, responseEntity.getBody().size()),
+                    () -> assertTrue(
+                            responseEntity.getBody().stream()
+                                    .anyMatch(a -> {
+                                        return role2.getId() == a.getId()
+                                                && a.getAuthorityIds().size() == 1
+                                                && a.getAuthorityIds().contains(authority.getId());
+                                    }),
+                            "Expected authority '" + authorityName + "' not found in role '" + roleName2 + "'"));
+        }
+
+        @Test
+        public void shouldSetUserRoles_withoutUserRole() {
+            // GIVEN: New authority exists
+            String authorityName = "authority_" + UUID.randomUUID();
+            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+
+            // GIVEN: Two new role exists (second one with authorities)
+            String roleName1 = "role_" + UUID.randomUUID();
+            String roleName2 = "role_" + UUID.randomUUID();
+            Role role1 = roleService.save(Role.builder().name(roleName1).build());
+            Role role2 = roleService.save(Role.builder().name(roleName2).authorities(Set.of(authority)).build());
+
+            // GIVEN: New user exists with new role
+            String username = "user_" + UUID.randomUUID();
+            User user = userService.save(User.builder().username(username).roles(Set.of(role1, userRole)).build());
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
             HttpEntity<List<Integer>> request = new HttpEntity<>(List.of(role2.getId()), headers);
 
             // GIVEN: New user id in path
@@ -208,7 +255,7 @@ public class UserRoleControllerTest extends BasicContext {
                     uri, HttpMethod.POST, request, new ParameterizedTypeReference<List<RoleDto>>() {
                     });
 
-            // THEN: Returns user roles
+            // THEN: Returns user roles, including 'USER' role
             assertAll(
                     () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                     () -> assertNotNull(responseEntity.getBody()),
@@ -253,7 +300,7 @@ public class UserRoleControllerTest extends BasicContext {
                     uri, HttpMethod.POST, request, new ParameterizedTypeReference<List<RoleDto>>() {
                     });
 
-            // THEN: Returns only the 'user' role
+            // THEN: Returns only the 'USER' role
             assertAll(
                     () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                     () -> assertNotNull(responseEntity.getBody()),
@@ -642,6 +689,47 @@ public class UserRoleControllerTest extends BasicContext {
                                                 && a.getAuthorityIds().contains(authority.getId());
                                     }),
                             "Expected authority '" + authorityName + "' not found in role '" + roleName + "'"));
+        }
+
+        @Test
+        public void should400_whenRemoveUserRole() {
+            // GIVEN: New authority exists
+            String authorityName = "authority_" + UUID.randomUUID();
+            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+
+            // GIVEN: Two new role exists (second one with authorities)
+            String roleName1 = "role_" + UUID.randomUUID();
+            String roleName2 = "role_" + UUID.randomUUID();
+            Role role1 = roleService.save(Role.builder().name(roleName1).build());
+            Role role2 = roleService.save(Role.builder().name(roleName2).authorities(Set.of(authority)).build());
+
+            // GIVEN: New user exists with new role
+            String username = "user_" + UUID.randomUUID();
+            User user = userService
+                    .save(User.builder().username(username).roles(Set.of(role1, role2, userRole)).build());
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            HttpEntity<List<Integer>> request = new HttpEntity<>(List.of(role1.getId(), userRole.getId()), headers);
+
+            // GIVEN: New user id in path
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                    .path(ENDPOINT)
+                    .buildAndExpand(user.getId())
+                    .toUri();
+
+            // WHEN: Remove user roles
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                    uri, HttpMethod.DELETE, request, new ParameterizedTypeReference<ErrorDto>() {
+                    });
+
+            // THEN: Returns user roles without deleted role
+            assertAll(
+                    () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
+                    () -> assertNotNull(responseEntity.getBody()),
+                    () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                    () -> assertEquals("Cannot remove user role.", responseEntity.getBody().getMessage()));
         }
 
         @Test
