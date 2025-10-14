@@ -133,7 +133,9 @@ public class UserRoleController {
     @PreAuthorize("hasAuthority(@DbSetup.USER_WRITE) and hasAuthority(@DbSetup.ROLE_READ)")
     public List<RoleDto> setUserRoles(@PathVariable int userId, @RequestBody List<Integer> roleIds) {
         User user = userService.get(userId);
-        user.setRoles(new HashSet<>(roleService.get(roleIds)));
+        Set<Role> roles = new HashSet<>(roleService.get(roleIds));
+        roles.add(roleService.get(RoleService.USER_ROLE_NAME));
+        user.setRoles(roles);
         userService.save(user);
 
         return userService.getRoles(userId).stream()
@@ -227,6 +229,13 @@ public class UserRoleController {
             )
         ),
         @ApiResponse(
+            responseCode = "400",
+            content = @Content(
+                schema = @Schema(implementation = ErrorDto.class),
+                mediaType = "application/json"
+            )
+        ),
+        @ApiResponse(
             responseCode = "403",
             content = @Content(
                 schema = @Schema(implementation = ErrorDto.class),
@@ -251,6 +260,10 @@ public class UserRoleController {
     public List<RoleDto> removeUserRoles(@PathVariable int userId, @RequestBody List<Integer> roleIds) {
         Set<Role> roles = userService.getRoles(userId);
         roles.removeAll(roleService.get(roleIds));
+        if (!roles.contains(roleService.get(RoleService.USER_ROLE_NAME))) {
+            throw new IllegalArgumentException(
+                    "Role '" + RoleService.USER_ROLE_NAME + "' cannot be removed from users.");
+        }
 
         User user = userService.get(userId);
         user.setRoles(roles);
