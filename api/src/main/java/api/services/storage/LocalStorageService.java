@@ -93,4 +93,3 @@ public class LocalStorageService implements SimpleStorageService {
         }
     }
 }
-

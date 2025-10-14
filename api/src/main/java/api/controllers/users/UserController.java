@@ -216,7 +216,7 @@ public class UserController {
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(required = false) Integer size
     ) {
-        int requestedSize = (size != null) ? size : defaultPageSize;
+        int requestedSize = size != null ? size : defaultPageSize;
         int safeSize = Math.min(requestedSize, maxPageSize);
 
         Pageable pageable = PageRequest.of(page, safeSize, Sort.by("id").ascending());

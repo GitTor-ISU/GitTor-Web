@@ -41,7 +41,7 @@ public class SecurityConfig {
             .sessionManagement(httpSecuritySessionManagementConfigurer ->
                 httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-            .authorizeHttpRequests((requests) -> requests
+            .authorizeHttpRequests(requests -> requests
                 .requestMatchers("/").permitAll()
                 .requestMatchers("/v3/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
