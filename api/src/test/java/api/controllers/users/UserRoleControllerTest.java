@@ -729,7 +729,8 @@ public class UserRoleControllerTest extends BasicContext {
                     () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
                     () -> assertNotNull(responseEntity.getBody()),
                     () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                    () -> assertEquals("Cannot remove user role.", responseEntity.getBody().getMessage()));
+                    () -> assertEquals("Role '" + RoleService.USER_ROLE_NAME + "' cannot be removed from users.",
+                            responseEntity.getBody().getMessage()));
         }
 
         @Test

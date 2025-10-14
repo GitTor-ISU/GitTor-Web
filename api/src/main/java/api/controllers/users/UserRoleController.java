@@ -261,7 +261,8 @@ public class UserRoleController {
         Set<Role> roles = userService.getRoles(userId);
         roles.removeAll(roleService.get(roleIds));
         if (!roles.contains(roleService.get(RoleService.USER_ROLE_NAME))) {
-            throw new IllegalArgumentException("Cannot remove user role.");
+            throw new IllegalArgumentException(
+                    "Role '" + RoleService.USER_ROLE_NAME + "' cannot be removed from users.");
         }
 
         User user = userService.get(userId);
