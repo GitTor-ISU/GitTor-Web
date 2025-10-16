@@ -20,7 +20,7 @@ public class EntityNotFoundException extends RuntimeException {
      * @return {@link EntityNotFoundException}
      */
     public static EntityNotFoundException fromUser(String username) {
-        return new EntityNotFoundException("User '" + username +  "' not found.");
+        return new EntityNotFoundException("User '" + username + "' not found.");
     }
 
     /**
@@ -31,7 +31,7 @@ public class EntityNotFoundException extends RuntimeException {
      * @see EntityNotFoundException#fromUser(String) from username (when possible)
      */
     public static EntityNotFoundException fromUser(int id) {
-        return new EntityNotFoundException("User " + id +  " not found.");
+        return new EntityNotFoundException("User " + id + " not found.");
     }
 
     /**
@@ -41,7 +41,7 @@ public class EntityNotFoundException extends RuntimeException {
      * @return {@link EntityNotFoundException}
      */
     public static EntityNotFoundException fromUserAvatar(String username) {
-        return new EntityNotFoundException("User '" + username +  "' avatar not found.");
+        return new EntityNotFoundException("User '" + username + "' avatar not found.");
     }
 
     /**
@@ -52,7 +52,7 @@ public class EntityNotFoundException extends RuntimeException {
      * @see EntityNotFoundException#fromUserAvatar(String) from username (when possible)
      */
     public static EntityNotFoundException fromUserAvatar(int id) {
-        return new EntityNotFoundException("User " + id +  " avatar not found.");
+        return new EntityNotFoundException("User " + id + " avatar not found.");
     }
 
     /**
@@ -62,7 +62,7 @@ public class EntityNotFoundException extends RuntimeException {
      * @return {@link EntityNotFoundException}
      */
     public static EntityNotFoundException fromRole(String role) {
-        return new EntityNotFoundException("Role '" + role +  "' not found.");
+        return new EntityNotFoundException("Role '" + role + "' not found.");
     }
 
     /**
@@ -73,7 +73,7 @@ public class EntityNotFoundException extends RuntimeException {
      * @see EntityNotFoundException#fromRole(String) from role name (when possible)
      */
     public static EntityNotFoundException fromRole(int id) {
-        return new EntityNotFoundException("Role " + id +  " not found.");
+        return new EntityNotFoundException("Role " + id + " not found.");
     }
 
     /**
@@ -83,7 +83,7 @@ public class EntityNotFoundException extends RuntimeException {
      * @return {@link EntityNotFoundException}
      */
     public static EntityNotFoundException fromAuthority(String authority) {
-        return new EntityNotFoundException("Authority '" + authority +  "' not found.");
+        return new EntityNotFoundException("Authority '" + authority + "' not found.");
     }
 
     /**
@@ -94,6 +94,6 @@ public class EntityNotFoundException extends RuntimeException {
      * @see EntityNotFoundException#fromAuthority(String) from authority name (when possible)
      */
     public static EntityNotFoundException fromAuthority(int id) {
-        return new EntityNotFoundException("Authority " + id +  " not found.");
+        return new EntityNotFoundException("Authority " + id + " not found.");
     }
 }

@@ -20,7 +20,7 @@ public class DuplicateEntityException extends RuntimeException {
      * @return {@link DuplicateEntityException}
      */
     public static DuplicateEntityException fromUser(String username) {
-        return new DuplicateEntityException("User '" + username +  "' already exists.");
+        return new DuplicateEntityException("User '" + username + "' already exists.");
     }
 
     /**
@@ -30,6 +30,6 @@ public class DuplicateEntityException extends RuntimeException {
      * @return {@link DuplicateEntityException}
      */
     public static DuplicateEntityException fromRole(String role) {
-        return new DuplicateEntityException("Role '" + role +  "' already exists.");
+        return new DuplicateEntityException("Role '" + role + "' already exists.");
     }
 }
