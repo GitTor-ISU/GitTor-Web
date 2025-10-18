@@ -10,7 +10,7 @@
   --background-mid: oklch(0.98 0 0); // Cards, popovers, etc
   --foreground: oklch(0.1 0 0); // Dark Text
   --background-light: oklch(1 0 0);
-  --highlight: oklch(1 0 0);
+  --highlight: var(--background);
   --card: var(--background-mid);
   --card-foreground: var(--foreground);
   --popover: var(--background-mid);
@@ -43,11 +43,11 @@
 }
 
 .dark {
-  --background: oklch(0.125 0 0); // Page background
-  --background-mid: oklch(0.175 0 0); // Cards, popovers, etc
+  --background: oklch(0.175 0 0); // Page background
+  --background-mid: oklch(0.2 0 0); // Cards, popovers, etc
   --foreground: oklch(0.95 0 0); // Light text
   --background-light: oklch(0.225 0 0);
-  --highlight: oklch(0.6 0 0);
+  --highlight: oklch(0.45 0 0);
   --card: var(--background-mid);
   --card-foreground: var(--foreground);
   --popover: var(--background-mid);
@@ -80,6 +80,13 @@
   --shadow:
     0px 4px 6px oklch(0 0 0 / 0.5),
     0px 8px 12px oklch(0 0 0 / 0.7);
+}
+
+// For custom colors
+@theme {
+  --color-background-mid: var(--background-mid);
+  --color-highlight: var(--highlight);
+  --color-background-light: var(--background-light);
 }
 
 @theme inline {
@@ -123,6 +130,6 @@
 
 @layer base {
   * {
-    @apply border-[var(--border)];
+    @apply border-border;
   }
 }
