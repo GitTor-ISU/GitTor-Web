@@ -1,13 +1,13 @@
 {
   "style": "css",
+  "packageManager": "npm",
   "tailwind": {
     "css": "src/styles.scss",
-    "baseColor": "stone",
+    "baseColor": "neutral",
     "cssVariables": true
   },
   "aliases": {
     "components": "src/app/shared/components",
     "utils": "src/app/shared/utils"
-  },
-  "theme": "stone"
+  }
 }
