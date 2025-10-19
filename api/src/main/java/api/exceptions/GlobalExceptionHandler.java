@@ -61,4 +61,15 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorDto> handleAccessDeniedException(AccessDeniedException ex) {
         return new ResponseEntity<>(errorService.error(ex.getMessage()), HttpStatus.FORBIDDEN);
     }
+
+    /**
+     * Handle {@link IllegalStateException}.
+     *
+     * @param ex Exception
+     * @return {@link ResponseEntity}
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorDto> handleIllegalStateException(IllegalStateException ex) {
+        return new ResponseEntity<>(errorService.error(ex.getMessage()), HttpStatus.CONFLICT);
+    }
 }
