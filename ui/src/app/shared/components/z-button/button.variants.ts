@@ -11,7 +11,7 @@ export const buttonVariants = cva(
         outline:
           'border border-t-highlight bg-secondary shadow-xs/10 hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:hover:bg-input/50',
         secondary: 'bg-secondary text-secondary-foreground shadow-xs/10 hover:bg-secondary/80',
-        ghost: 'hover:bg-background-mid hover:text-accent-foreground dark:hover:bg-accent/50',
+        ghost: 'hover:bg-muted hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
       },
       zSize: {
