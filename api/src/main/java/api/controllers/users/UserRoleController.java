@@ -135,6 +135,13 @@ public class UserRoleController {
         User user = userService.get(userId);
         Set<Role> roles = new HashSet<>(roleService.get(roleIds));
         roles.add(roleService.get(RoleService.USER_ROLE_NAME));
+        if (user.getRoles().contains(roleService.get(RoleService.ADMIN_ROLE_NAME))
+            && !roles.contains(roleService.get(RoleService.ADMIN_ROLE_NAME))
+            && userService.getAllContainingRole(roleService.get(RoleService.ADMIN_ROLE_NAME)).size() == 1
+        ) {
+            throw new IllegalStateException(
+                "Role '" + RoleService.ADMIN_ROLE_NAME + "' cannot be removed from only admin user.");
+        }
         user.setRoles(roles);
         userService.save(user);
 
@@ -259,10 +266,18 @@ public class UserRoleController {
         """)
     public List<RoleDto> removeUserRoles(@PathVariable int userId, @RequestBody List<Integer> roleIds) {
         Set<Role> roles = userService.getRoles(userId);
-        roles.removeAll(roleService.get(roleIds));
-        if (!roles.contains(roleService.get(RoleService.USER_ROLE_NAME))) {
-            throw new IllegalArgumentException(
+        if (roles.removeAll(roleService.get(roleIds))) {
+            if (!roles.contains(roleService.get(RoleService.USER_ROLE_NAME))) {
+                throw new IllegalArgumentException(
                     "Role '" + RoleService.USER_ROLE_NAME + "' cannot be removed from users.");
+            }
+            if (!roles.contains(roleService.get(RoleService.ADMIN_ROLE_NAME))
+                && userService.getAllContainingRole(roleService.get(RoleService.ADMIN_ROLE_NAME))
+                    .equals(Set.of(userService.get(userId)))
+            ) {
+                throw new IllegalStateException(
+                    "Role '" + RoleService.ADMIN_ROLE_NAME + "' cannot be removed from only admin user.");
+            }
         }
 
         User user = userService.get(userId);
