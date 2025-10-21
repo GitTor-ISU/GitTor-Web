@@ -12,6 +12,7 @@ import api.entities.Role;
 import api.entities.User;
 import api.exceptions.EntityNotFoundException;
 import api.repositories.RoleRepository;
+import api.repositories.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -23,7 +24,7 @@ public class RoleService {
     @Autowired
     private RoleRepository roleRepository;
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
 
     public static final String USER_ROLE_NAME = "USER";
     public static final String ADMIN_ROLE_NAME = "ADMIN";
@@ -137,11 +138,11 @@ public class RoleService {
      */
     @Transactional
     public void detachFromUsers(Role role) {
-        for (User user : userService.getAllContainingRole(role)) {
+        for (User user : userRepository.findAllByRolesContaining(role)) {
             Set<Role> roles = user.getRoles();
             roles.remove(role);
             user.setRoles(roles);
-            userService.save(user);
+            userRepository.save(user);
         }
     }
 

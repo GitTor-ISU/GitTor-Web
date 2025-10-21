@@ -134,8 +134,7 @@ public class UserService implements UserDetailsService {
      */
     @Transactional(readOnly = true)
     public Set<User> getAllContainingRole(Role role) {
-        Set<User> user = userRepository.findAllByRolesContaining(role);
-        return user;
+        return userRepository.findAllByRolesContaining(role);
     }
 
     /**
@@ -146,9 +145,8 @@ public class UserService implements UserDetailsService {
      */
     @Transactional(readOnly = true)
     public User get(int id) {
-        User user = find(id)
+        return find(id)
             .orElseThrow(() -> EntityNotFoundException.fromUser(id));
-        return user;
     }
 
     /**
@@ -159,9 +157,8 @@ public class UserService implements UserDetailsService {
      */
     @Transactional(readOnly = true)
     public User get(String username) {
-        User user = find(username)
+        return find(username)
             .orElseThrow(() -> EntityNotFoundException.fromUser(username));
-        return user;
     }
 
     /**
