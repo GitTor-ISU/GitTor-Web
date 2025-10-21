@@ -24,7 +24,6 @@ import api.dtos.ErrorDto;
 import api.dtos.UserDto;
 import api.entities.User;
 import api.mapper.UserMapper;
-import api.services.RoleService;
 import api.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -43,8 +42,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class UserController {
     @Autowired
     private UserService userService;
-    @Autowired
-    private RoleService roleService;
     @Autowired
     private UserMapper userMapper;
     @Autowired
@@ -178,11 +175,6 @@ public class UserController {
     // endregion
     @DeleteMapping("/me")
     public void deleteMe(@AuthenticationPrincipal User user) {
-        if (user.getRoles().contains(roleService.get(RoleService.ADMIN_ROLE_NAME))
-            && userService.getAllContainingRole(roleService.get(RoleService.ADMIN_ROLE_NAME)).size() == 1
-        ) {
-            throw new IllegalStateException("Last admin user cannot be deleted.");
-        }
         userService.delete(user);
     }
 
@@ -362,11 +354,6 @@ public class UserController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority(@DbSetup.USER_WRITE)")
     public void deleteUser(@PathVariable int id) {
-        if (userService.getRoles(id).contains(roleService.get(RoleService.ADMIN_ROLE_NAME))
-            && userService.getAllContainingRole(roleService.get(RoleService.ADMIN_ROLE_NAME)).size() == 1
-        ) {
-            throw new IllegalStateException("Last admin user cannot be deleted.");
-        }
         userService.delete(id);
     }
 }

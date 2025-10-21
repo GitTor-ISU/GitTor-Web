@@ -41,6 +41,8 @@ public class UserService implements UserDetailsService {
     @Autowired
     private UserMapper userMapper;
     @Autowired
+    private RoleService roleService;
+    @Autowired
     private S3ObjectService s3ObjectService;
     @Autowired
     private MimeTypeService mimeTypeService;
@@ -206,8 +208,13 @@ public class UserService implements UserDetailsService {
      */
     @Transactional
     public User save(User user) {
-        if (!user.getRoles().stream().anyMatch(role -> role.getName().equals(RoleService.USER_ROLE_NAME))) {
+        if (!user.getRoles().contains(roleService.get(RoleService.USER_ROLE_NAME))) {
             throw new IllegalStateException("User must have user role.");
+        }
+        if (!user.getRoles().contains(roleService.get(RoleService.ADMIN_ROLE_NAME))
+            && getAllContainingRole(roleService.get(RoleService.ADMIN_ROLE_NAME)).isEmpty()
+        ) {
+            throw new IllegalStateException("User must exist in the system with admin role.");
         }
         User saved = userRepository.save(user);
         log.info("User saved: " + user);
@@ -224,6 +231,11 @@ public class UserService implements UserDetailsService {
         if (!exists(id)) {
             throw EntityNotFoundException.fromUser(id);
         }
+        if (getRoles(id).contains(roleService.get(RoleService.ADMIN_ROLE_NAME))
+            && getAllContainingRole(roleService.get(RoleService.ADMIN_ROLE_NAME)).size() == 1
+        ) {
+            throw new IllegalStateException("Last admin user cannot be removed from the system.");
+        }
         userRepository.deleteById(id);
         log.info("User deleted: " + id);
     }
@@ -235,6 +247,12 @@ public class UserService implements UserDetailsService {
      */
     @Transactional
     public void delete(User user) {
+        if (user.getRoles().contains(roleService.get(RoleService.ADMIN_ROLE_NAME))
+            && getAllContainingRole(roleService.get(RoleService.ADMIN_ROLE_NAME)).size() == 1
+        ) {
+            throw new IllegalStateException("Last admin user cannot be removed from the system.");
+
+        }
         userRepository.delete(user);
         log.info("User deleted: " + user);
     }
