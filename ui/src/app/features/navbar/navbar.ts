@@ -5,6 +5,7 @@ import { ZardButtonComponent } from '@shared/components/z-button/button.componen
 import { MenuItem } from '@shared/components/z-menu/menu-item.directive';
 import { ZardMenuModule } from '@shared/components/z-menu/menu.module';
 
+import { RouterLink } from '@angular/router';
 import { ThemeService } from '@core/theme';
 import { ZardDividerComponent } from '@shared/components/z-divider/divider.component';
 import {
@@ -24,7 +25,7 @@ import {
  */
 @Component({
   selector: 'app-navbar',
-  imports: [ZardMenuModule, ZardButtonComponent, CommonModule, LucideAngularModule, ZardDividerComponent],
+  imports: [ZardMenuModule, ZardButtonComponent, CommonModule, LucideAngularModule, ZardDividerComponent, RouterLink],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
 })

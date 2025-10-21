@@ -1,13 +1,13 @@
 <nav
-  class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 pb-2 transition-transform duration-500 shadow bg-background text-foreground"
+  class="text-foreground bg-background-light fixed top-0 right-0 left-0 z-50 flex items-center justify-between rounded-b-lg border px-5 py-3 shadow-md/10 transition-transform duration-500"
   [ngClass]="this.isVisible() ? 'translate-y-0' : '-translate-y-full'"
 >
-  <div class="md:hidden items-center gap-4">
+  <div class="items-center gap-4 md:hidden">
     <button z-button zType="ghost" z-menu zTrigger="hover" [zMenuTriggerFor]="navMenu">
       <lucide-angular [img]="menuIcon" />
     </button>
   </div>
-  <div class="md:flex hidden items-center gap-4">
+  <div class="hidden items-center gap-4 md:flex">
     <ng-container *ngTemplateOutlet="buttons" />
   </div>
   <ng-template #navMenu>
@@ -17,7 +17,7 @@
   </ng-template>
   <ng-template #buttons>
     @for (item of items; track item) {
-      <a z-button zType="ghost" [href]="item.route">
+      <a z-button zType="ghost" [routerLink]="item.route">
         <lucide-angular [img]="item.icon" />
         {{ item.label }}
       </a>
