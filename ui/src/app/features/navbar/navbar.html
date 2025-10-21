@@ -17,7 +17,7 @@
   </ng-template>
   <ng-template #buttons>
     @for (item of items; track item) {
-      <a z-button zType="ghost" [href]="item.route">
+      <a z-button zType="ghost" [routerLink]="item.route">
         <lucide-angular [img]="item.icon" />
         {{ item.label }}
       </a>
