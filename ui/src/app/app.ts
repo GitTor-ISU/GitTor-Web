@@ -1,7 +1,6 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ThemeService } from '@core/theme';
-import { Navbar } from '@features/navbar/navbar';
 import { HeartbeatService } from '@generated/openapi/services/heartbeat';
 import { ZardToastComponent } from '@shared/components/z-toast/toast.component';
 import { toast } from 'ngx-sonner';
@@ -12,7 +11,7 @@ import { Subscription } from 'rxjs';
  */
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Navbar, ZardToastComponent],
+  imports: [RouterOutlet, ZardToastComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
   providers: [],
