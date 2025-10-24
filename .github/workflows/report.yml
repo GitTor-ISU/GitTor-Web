@@ -1,4 +1,4 @@
-name: Report pages
+name: Report
 
 on:
   workflow_call:

@@ -45,3 +45,6 @@ jobs:
       - ui-build
       - ui-test
     uses: ./.github/workflows/report.yml
+
+  deploy:
+    uses: ./.github/workflows/deploy.yml
