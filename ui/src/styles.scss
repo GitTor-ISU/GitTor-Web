@@ -19,7 +19,7 @@
   --primary-foreground: var(--background-mid); // Light Text
   --secondary: var(--background-light);
   --secondary-foreground: var(--foreground);
-  --muted: oklch(0.98 0 0);
+  --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.3 0 0); // Muted text
   --accent: var(--muted);
   --accent-foreground: var(--foreground);
@@ -58,7 +58,7 @@
   --primary-foreground: var(--background-mid); // Dark Text
   --secondary: var(--background-light);
   --secondary-foreground: var(--foreground);
-  --muted: oklch(0.215 0 0);
+  --muted: oklch(0.21 0 0);
   --muted-foreground: oklch(0.7 0 0); // Muted text
   --accent: var(--muted);
   --accent-foreground: var(--foreground);

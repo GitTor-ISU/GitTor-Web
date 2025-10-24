@@ -1,4 +1,11 @@
-<app-navbar />
-<div class="pt-16">
-  <router-outlet />
-</div>
+<z-layout class="border">
+  <app-navbar />
+  <z-layout>
+    <z-content class="min-h-screen pt-16">
+      <router-outlet />
+    </z-content>
+    <z-footer>
+      <div class="text-muted-foreground flex w-full items-center justify-center text-sm">GitTor</div>
+    </z-footer>
+  </z-layout>
+</z-layout>
