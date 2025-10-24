@@ -24,15 +24,7 @@
     }
   </ng-template>
   <div class="flex items-center">
-    @if (getCurrentTheme() === 'dark') {
-      <button z-button zType="ghost" zShape="circle" zSize="icon" (click)="toggleTheme()">
-        <lucide-angular [img]="sunIcon" />
-      </button>
-    } @else {
-      <button z-button zType="ghost" zShape="circle" zSize="icon" (click)="toggleTheme()">
-        <lucide-angular [img]="moonIcon" />
-      </button>
-    }
+    <app-theme-toggle />
     <z-divider zOrientation="vertical" class="mx-2 h-6" />
     <button z-button z-menu zType="ghost" zShape="circle" zSize="icon" [zMenuTriggerFor]="userMenu">
       <lucide-angular [img]="userIcon" />

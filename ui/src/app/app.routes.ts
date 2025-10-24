@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { About } from '@features/about/about';
+import { Login } from '@features/auth/login/login';
 import { Register } from '@features/auth/register/register';
 import { Home } from '@features/home/home';
 import { NotFound } from '@features/not-found/not-found';
@@ -18,7 +19,10 @@ export const routes: Routes = [
   {
     path: '',
     component: AuthLayout,
-    children: [{ path: 'register', component: Register }],
+    children: [
+      { path: 'register', component: Register },
+      { path: 'login', component: Login },
+    ],
   },
   { path: '**', component: NotFound },
 ];

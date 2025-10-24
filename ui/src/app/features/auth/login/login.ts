@@ -3,11 +3,11 @@ import { ZardCardComponent } from '@shared/components/z-card/card.component';
 import { ZardFormModule } from '@shared/components/z-form/form.module';
 
 /**
- * Register component.
+ * Login component.
  */
 @Component({
-  selector: 'app-register',
+  selector: 'app-login',
   imports: [ZardFormModule, ZardCardComponent],
-  templateUrl: './register.html',
+  templateUrl: './login.html',
 })
-export class Register {}
+export class Login {}

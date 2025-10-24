@@ -1,0 +1,11 @@
+<div>
+  @if (themeService.getCurrentTheme() === 'dark') {
+    <button z-button zType="ghost" zShape="circle" zSize="icon" (click)="themeService.toggleTheme()">
+      <lucide-angular [img]="sunIcon" />
+    </button>
+  } @else {
+    <button z-button zType="ghost" zShape="circle" zSize="icon" (click)="themeService.toggleTheme()">
+      <lucide-angular [img]="moonIcon" />
+    </button>
+  }
+</div>
