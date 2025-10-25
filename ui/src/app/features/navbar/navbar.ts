@@ -5,7 +5,7 @@ import { ZardButtonComponent } from '@shared/components/z-button/button.componen
 import { MenuItem } from '@shared/components/z-menu/menu-item.directive';
 import { ZardMenuModule } from '@shared/components/z-menu/menu.module';
 
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ThemeToggle } from '@shared/components/theme-toggle/theme-toggle';
 import { ZardDividerComponent } from '@shared/components/z-divider/divider.component';
 import {
@@ -64,6 +64,7 @@ export class Navbar implements OnInit {
   ];
 
   private readonly auth: Auth = inject(Auth);
+  private readonly router: Router = inject(Router);
 
   public constructor() {
     effect((onCleanup) => {
@@ -105,13 +106,8 @@ export class Navbar implements OnInit {
     this.isLoggedIn.set(this.auth.isLoggedIn());
   }
 
-  protected login(): void {
-    this.auth.setToken('token');
-    this.refresh();
-  }
-
   protected logout(): void {
     this.auth.removeToken();
-    this.refresh();
+    this.router.navigate(['/login']);
   }
 }

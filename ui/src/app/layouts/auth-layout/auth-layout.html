@@ -1,10 +1,12 @@
 <z-layout class="min-h-screen overflow-hidden">
-  <div class="lg:hidden">
-    <ng-container *ngTemplateOutlet="form" />
-  </div>
-  <z-resizable class="bg-background hidden lg:flex">
-    <z-resizable-panel zMax="99.99" zDefaultSize="35" class="relative z-2 shadow-2xl">
-      <ng-container *ngTemplateOutlet="form" />
+  <z-resizable class="bg-background block xl:flex">
+    <z-resizable-panel zMin="25" zMax="99.99" zDefaultSize="35" class="relative z-2 shadow-2xl">
+      <div class="bg-background relative h-screen shadow-md">
+        <div class="absolute top-4 left-4">
+          <app-theme-toggle />
+        </div>
+        <router-outlet />
+      </div>
     </z-resizable-panel>
     <z-resizable-handle zWithHandle />
     <z-resizable-panel zDefaultSize="70" class="bg-background relative z-1 overflow-hidden">
@@ -16,12 +18,4 @@
       />
     </z-resizable-panel>
   </z-resizable>
-  <ng-template #form>
-    <div class="bg-background relative h-screen shadow-md">
-      <div class="absolute top-4 left-4">
-        <app-theme-toggle />
-      </div>
-      <router-outlet />
-    </div>
-  </ng-template>
 </z-layout>

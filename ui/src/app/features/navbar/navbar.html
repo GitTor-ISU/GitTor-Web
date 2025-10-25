@@ -37,7 +37,7 @@
         <button z-menu-item>Settings</button>
         <button z-menu-item (click)="logout()">Logout</button>
       } @else {
-        <button z-menu-item (click)="login()">Login</button>
+        <a z-menu-item routerLink="/login">Login</a>
       }
     </div>
   </ng-template>

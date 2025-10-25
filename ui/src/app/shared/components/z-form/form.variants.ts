@@ -12,7 +12,7 @@ export const formLabelVariants = cva('text-sm font-medium leading-none peer-disa
 
 export const formControlVariants = cva('');
 
-export const formMessageVariants = cva('text-sm', {
+export const formMessageVariants = cva('text-xs', {
   variants: {
     zType: {
       default: 'text-muted-foreground',
