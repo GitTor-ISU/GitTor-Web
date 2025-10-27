@@ -362,7 +362,7 @@ public class UserRoleControllerTest extends BasicContext {
 
             // WHEN: Set user roles
             ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                    uri, HttpMethod.GET, request, new ParameterizedTypeReference<ErrorDto>() {
+                    uri, HttpMethod.POST, request, new ParameterizedTypeReference<ErrorDto>() {
                     });
 
             // THEN: Responds not found
@@ -371,6 +371,36 @@ public class UserRoleControllerTest extends BasicContext {
                     () -> assertNotNull(responseEntity.getBody()),
                     () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
                     () -> assertEquals("User " + wrongId + " not found.", responseEntity.getBody().getMessage()));
+        }
+
+        @Test
+        public void should409_whenRemovingOnlyAdminRole() {
+            // GIVEN: Admin user exists
+            User adminUser = userService.get("admin");
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            HttpEntity<List<Integer>> request = new HttpEntity<>(Collections.emptyList(), headers);
+
+            // GIVEN: Admin user id in path
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                    .path(ENDPOINT)
+                    .buildAndExpand(adminUser.getId())
+                    .toUri();
+
+            // WHEN: Set user roles
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                    uri, HttpMethod.POST, request, new ParameterizedTypeReference<ErrorDto>() {
+                    });
+
+            // THEN: Responds conflict
+            assertAll(
+                    () -> assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode()),
+                    () -> assertNotNull(responseEntity.getBody()),
+                    () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                    () -> assertEquals(
+                            "User must exist in the system with admin role.", responseEntity.getBody().getMessage()));
         }
     }
 
@@ -797,6 +827,37 @@ public class UserRoleControllerTest extends BasicContext {
                     () -> assertNotNull(responseEntity.getBody()),
                     () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
                     () -> assertEquals("User " + wrongId + " not found.", responseEntity.getBody().getMessage()));
+        }
+
+        @Test
+        public void should409_whenRemovingOnlyAdminRole() {
+            // GIVEN: Admin user exists
+            User adminUser = userService.get("admin");
+            Role adminRole = roleService.get(RoleService.ADMIN_ROLE_NAME);
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            HttpEntity<List<Integer>> request = new HttpEntity<>(List.of(adminRole.getId()), headers);
+
+            // GIVEN: Admin user id in path
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                    .path(ENDPOINT)
+                    .buildAndExpand(adminUser.getId())
+                    .toUri();
+
+            // WHEN: Remove user roles
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                    uri, HttpMethod.DELETE, request, new ParameterizedTypeReference<ErrorDto>() {
+                    });
+
+            // THEN: Responds conflict
+            assertAll(
+                    () -> assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode()),
+                    () -> assertNotNull(responseEntity.getBody()),
+                    () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                    () -> assertEquals(
+                            "User must exist in the system with admin role.", responseEntity.getBody().getMessage()));
         }
     }
 }
