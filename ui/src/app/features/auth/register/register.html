@@ -7,7 +7,7 @@
       <p>Register</p>
       <p class="text-muted-foreground text-sm">Create your account</p>
     </div>
-    <form class="text-muted-foreground max-w-sm space-y-6 text-sm" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <form class="max-w-sm space-y-6 text-sm" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
       <z-form-field>
         <label z-form-label [zRequired]="registerForm.controls.username.invalid">Username</label>
         <z-form-control>

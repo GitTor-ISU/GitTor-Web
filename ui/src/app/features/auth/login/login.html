@@ -7,7 +7,7 @@
       <p>Log in</p>
       <p class="text-muted-foreground text-sm">Enter your credentials</p>
     </div>
-    <form class="text-muted-foreground max-w-sm space-y-8 text-sm" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <form class="max-w-sm space-y-8 text-sm" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <z-form-field>
         <label z-form-label [zRequired]="loginForm.controls.usernameOrEmail.invalid">Username or Email</label>
         <z-form-control>

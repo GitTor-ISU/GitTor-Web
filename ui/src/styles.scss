@@ -20,7 +20,7 @@
   --secondary: var(--background-light);
   --secondary-foreground: var(--foreground);
   --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.3 0 0); // Muted text
+  --muted-foreground: oklch(0.5 0 0); // Muted text
   --accent: var(--muted);
   --accent-foreground: var(--foreground);
   --destructive: oklch(0.577 0.245 27.325);
