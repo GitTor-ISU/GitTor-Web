@@ -44,11 +44,11 @@ export const resizableHandleVariants = cva(
   },
 );
 
-export const resizableHandleIndicatorVariants = cva('absolute z-10 bg-muted-foreground/30 transition-colors group-hover:bg-muted-foreground/50 rounded-full', {
+export const resizableHandleIndicatorVariants = cva('absolute z-10 bg-muted-foreground/80 transition-colors group-hover:bg-muted-foreground rounded-full', {
   variants: {
     zLayout: {
-      vertical: 'w-8 h-px',
-      horizontal: 'w-px h-8',
+      vertical: 'w-16 h-1',
+      horizontal: 'w-1 h-16',
     },
   },
   defaultVariants: {

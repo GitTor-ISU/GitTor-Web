@@ -9,27 +9,34 @@
     </div>
     <form class="text-muted-foreground max-w-sm space-y-6 text-sm" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
       <z-form-field>
-        <label z-form-label zRequired>Username</label>
+        <label z-form-label [zRequired]="registerForm.controls.username.invalid">Username</label>
         <z-form-control>
-          <input z-input zSize="sm" type="text" placeholder="Choose a username" formControlName="username" />
+          <input z-input zSize="sm" type="text" placeholder="Choose your username" formControlName="username" />
         </z-form-control>
-        <z-form-message zType="default">Username must be 3-20 characters long.</z-form-message>
+        <z-form-message class="h-0">
+          {{ usernameErrorMessage() }}
+        </z-form-message>
       </z-form-field>
       <z-form-field>
-        <label z-form-label zRequired>Email</label>
+        <label z-form-label [zRequired]="registerForm.controls.email.invalid">Email</label>
         <z-form-control>
           <input z-input zSize="sm" type="email" placeholder="Enter your email" formControlName="email" />
         </z-form-control>
+        <z-form-message class="h-0">
+          {{ emailErrorMessage() }}
+        </z-form-message>
       </z-form-field>
       <z-form-field>
-        <label z-form-label zRequired>Password</label>
+        <label z-form-label [zRequired]="registerForm.controls.password.invalid">Password</label>
         <z-form-control>
-          <input z-input zSize="sm" type="password" placeholder="Create a password" formControlName="password" />
+          <input z-input zSize="sm" type="password" placeholder="Create your password" formControlName="password" />
         </z-form-control>
-        <z-form-message zType="default">Password must be at least 6 characters.</z-form-message>
+        <z-form-message class="h-0">
+          {{ passwordErrorMessage() }}
+        </z-form-message>
       </z-form-field>
       <z-form-field>
-        <label z-form-label zRequired>Confirm password</label>
+        <label z-form-label [zRequired]="registerForm.hasError('passwordMismatch')">Confirm password</label>
         <z-form-control>
           <input
             z-input
@@ -39,6 +46,9 @@
             formControlName="confirmPassword"
           />
         </z-form-control>
+        <z-form-message class="h-0">
+          {{ confirmPasswordErrorMessage() }}
+        </z-form-message>
       </z-form-field>
       <div class="flex gap-3">
         <a z-button zType="secondary" routerLink="/login" class="flex-1 text-center">Login</a>
