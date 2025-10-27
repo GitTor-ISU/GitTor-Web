@@ -210,8 +210,8 @@ public class UserService implements UserDetailsService {
         }
         if (!user.getRoles().contains(roleService.get(RoleService.ADMIN_ROLE_NAME))
             && getAllContainingRole(roleService.get(RoleService.ADMIN_ROLE_NAME)).size() == 1
-            && getAllContainingRole(roleService.get(RoleService.ADMIN_ROLE_NAME)).iterator().next().getId() == 
-                user.getId()
+            && getAllContainingRole(roleService.get(RoleService.ADMIN_ROLE_NAME)).iterator().next().getId() 
+                == user.getId()
         ) {
             throw new IllegalStateException("User must exist in the system with admin role.");
         }
