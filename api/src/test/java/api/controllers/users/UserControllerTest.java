@@ -1,5 +1,12 @@
 package api.controllers.users;
 
+import java.net.URI;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.IntStream;
+
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -8,14 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.net.URI;
-import java.time.temporal.ChronoUnit;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.IntStream;
-
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -845,6 +844,28 @@ public class UserControllerTest extends BasicContext {
                 )
             );
         }
+
+        @Test
+        public void should409_whenLastAdminUser() {
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // GIVEN: Delete admin user
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                url + ENDPOINT, HttpMethod.DELETE, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds conflict
+            assertAll(
+                () -> assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals("Last admin user cannot be removed from the system.",
+                            responseEntity.getBody().getMessage())
+            );
+        }
     }
 
     /**
@@ -1606,6 +1627,37 @@ public class UserControllerTest extends BasicContext {
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
                 () -> assertEquals("User " + wrongId + " not found.", responseEntity.getBody().getMessage())
+            );
+        }
+
+        @Test
+        public void should409_whenLastAdminUser() {
+            // GIVEN: Admin user exists
+            User adminUser = userService.get("admin");
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // GIVEN: New user id in path
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(adminUser.getId())
+                .toUri();
+
+            // WHEN: Delete user
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.DELETE, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds conflict
+            assertAll(
+                () -> assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals("Last admin user cannot be removed from the system.",
+                            responseEntity.getBody().getMessage())
             );
         }
     }
