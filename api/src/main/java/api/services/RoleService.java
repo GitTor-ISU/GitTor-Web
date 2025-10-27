@@ -139,7 +139,7 @@ public class RoleService {
     @Transactional
     public void detachFromUsers(Role role) {
         if (role.getId() == get(USER_ROLE_NAME).getId() || role.getId() == get(ADMIN_ROLE_NAME).getId()) {
-            throw new IllegalArgumentException("Role '" + role.getName() + "' cannot be removed.");
+            throw new IllegalArgumentException("Role " + role.getId() + " cannot be deleted.");
         }
         for (User user : userRepository.findAllByRolesContaining(role)) {
             Set<Role> roles = user.getRoles();
