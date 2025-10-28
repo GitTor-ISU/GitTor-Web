@@ -170,10 +170,8 @@ public class UserService implements UserDetailsService {
      */
     @Transactional(readOnly = true)
     public User getWithRoles(String username) {
-        User user = find(username)
-            .orElseThrow(() -> EntityNotFoundException.fromUser(username));
+        User user = get(username);
         Hibernate.initialize(user.getRoles());
-        user.getRoles().forEach(role -> Hibernate.initialize(role.getAuthorities()));
         return user;
     }
 
