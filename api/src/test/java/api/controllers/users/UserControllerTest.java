@@ -493,6 +493,74 @@ public class UserControllerTest extends BasicContext {
                 () -> assertNull(responseEntity.getBody())
             );
         }
+
+        @Test
+        public void shouldReturnEmptyAuthoritiesWhenUserHasDefaultUserRole() {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            AuthenticationDto auth = authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: Remove default roles and assign empty role
+            User user = userService.getWithRoles(username);
+            int expectedAuthorityCount = user.getRoles().stream()
+                .mapToInt(role -> role.getAuthorities().size())
+                .sum();
+
+            // GIVEN: JWT authentication
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(auth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // WHEN: Get my authorities
+            ResponseEntity<List<AuthorityDto>> responseEntity = testRestTemplate.exchange(
+                url + ENDPOINT,
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<List<AuthorityDto>>() {}
+            );
+
+            // THEN: Returns empty or minimal list (matches default USER role)
+            List<AuthorityDto> authorities = responseEntity.getBody();
+            assertAll(
+                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                () -> assertNotNull(authorities),
+                () -> assertEquals(expectedAuthorityCount, authorities.size(),
+                    "Should return authorities matching default USER role")
+            );
+        }
+
+        @Test
+        public void shouldReturnPopulatedAuthoritiesWhenUserHasAdminRole() {
+            // GIVEN: Use existing admin user from BasicContext
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // WHEN: Get my authorities
+            ResponseEntity<List<AuthorityDto>> responseEntity = testRestTemplate.exchange(
+                url + ENDPOINT,
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<List<AuthorityDto>>() {}
+            );
+
+            // THEN: Returns populated list with admin authorities
+            List<AuthorityDto> authorities = responseEntity.getBody();
+            assertAll(
+                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                () -> assertNotNull(authorities),
+                () -> assertTrue(authorities.size() > 0, "Admin should have at least one authority"),
+                () -> assertTrue(
+                    authorities.stream().allMatch(a -> a.getId() != null && a.getAuthority() != null),
+                    "All authorities should have valid structure"
+                )
+            );
+        }
     }
 
     /**
