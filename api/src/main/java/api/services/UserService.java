@@ -162,7 +162,7 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
-    /*
+    /**
      * Get user with roles.
      *
      * @param username Username
