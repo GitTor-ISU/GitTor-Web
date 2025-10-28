@@ -1,6 +1,7 @@
 package api.controllers.users;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,9 +22,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import api.dtos.AuthorityDto;
 import api.dtos.ErrorDto;
 import api.dtos.UserDto;
+import api.entities.Authority;
 import api.entities.User;
+import api.mapper.AuthorityMapper;
 import api.mapper.UserMapper;
 import api.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,6 +51,8 @@ public class UserController {
     private UserMapper userMapper;
     @Autowired
     private PasswordEncoder encoder;
+    @Autowired
+    private AuthorityMapper authorityMapper;
 
     @Value("${pagination.default-page-size:10}")
     private int defaultPageSize;
@@ -76,6 +83,34 @@ public class UserController {
     @GetMapping("/me")
     public UserDto getMe(@AuthenticationPrincipal User user) {
         return userMapper.toDto(user);
+    }
+
+    /**
+     * Get my authorities.
+     *
+     * @param user User
+     * @return {@link List} of {@link AuthorityDto}
+     */
+    // region
+    @Operation(
+        summary = "Get My Authorities",
+        description = "Get a list of the current user's authorities."
+    )
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200",
+            content = @Content(
+                array = @ArraySchema(schema = @Schema(implementation = AuthorityDto.class)),
+                mediaType = "application/json"
+            )
+        ),
+    })
+    // endregion
+    @GetMapping("/me/authorities")
+    public List<AuthorityDto> getMyAuthorities(@AuthenticationPrincipal User user) {
+        return user.getAuthorities().stream()
+            .map((GrantedAuthority a) -> authorityMapper.toDto((Authority) a))
+            .collect(Collectors.toList());
     }
 
     /**

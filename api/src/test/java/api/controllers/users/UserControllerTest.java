@@ -33,6 +33,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import api.BasicContext;
 import api.controllers.AuthenticationController;
 import api.dtos.AuthenticationDto;
+import api.dtos.AuthorityDto;
 import api.dtos.ErrorDto;
 import api.dtos.LoginDto;
 import api.dtos.RegisterDto;
@@ -264,6 +265,300 @@ public class UserControllerTest extends BasicContext {
             assertAll(
                 () -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
                 () -> assertNull(responseEntity.getBody())
+            );
+        }
+    }
+
+    /**
+     * {@link UserController#getMyAuthorities} test.
+     */
+    @Nested
+    public class GetMyAuthorities {
+        private static final String ENDPOINT = "/users/me/authorities";
+
+        @Test
+        public void shouldGetMyAuthoritiesWhenJwtAuthentication() {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            AuthenticationDto auth = authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: JWT authentication
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(auth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // WHEN: Get my authorities
+            ResponseEntity<List<AuthorityDto>> responseEntity = testRestTemplate.exchange(
+                url + ENDPOINT,
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<List<AuthorityDto>>() {}
+            );
+
+            // THEN: Returns my authorities
+            assertAll(
+                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody())
+            );
+        }
+
+        @Test
+        public void shouldGetMyAuthoritiesWhenBasicAuthentication() {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            String password = "password";
+            authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password(password)
+                    .build()
+            );
+
+            // GIVEN: Basic authentication
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBasicAuth(username, password);
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // WHEN: Get my authorities
+            ResponseEntity<List<AuthorityDto>> responseEntity = testRestTemplate.exchange(
+                url + ENDPOINT,
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<List<AuthorityDto>>() {}
+            );
+
+            // THEN: Returns my authorities
+            assertAll(
+                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody())
+            );
+        }
+
+        @Test
+        public void should401WhenNoAuthentication() {
+            // GIVEN: No authentication
+
+            // WHEN: Get my authorities
+            ResponseEntity<String> responseEntity = testRestTemplate.exchange(
+                url + ENDPOINT,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<String>() {}
+            );
+
+            // THEN: Responds unauthorized
+            assertAll(
+                () -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
+                () -> assertNull(responseEntity.getBody())
+            );
+        }
+
+        @Test
+        public void should401WhenJwtAuthenticationExpires() {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: JWT authentication
+            AuthenticationDto auth = tokenService.generateToken(
+                new UsernamePasswordAuthenticationToken(username, null, Collections.emptyList())
+            );
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(auth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // GIVEN: Wait till token expires
+            instant = instant.plus(expires, ChronoUnit.MINUTES).plus(1, ChronoUnit.SECONDS);
+
+            // WHEN: Get my authorities
+            ResponseEntity<String> responseEntity = testRestTemplate.exchange(
+                url + ENDPOINT,
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<String>() {}
+            );
+
+            // THEN: Responds unauthorized
+            assertAll(
+                () -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
+                () -> assertNull(responseEntity.getBody())
+            );
+        }
+
+        @Test
+        public void should401WhenJwtAuthenticationInvalid() {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: Invalid JWT authentication
+            String invalidToken = Jwts.builder()
+                .subject(username)
+                .signWith(Jwts.SIG.HS512.key().build())
+                .compact();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(invalidToken);
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // WHEN: Get my authorities
+            ResponseEntity<String> responseEntity = testRestTemplate.exchange(
+                url + ENDPOINT,
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<String>() {}
+            );
+
+            // THEN: Responds unauthorized
+            assertAll(
+                () -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
+                () -> assertNull(responseEntity.getBody())
+            );
+        }
+
+        @Test
+        public void should401WhenBasicAuthenticationIncorrectUsername() {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            String password = "password";
+            authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password(password)
+                    .build()
+            );
+
+            // GIVEN: Basic authentication with incorrect username
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBasicAuth(username + "_incorrect", password);
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // WHEN: Get my authorities
+            ResponseEntity<List<AuthorityDto>> responseEntity = testRestTemplate.exchange(
+                url + ENDPOINT,
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<List<AuthorityDto>>() {}
+            );
+
+            // THEN: Responds unauthorized
+            assertAll(
+                () -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
+                () -> assertNull(responseEntity.getBody())
+            );
+        }
+
+        @Test
+        public void should401WhenBasicAuthenticationIncorrectPassword() {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            String password = "password";
+            authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password(password)
+                    .build()
+            );
+
+            // GIVEN: Basic authentication with incorrect password
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBasicAuth(username, password + "_incorrect");
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // WHEN: Get my authorities
+            ResponseEntity<List<AuthorityDto>> responseEntity = testRestTemplate.exchange(
+                url + ENDPOINT,
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<List<AuthorityDto>>() {}
+            );
+
+            // THEN: Responds unauthorized
+            assertAll(
+                () -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
+                () -> assertNull(responseEntity.getBody())
+            );
+        }
+
+        @Test
+        public void shouldReturnEmptyAuthoritiesWhenUserHasDefaultUserRole() {
+            // GIVEN: New user registered
+            String username = "user_" + UUID.randomUUID();
+            AuthenticationDto auth = authenticationController.register(
+                RegisterDto.builder()
+                    .username(username)
+                    .password("password")
+                    .build()
+            );
+
+            // GIVEN: Remove default roles and assign empty role
+            User user = userService.getWithRoles(username);
+            int expectedAuthorityCount = user.getRoles().stream()
+                .mapToInt(role -> role.getAuthorities().size())
+                .sum();
+
+            // GIVEN: JWT authentication
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(auth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // WHEN: Get my authorities
+            ResponseEntity<List<AuthorityDto>> responseEntity = testRestTemplate.exchange(
+                url + ENDPOINT,
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<List<AuthorityDto>>() {}
+            );
+
+            // THEN: Returns empty or minimal list (matches default USER role)
+            List<AuthorityDto> authorities = responseEntity.getBody();
+            assertAll(
+                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                () -> assertNotNull(authorities),
+                () -> assertEquals(expectedAuthorityCount, authorities.size(),
+                    "Should return authorities matching default USER role")
+            );
+        }
+
+        @Test
+        public void shouldReturnPopulatedAuthoritiesWhenUserHasAdminRole() {
+            // GIVEN: Use existing admin user from BasicContext
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // WHEN: Get my authorities
+            ResponseEntity<List<AuthorityDto>> responseEntity = testRestTemplate.exchange(
+                url + ENDPOINT,
+                HttpMethod.GET,
+                request,
+                new ParameterizedTypeReference<List<AuthorityDto>>() {}
+            );
+
+            // THEN: Returns populated list with admin authorities
+            List<AuthorityDto> authorities = responseEntity.getBody();
+            assertAll(
+                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                () -> assertNotNull(authorities),
+                () -> assertTrue(authorities.size() > 0, "Admin should have at least one authority"),
+                () -> assertTrue(
+                    authorities.stream().allMatch(a -> a.getId() != null && a.getAuthority() != null),
+                    "All authorities should have valid structure"
+                )
             );
         }
     }

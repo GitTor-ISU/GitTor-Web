@@ -162,6 +162,19 @@ public class UserService implements UserDetailsService {
     }
 
     /**
+     * Get user with roles.
+     *
+     * @param username Username
+     * @return {@link User}
+     */
+    @Transactional(readOnly = true)
+    public User getWithRoles(String username) {
+        User user = get(username);
+        Hibernate.initialize(user.getRoles());
+        return user;
+    }
+
+    /**
      * Update user.
      *
      * @param id User id
