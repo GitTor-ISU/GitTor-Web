@@ -24,7 +24,7 @@
     "@angular/forms": "^20.3.7",
     "@angular/platform-browser": "^20.3.7",
     "@angular/router": "^20.3.7",
-    "@omnedia/ngx-background-beams": "^3.0.0",
+    "@omnedia/ngx-gridpattern": "^3.0.0",
     "@omnedia/ngx-typewriter": "^3.1.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

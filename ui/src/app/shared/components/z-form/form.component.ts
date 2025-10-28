@@ -3,7 +3,7 @@ import type { ClassValue } from 'clsx';
 import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 
 import { mergeClasses, transform } from '@shared/utils/merge-classes';
-import { formFieldVariants, formControlVariants, formLabelVariants, formMessageVariants, ZardFormMessageVariants } from './form.variants';
+import { formControlVariants, formFieldVariants, formLabelVariants, formMessageVariants, ZardFormMessageVariants } from './form.variants';
 
 @Component({
   selector: 'z-form-field, [z-form-field]',
@@ -33,15 +33,15 @@ export class ZardFormFieldComponent {
     <div class="relative">
       <ng-content></ng-content>
     </div>
-    @if (errorMessage() || helpText()) {
-      <div class="mt-1.5 min-h-[1.25rem]">
-        @if (errorMessage()) {
-          <p class="text-sm text-red-500">{{ errorMessage() }}</p>
-        } @else if (helpText()) {
-          <p class="text-sm text-muted-foreground">{{ helpText() }}</p>
-        }
-      </div>
-    }
+    <div class="mt-1 h-0">
+      @if (errorMessage() || helpText()) {
+          @if (errorMessage()) {
+            <p class="text-xs text-destructive">{{ errorMessage() }}</p>
+          } @else if (helpText()) {
+            <p class="text-xs text-muted-foreground">{{ helpText() }}</p>
+          }
+      }
+    </div>
   `,
   host: {
     '[class]': 'classes()',

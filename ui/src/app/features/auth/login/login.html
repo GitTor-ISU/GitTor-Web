@@ -7,9 +7,9 @@
       <p>Log in</p>
       <p class="text-muted-foreground text-sm">Enter your credentials</p>
     </div>
-    <form class="max-w-sm space-y-8 text-sm" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <form class="max-w-sm space-y-6 text-sm" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <z-form-field>
-        <label z-form-label [zRequired]="loginForm.controls.usernameOrEmail.invalid">Username or Email</label>
+        <label z-form-label zRequired>Username or Email</label>
         <z-form-control>
           <input
             z-input
@@ -21,7 +21,7 @@
         </z-form-control>
       </z-form-field>
       <z-form-field>
-        <label z-form-label [zRequired]="loginForm.controls.password.invalid">Password</label>
+        <label z-form-label zRequired>Password</label>
         <z-form-control>
           <input z-input zSize="sm" type="password" placeholder="Enter your password" formControlName="password" />
         </z-form-control>

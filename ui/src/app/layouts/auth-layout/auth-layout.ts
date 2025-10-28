@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ThemeService } from '@core/theme';
-import { NgxBackgroundBeamsComponent } from '@omnedia/ngx-background-beams';
+import { NgxGridpatternComponent } from '@omnedia/ngx-gridpattern';
 import { NgxTypewriterComponent } from '@omnedia/ngx-typewriter';
 import { ThemeToggle } from '@shared/components/theme-toggle/theme-toggle';
 import { LayoutModule } from '@shared/components/z-layout/layout.module';
@@ -22,12 +22,12 @@ import { ZardResizableComponent } from '@shared/components/z-resizable/resizable
     ZardResizableHandleComponent,
     LayoutModule,
     ThemeToggle,
-    NgxBackgroundBeamsComponent,
     NgxTypewriterComponent,
+    NgxGridpatternComponent,
   ],
   templateUrl: './auth-layout.html',
 })
 export class AuthLayout {
-  protected readonly typeWriterWords = ['Secure', 'Peer-to-peer', 'Open', 'GitTor'];
+  protected readonly typeWriterWords = ['GitTor', 'Secure', 'Peer-to-peer', 'Open-source', 'GitTor'];
   protected readonly themeService = inject(ThemeService);
 }

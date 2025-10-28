@@ -5,7 +5,7 @@ export const formFieldVariants = cva('grid gap-2');
 export const formLabelVariants = cva('text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70', {
   variants: {
     zRequired: {
-      true: "after:content-['*'] after:ml-0.5 after:text-red-500",
+      true: "after:content-['*'] after:ml-0.5 after:text-destructive",
     },
   },
 });
