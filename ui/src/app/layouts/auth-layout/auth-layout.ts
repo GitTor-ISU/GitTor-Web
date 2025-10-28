@@ -28,6 +28,6 @@ import { ZardResizableComponent } from '@shared/components/z-resizable/resizable
   templateUrl: './auth-layout.html',
 })
 export class AuthLayout {
-  protected readonly typeWriterWords = ['GitTor', 'Secure', 'Peer-to-peer', 'Open-source', 'GitTor'];
+  protected readonly typeWriterWords = ['GitTor', 'Secure', 'Peer-to-Peer', 'Open-Source', 'GitTor'];
   protected readonly themeService = inject(ThemeService);
 }
