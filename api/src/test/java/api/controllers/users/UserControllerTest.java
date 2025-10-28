@@ -845,6 +845,28 @@ public class UserControllerTest extends BasicContext {
                 )
             );
         }
+
+        @Test
+        public void should409_whenLastAdminUser() {
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // GIVEN: Delete admin user
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                url + ENDPOINT, HttpMethod.DELETE, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds conflict
+            assertAll(
+                () -> assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals("Last admin user cannot be removed from the system.",
+                            responseEntity.getBody().getMessage())
+            );
+        }
     }
 
     /**
@@ -1606,6 +1628,37 @@ public class UserControllerTest extends BasicContext {
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
                 () -> assertEquals("User " + wrongId + " not found.", responseEntity.getBody().getMessage())
+            );
+        }
+
+        @Test
+        public void should409_whenLastAdminUser() {
+            // GIVEN: Admin user exists
+            User adminUser = userService.get("admin");
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // GIVEN: New user id in path
+            URI uri = UriComponentsBuilder.fromUriString(url)
+                .path(ENDPOINT)
+                .buildAndExpand(adminUser.getId())
+                .toUri();
+
+            // WHEN: Delete user
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                uri, HttpMethod.DELETE, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds conflict
+            assertAll(
+                () -> assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals("Last admin user cannot be removed from the system.",
+                            responseEntity.getBody().getMessage())
             );
         }
     }

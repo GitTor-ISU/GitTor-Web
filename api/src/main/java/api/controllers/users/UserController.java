@@ -171,6 +171,13 @@ public class UserController {
         @ApiResponse(
             responseCode = "200"
         ),
+        @ApiResponse(
+            responseCode = "409",
+            content = @Content(
+                schema = @Schema(implementation = ErrorDto.class),
+                mediaType = "application/json"
+            )
+        ),
     })
     // endregion
     @DeleteMapping("/me")
@@ -344,6 +351,13 @@ public class UserController {
         ),
         @ApiResponse(
             responseCode = "404",
+            content = @Content(
+                schema = @Schema(implementation = ErrorDto.class),
+                mediaType = "application/json"
+            )
+        ),
+        @ApiResponse(
+            responseCode = "409",
             content = @Content(
                 schema = @Schema(implementation = ErrorDto.class),
                 mediaType = "application/json"

@@ -127,6 +127,13 @@ public class UserRoleController {
                 mediaType = "application/json"
             )
         ),
+        @ApiResponse(
+            responseCode = "409",
+            content = @Content(
+                schema = @Schema(implementation = ErrorDto.class),
+                mediaType = "application/json"
+            )
+        ),
     })
     // endregion
     @PostMapping("")
@@ -244,6 +251,13 @@ public class UserRoleController {
         ),
         @ApiResponse(
             responseCode = "404",
+            content = @Content(
+                schema = @Schema(implementation = ErrorDto.class),
+                mediaType = "application/json"
+            )
+        ),
+        @ApiResponse(
+            responseCode = "409",
             content = @Content(
                 schema = @Schema(implementation = ErrorDto.class),
                 mediaType = "application/json"
