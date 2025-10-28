@@ -3,7 +3,7 @@
   [ngClass]="this.isVisible() ? 'translate-y-0' : '-translate-y-full'"
 >
   <div class="items-center gap-4 md:hidden">
-    <button z-button zType="ghost" z-menu zTrigger="hover" [zMenuTriggerFor]="navMenu">
+    <button z-button z-menu zType="ghost" zTrigger="hover" [zMenuTriggerFor]="navMenu">
       <lucide-angular [img]="menuIcon" />
     </button>
   </div>
@@ -24,28 +24,20 @@
     }
   </ng-template>
   <div class="flex items-center">
-    @if (getCurrentTheme() === 'dark') {
-      <button z-button zType="ghost" zShape="circle" zSize="icon" (click)="toggleTheme()">
-        <lucide-angular [img]="sunIcon" />
-      </button>
-    } @else {
-      <button z-button zType="ghost" zShape="circle" zSize="icon" (click)="toggleTheme()">
-        <lucide-angular [img]="moonIcon" />
-      </button>
-    }
+    <app-theme-toggle />
     <z-divider zOrientation="vertical" class="mx-2 h-6" />
-    <button z-button z-menu zType="ghost" zShape="circle" zSize="icon" [zMenuTriggerFor]="productsMenu">
+    <button z-button z-menu zType="ghost" zShape="circle" zSize="icon" [zMenuTriggerFor]="userMenu">
       <lucide-angular [img]="userIcon" />
     </button>
   </div>
-  <ng-template #productsMenu>
-    <div z-menu-content class="w-24">
+  <ng-template #userMenu>
+    <div z-menu-content class="bg-background-light w-24">
       @if (isLoggedIn()) {
         <button z-menu-item>Profile</button>
         <button z-menu-item>Settings</button>
         <button z-menu-item (click)="logout()">Logout</button>
       } @else {
-        <button z-menu-item (click)="login()">Login</button>
+        <a z-menu-item routerLink="/login">Login</a>
       }
     </div>
   </ng-template>

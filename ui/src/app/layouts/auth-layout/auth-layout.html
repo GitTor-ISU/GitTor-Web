@@ -1,0 +1,26 @@
+<z-layout class="min-h-screen overflow-hidden">
+  <z-resizable class="bg-background block xl:flex">
+    <z-resizable-panel zMin="25" zMax="99.99" zDefaultSize="35" class="relative z-2 shadow-xl dark:shadow-none">
+      <div class="bg-background relative h-screen">
+        <div class="absolute top-4 left-4">
+          <app-theme-toggle />
+        </div>
+        <router-outlet />
+      </div>
+    </z-resizable-panel>
+    <z-resizable-handle zWithHandle class="hidden xl:flex" />
+    <z-resizable-panel zDefaultSize="70" class="z-1">
+      <om-gridpattern
+        class="pointer-events-none fixed top-1/2 left-2/3 z-0 h-screen w-screen -translate-x-1/2 -translate-y-1/2"
+        [gradientColor]="themeService.getCurrentTheme() === 'dark' ? 'rgb(15, 15, 15)' : 'rgb(185, 185, 185)'"
+        [gridColor]="themeService.getCurrentTheme() === 'dark' ? 'rgb(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.15)'"
+      />
+      <om-typewriter
+        class="text-foreground fixed top-1/2 left-2/3 -translate-x-1/2 -translate-y-1/2 text-center text-7xl font-semibold"
+        [disableLoop]="true"
+        [words]="typeWriterWords"
+        [writeSpeed]="150"
+      />
+    </z-resizable-panel>
+  </z-resizable>
+</z-layout>

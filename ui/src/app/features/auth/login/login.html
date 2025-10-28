@@ -1,0 +1,35 @@
+<div class="grid h-full place-items-center p-2">
+  <z-card class="w-100">
+    <div class="mb-12 flex flex-col items-center text-center font-medium">
+      <div class="bg-background-light mb-4 flex h-20 w-20 items-center justify-center rounded-full border shadow-sm">
+        <lucide-angular class="text-primary h-12 w-12" [img]="logoIcon" [strokeWidth]="1.5" />
+      </div>
+      <p>Log in</p>
+      <p class="text-muted-foreground text-sm">Enter your credentials</p>
+    </div>
+    <form class="max-w-sm space-y-6 text-sm" [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <z-form-field>
+        <label z-form-label zRequired>Username or Email</label>
+        <z-form-control>
+          <input
+            z-input
+            zSize="sm"
+            type="text"
+            placeholder="Enter your username or email"
+            formControlName="usernameOrEmail"
+          />
+        </z-form-control>
+      </z-form-field>
+      <z-form-field>
+        <label z-form-label zRequired>Password</label>
+        <z-form-control>
+          <input z-input zSize="sm" type="password" placeholder="Enter your password" formControlName="password" />
+        </z-form-control>
+      </z-form-field>
+      <div class="flex gap-3">
+        <a z-button zType="secondary" routerLink="/register" class="flex-1 text-center">Register</a>
+        <button z-button zType="default" type="submit" class="flex-1" [disabled]="loginForm.invalid">Log in</button>
+      </div>
+    </form>
+  </z-card>
+</div>

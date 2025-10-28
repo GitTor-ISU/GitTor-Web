@@ -5,8 +5,8 @@ import { ZardButtonComponent } from '@shared/components/z-button/button.componen
 import { MenuItem } from '@shared/components/z-menu/menu-item.directive';
 import { ZardMenuModule } from '@shared/components/z-menu/menu.module';
 
-import { RouterLink } from '@angular/router';
-import { ThemeService } from '@core/theme';
+import { Router, RouterLink } from '@angular/router';
+import { ThemeToggle } from '@shared/components/theme-toggle/theme-toggle';
 import { ZardDividerComponent } from '@shared/components/z-divider/divider.component';
 import {
   BookAIcon,
@@ -15,8 +15,6 @@ import {
   InfoIcon,
   LucideAngularModule,
   MenuIcon,
-  MoonIcon,
-  SunIcon,
   UserCogIcon,
 } from 'lucide-angular';
 
@@ -25,17 +23,22 @@ import {
  */
 @Component({
   selector: 'app-navbar',
-  imports: [ZardMenuModule, ZardButtonComponent, CommonModule, LucideAngularModule, ZardDividerComponent, RouterLink],
+  imports: [
+    ZardMenuModule,
+    ZardButtonComponent,
+    CommonModule,
+    LucideAngularModule,
+    ZardDividerComponent,
+    RouterLink,
+    ThemeToggle,
+  ],
   templateUrl: './navbar.html',
-  styleUrl: './navbar.scss',
 })
 export class Navbar implements OnInit {
   protected readonly isLoggedIn = signal(false);
   protected readonly isVisible = signal(true);
 
   protected userIcon = UserCogIcon;
-  protected sunIcon = SunIcon;
-  protected moonIcon = MoonIcon;
   protected menuIcon = MenuIcon;
   protected items: MenuItem[] = [
     {
@@ -61,7 +64,7 @@ export class Navbar implements OnInit {
   ];
 
   private readonly auth: Auth = inject(Auth);
-  private readonly themeService = inject(ThemeService);
+  private readonly router: Router = inject(Router);
 
   public constructor() {
     effect((onCleanup) => {
@@ -103,21 +106,8 @@ export class Navbar implements OnInit {
     this.isLoggedIn.set(this.auth.isLoggedIn());
   }
 
-  protected login(): void {
-    this.auth.setToken('token');
-    this.refresh();
-  }
-
   protected logout(): void {
     this.auth.removeToken();
-    this.refresh();
-  }
-
-  protected toggleTheme(): void {
-    this.themeService.toggleTheme();
-  }
-
-  protected getCurrentTheme(): 'light' | 'dark' {
-    return this.themeService.getCurrentTheme();
+    this.router.navigate(['/login']);
   }
 }
