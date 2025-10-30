@@ -35,6 +35,8 @@ import {
   templateUrl: './navbar.html',
 })
 export class Navbar implements OnInit {
+  private static readonly DEBOUNCE_MARGIN: number = 10;
+
   protected readonly isLoggedIn = signal(false);
   protected readonly isVisible = signal(true);
 
@@ -82,7 +84,16 @@ export class Navbar implements OnInit {
           return;
         }
 
-        this.isVisible.set(currentScrollY < lastScrollY);
+        if (currentScrollY < Navbar.DEBOUNCE_MARGIN) {
+          // Top (show)
+          this.isVisible.set(true);
+        } else if (window.innerHeight + currentScrollY >= document.body.offsetHeight - Navbar.DEBOUNCE_MARGIN) {
+          // Bottom (hide)
+          this.isVisible.set(false);
+        } else {
+          // Scroll down (hide)
+          this.isVisible.set(currentScrollY < lastScrollY);
+        }
 
         lastScrollY = currentScrollY;
       };
