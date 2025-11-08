@@ -20,6 +20,9 @@ public class UserDto {
     @Null
     private Integer id;
 
+    @Null
+    private String email;
+
     @Nullable
     @Size(min = 3, max = 20)
     @Pattern(regexp = "^[a-zA-Z0-9_-]*$")
