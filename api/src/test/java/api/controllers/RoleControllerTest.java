@@ -890,7 +890,6 @@ public class RoleControllerTest extends BasicContext {
                     .set(javaGetter(Role::getAuthorities), Set.of(authority))
                     .sample()
             );
-            String roleName = role.getName();
 
             // GIVEN: New user exists with role
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
@@ -922,8 +921,8 @@ public class RoleControllerTest extends BasicContext {
                 () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                 () -> assertNull(responseEntity.getBody()),
                 () -> assertFalse(
-                    roleService.exists(roleName),
-                    "Unexpected user '" + roleName + "' found"
+                    roleService.exists(role.getName()),
+                    "Unexpected user '" + role.getName() + "' found"
                 )
             );
         }

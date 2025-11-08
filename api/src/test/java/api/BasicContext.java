@@ -83,6 +83,11 @@ public abstract class BasicContext {
         );
     }
 
+    /**
+     * Get authority fixture builder.
+     *
+     * @return {@link ArbitraryBuilder} {@link Authority}
+     */
     protected ArbitraryBuilder<Authority> getAuthorityBuilder() {
         return fixtureMonkey.giveMeBuilder(Authority.class)
                 .setNull(javaGetter(Authority::getId))
@@ -92,6 +97,11 @@ public abstract class BasicContext {
                 );
     }
 
+    /**
+     * Get role fixture builder.
+     *
+     * @return {@link ArbitraryBuilder} {@link Role}
+     */
     protected ArbitraryBuilder<Role> getRoleBuilder() {
         return fixtureMonkey.giveMeBuilder(Role.class)
                 .setNull(javaGetter(Role::getId))
@@ -102,6 +112,11 @@ public abstract class BasicContext {
                 );
     }
 
+    /**
+     * Get user fixture builder.
+     *
+     * @return {@link ArbitraryBuilder} {@link User}
+     */
     protected ArbitraryBuilder<User> getUserBuilder() {
         return fixtureMonkey.giveMeBuilder(User.class)
                 .setNull(javaGetter(User::getAvatar))
