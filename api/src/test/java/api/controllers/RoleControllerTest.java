@@ -12,7 +12,6 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -64,12 +63,16 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldGetRoles() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            String authorityName = authority.getAuthority();
 
             // GIVEN: New role exists with new authority
-            String roleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(roleName).authorities(Set.of(authority)).build());
+            Role role = roleService.save(
+                getRoleBuilder()
+                    .set(javaGetter(Role::getAuthorities), Set.of(authority))
+                    .sample()
+            );
+            String roleName = role.getName();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -134,12 +137,16 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldGetRole() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            String authorityName = authority.getAuthority();
 
             // GIVEN: New role exists with new authority
-            String roleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(roleName).authorities(Set.of(authority)).build());
+            Role role = roleService.save(
+                getRoleBuilder()
+                    .set(javaGetter(Role::getAuthorities), Set.of(authority))
+                    .sample()
+            );
+            String roleName = role.getName();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -211,8 +218,7 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: New role exists
-            String roleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(roleName).build());
+            Role role = roleService.save(getRoleBuilder().sample());
 
             // GIVEN: User authentication header
             AuthenticationDto auth = authenticationController.register(fixtureMonkey.giveMeOne(RegisterDto.class));
@@ -242,8 +248,7 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should404_whenNonexistent() {
             // GIVEN: New role exists
-            String roleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(roleName).build());
+            Role role = roleService.save(getRoleBuilder().sample());
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -282,8 +287,7 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldCreateRole() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
 
             // GIVEN: Role with new authority id
             RoleDto role = fixtureMonkey.giveMeBuilder(RoleDto.class)
@@ -313,8 +317,7 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldCreateWithoutAuthority_whenAuthorityNonexistent() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
 
             // GIVEN: Role with wrong authority id
             int wrongId = authority.getId() + 1;
@@ -397,8 +400,8 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should409_whenDuplicateRoleName() {
             // GIVEN: Role exists
-            String roleName = "role_" + UUID.randomUUID();
-            roleService.save(Role.builder().name(roleName).build());
+            Role savedRole = roleService.save(getRoleBuilder().sample());
+            String roleName = savedRole.getName();
 
             // GIVEN: Role with duplicate name
             RoleDto role = fixtureMonkey.giveMeBuilder(RoleDto.class)
@@ -435,12 +438,16 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldUpdateRole_whenUpdateName() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            String authorityName = authority.getAuthority();
 
             // GIVEN: New role exists with new authority
-            String oldRoleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(oldRoleName).authorities(Set.of(authority)).build());
+            Role role = roleService.save(
+                getRoleBuilder()
+                    .set(javaGetter(Role::getAuthorities), Set.of(authority))
+                    .sample()
+            );
+            String oldRoleName = role.getName();
 
             // GIVEN: Updated name, but some values null (id, authorities)
             RoleDto updated = fixtureMonkey.giveMeBuilder(RoleDto.class)
@@ -479,12 +486,12 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldUpdateRole_whenUpdateAuthorities() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            String authorityName = authority.getAuthority();
 
             // GIVEN: New role exists
-            String roleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(roleName).build());
+            Role role = roleService.save(getRoleBuilder().sample());
+            String roleName = role.getName();
 
             // GIVEN: Updated authorities with new authority
             RoleDto updated = fixtureMonkey.giveMeBuilder(RoleDto.class)
@@ -523,12 +530,16 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldUpdateRole_whenBodyIdIncorrect() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            String authorityName = authority.getAuthority();
 
             // GIVEN: New role exists with new authority
-            String oldRoleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(oldRoleName).authorities(Set.of(authority)).build());
+            Role role = roleService.save(
+                getRoleBuilder()
+                    .set(javaGetter(Role::getAuthorities), Set.of(authority))
+                    .sample()
+            );
+            String oldRoleName = role.getName();
 
             // GIVEN: Updated name, but some values null (id, authorities)
             RoleDto updated = fixtureMonkey.giveMeBuilder(RoleDto.class)
@@ -567,12 +578,12 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldUpdateRole_whenNameNotChanged() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            String authorityName = authority.getAuthority();
 
             // GIVEN: New role exists
-            String roleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(roleName).build());
+            Role role = roleService.save(getRoleBuilder().sample());
+            String roleName = role.getName();
 
             // GIVEN: Updated authorities with new authority and insert same name
             RoleDto updated = fixtureMonkey.giveMeBuilder(RoleDto.class)
@@ -611,12 +622,11 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldUpdateWithoutAuthority_whenAuthorityNonexistent() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
 
             // GIVEN: New role exists
-            String roleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(roleName).build());
+            Role role = roleService.save(getRoleBuilder().sample());
+            String roleName = role.getName();
 
             // GIVEN: Updated authorities with wrong id
             int wrongId = authority.getId() + 1;
@@ -652,8 +662,7 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should400_whenNameEmpty() {
             // GIVEN: New role exists
-            String oldRoleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(oldRoleName).build());
+            Role role = roleService.save(getRoleBuilder().sample());
 
             // GIVEN: Updated name to empty
             RoleDto updated = fixtureMonkey.giveMeBuilder(RoleDto.class)
@@ -723,8 +732,7 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: New role exists
-            String oldRoleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(oldRoleName).build());
+            Role role = roleService.save(getRoleBuilder().sample());
 
             // GIVEN: Updated name
             RoleDto updated = fixtureMonkey.giveMeOne(RoleDto.class);
@@ -757,8 +765,7 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should404_whenRoleNonexistent() {
             // GIVEN: New role exists
-            String oldRoleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(oldRoleName).build());
+            Role role = roleService.save(getRoleBuilder().sample());
 
             // GIVEN: Updated name
             RoleDto updated = fixtureMonkey.giveMeOne(RoleDto.class);
@@ -792,10 +799,9 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should409_whenDuplicateName() {
             // GIVEN: Two new role exists
-            String oldRoleName1 = "role_" + UUID.randomUUID();
-            String roleName2 = "role_" + UUID.randomUUID();
-            Role role1 = roleService.save(Role.builder().name(oldRoleName1).build());
-            roleService.save(Role.builder().name(roleName2).build());
+            Role role1 = roleService.save(getRoleBuilder().sample());
+            Role role2 = roleService.save(getRoleBuilder().sample());
+            String roleName2 = role2.getName();
 
             // GIVEN: Updated name to other role name
             RoleDto updated = fixtureMonkey.giveMeBuilder(RoleDto.class)
@@ -837,12 +843,15 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldDeleteRole() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
 
             // GIVEN: New role exists with new authority
-            String roleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(roleName).authorities(Set.of(authority)).build());
+            Role role = roleService.save(
+                getRoleBuilder()
+                    .set(javaGetter(Role::getAuthorities), Set.of(authority))
+                    .sample()
+            );
+            String roleName = role.getName();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -873,12 +882,15 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldDeleteRole_whenUsed() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
 
             // GIVEN: New role exists with new authority
-            String roleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(roleName).authorities(Set.of(authority)).build());
+            Role role = roleService.save(
+                getRoleBuilder()
+                    .set(javaGetter(Role::getAuthorities), Set.of(authority))
+                    .sample()
+            );
+            String roleName = role.getName();
 
             // GIVEN: New user exists with role
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
@@ -983,8 +995,7 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: New role exists
-            String roleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(roleName).build());
+            Role role = roleService.save(getRoleBuilder().sample());
 
             // GIVEN: User authentication header
             AuthenticationDto auth = authenticationController.register(fixtureMonkey.giveMeOne(RegisterDto.class));
@@ -1014,8 +1025,7 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should404_whenNonexistent() {
             // GIVEN: New role exists
-            String roleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(roleName).build());
+            Role role = roleService.save(getRoleBuilder().sample());
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();

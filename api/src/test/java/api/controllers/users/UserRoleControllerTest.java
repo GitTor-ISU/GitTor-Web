@@ -1,5 +1,6 @@
 package api.controllers.users;
 
+import static com.navercorp.fixturemonkey.api.expression.JavaGetterMethodPropertySelector.javaGetter;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -9,7 +10,6 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -59,16 +59,23 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void shouldGetUserRoles() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            String authorityName = authority.getAuthority();
 
             // GIVEN: New role exists with new authority
-            String roleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(roleName).authorities(Set.of(authority)).build());
+            Role role = roleService.save(
+                getRoleBuilder()
+                    .set(javaGetter(Role::getAuthorities), Set.of(authority))
+                    .sample()
+            );
+            String roleName = role.getName();
 
             // GIVEN: New user exists with new role
-            String username = "user_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(role, userRole)).build());
+            User user = userService.save(
+                getUserBuilder()
+                        .set(javaGetter(User::getRoles), Set.of(role, userRole))
+                        .sample()
+            );
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -136,8 +143,11 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void should404_whenNonexistentUser() {
             // GIVEN: New user exists
-            String username = "u_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(userRole)).build());
+            User user = userService.save(
+                getUserBuilder()
+                        .set(javaGetter(User::getRoles), Set.of(userRole))
+                        .sample()
+            );
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -176,18 +186,24 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void shouldSetUserRoles() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            String authorityName = authority.getAuthority();
 
             // GIVEN: Two new role exists (second one with authorities)
-            String roleName1 = "role_" + UUID.randomUUID();
-            String roleName2 = "role_" + UUID.randomUUID();
-            Role role1 = roleService.save(Role.builder().name(roleName1).build());
-            Role role2 = roleService.save(Role.builder().name(roleName2).authorities(Set.of(authority)).build());
+            Role role1 = roleService.save(getRoleBuilder().sample());
+            Role role2 = roleService.save(
+                getRoleBuilder()
+                    .set(javaGetter(Role::getAuthorities), Set.of(authority))
+                    .sample()
+            );
+            String roleName2 = role2.getName();
 
             // GIVEN: New user exists with new role
-            String username = "u_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(role1, userRole)).build());
+            User user = userService.save(
+                getUserBuilder()
+                    .set(javaGetter(User::getRoles), Set.of(role1, userRole))
+                    .sample()
+            );
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -223,18 +239,24 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void shouldSetUserRoles_withoutUserRole() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            String authorityName = authority.getAuthority();
 
             // GIVEN: Two new role exists (second one with authorities)
-            String roleName1 = "role_" + UUID.randomUUID();
-            String roleName2 = "role_" + UUID.randomUUID();
-            Role role1 = roleService.save(Role.builder().name(roleName1).build());
-            Role role2 = roleService.save(Role.builder().name(roleName2).authorities(Set.of(authority)).build());
+            Role role1 = roleService.save(getRoleBuilder().sample());
+            Role role2 = roleService.save(
+                getRoleBuilder()
+                    .set(javaGetter(Role::getAuthorities), Set.of(authority))
+                    .sample()
+            );
+            String roleName2 = role2.getName();
 
             // GIVEN: New user exists with new role
-            String username = "u_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(role1, userRole)).build());
+            User user = userService.save(
+                getUserBuilder()
+                        .set(javaGetter(User::getRoles), Set.of(role1, userRole))
+                        .sample()
+            );
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -270,16 +292,21 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void shouldSetUserRoles_whenRolesNotFound() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
 
             // GIVEN: New role exists with new authority
-            String roleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(roleName).authorities(Set.of(authority)).build());
+            Role role = roleService.save(
+                getRoleBuilder()
+                    .set(javaGetter(Role::getAuthorities), Set.of(authority))
+                    .sample()
+            );
 
             // GIVEN: New user exists with new role
-            String username = "u_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(role, userRole)).build());
+            User user = userService.save(
+                getUserBuilder()
+                        .set(javaGetter(User::getRoles), Set.of(role, userRole))
+                        .sample()
+            );
 
             // GIVEN: Admin authentication header with wrong role id
             HttpHeaders headers = new HttpHeaders();
@@ -339,8 +366,11 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void should404_whenNonexistentUser() {
             // GIVEN: New user exists
-            String username = "u_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(userRole)).build());
+            User user = userService.save(
+                getUserBuilder()
+                        .set(javaGetter(User::getRoles), Set.of(userRole))
+                        .sample()
+            );
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -409,18 +439,25 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void shouldAddUserRoles() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            String authorityName = authority.getAuthority();
 
             // GIVEN: Two new role exists (second one with authorities)
-            String roleName1 = "role_" + UUID.randomUUID();
-            String roleName2 = "role_" + UUID.randomUUID();
-            Role role1 = roleService.save(Role.builder().name(roleName1).build());
-            Role role2 = roleService.save(Role.builder().name(roleName2).authorities(Set.of(authority)).build());
+            Role role1 = roleService.save(getRoleBuilder().sample());
+            Role role2 = roleService.save(
+                getRoleBuilder()
+                    .set(javaGetter(Role::getAuthorities), Set.of(authority))
+                    .sample()
+            );
+            String roleName1 = role1.getName();
+            String roleName2 = role2.getName();
 
             // GIVEN: New user exists with new role
-            String username = "u_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(role1, userRole)).build());
+            User user = userService.save(
+                getUserBuilder()
+                    .set(javaGetter(User::getRoles), Set.of(role1, userRole))
+                    .sample()
+            );
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -460,16 +497,23 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void shouldAddUserRoles_whenRolesNotFound() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            String authorityName = authority.getAuthority();
 
             // GIVEN: New role exists with new authority
-            String roleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(roleName).authorities(Set.of(authority)).build());
+            Role role = roleService.save(
+                getRoleBuilder()
+                    .set(javaGetter(Role::getAuthorities), Set.of(authority))
+                    .sample()
+            );
+            String roleName = role.getName();
 
             // GIVEN: New user exists with new role
-            String username = "u_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(role, userRole)).build());
+            User user = userService.save(
+                getUserBuilder()
+                    .set(javaGetter(User::getRoles), Set.of(role, userRole))
+                    .sample()
+            );
 
             // GIVEN: Admin authentication header with wrong role id
             HttpHeaders headers = new HttpHeaders();
@@ -505,16 +549,23 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void shouldNotAddUserRoles_whenRolesAlreadyAdded() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            String authorityName = authority.getAuthority();
 
             // GIVEN: New role exists with new authority
-            String roleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(roleName).authorities(Set.of(authority)).build());
+            Role role = roleService.save(
+                getRoleBuilder()
+                    .set(javaGetter(Role::getAuthorities), Set.of(authority))
+                    .sample()
+            );
+            String roleName = role.getName();
 
             // GIVEN: New user exists with new role
-            String username = "u_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(role, userRole)).build());
+            User user = userService.save(
+                getUserBuilder()
+                        .set(javaGetter(User::getRoles), Set.of(role, userRole))
+                        .sample()
+            );
 
             // GIVEN: Admin authentication header with wrong role id
             HttpHeaders headers = new HttpHeaders();
@@ -582,8 +633,11 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void should404_whenNonexistentUser() {
             // GIVEN: New user exists
-            String username = "u_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(userRole)).build());
+            User user = userService.save(
+                getUserBuilder()
+                        .set(javaGetter(User::getRoles), Set.of(userRole))
+                        .sample()
+            );
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -622,19 +676,24 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void shouldRemoveUserRoles() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            String authorityName = authority.getAuthority();
 
             // GIVEN: Two new role exists (second one with authorities)
-            String roleName1 = "role_" + UUID.randomUUID();
-            String roleName2 = "role_" + UUID.randomUUID();
-            Role role1 = roleService.save(Role.builder().name(roleName1).build());
-            Role role2 = roleService.save(Role.builder().name(roleName2).authorities(Set.of(authority)).build());
+            Role role1 = roleService.save(getRoleBuilder().sample());
+            Role role2 = roleService.save(
+                getRoleBuilder()
+                    .set(javaGetter(Role::getAuthorities), Set.of(authority))
+                    .sample()
+            );
+            String roleName2 = role2.getName();
 
             // GIVEN: New user exists with new role
-            String username = "u_" + UUID.randomUUID();
-            User user = userService
-                    .save(User.builder().username(username).roles(Set.of(role1, role2, userRole)).build());
+            User user = userService.save(
+                getUserBuilder()
+                        .set(javaGetter(User::getRoles), Set.of(role1, role2, userRole))
+                        .sample()
+            );
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -670,16 +729,23 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void shouldNotRemoveUserRoles_whenRolesNotFound() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            String authorityName = authority.getAuthority();
 
             // GIVEN: New role exists with new authority
-            String roleName = "role_" + UUID.randomUUID();
-            Role role = roleService.save(Role.builder().name(roleName).authorities(Set.of(authority)).build());
+            Role role = roleService.save(
+                getRoleBuilder()
+                    .set(javaGetter(Role::getAuthorities), Set.of(authority))
+                    .sample()
+            );
+            String roleName = role.getName();
 
             // GIVEN: New user exists with new role
-            String username = "u_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(role, userRole)).build());
+            User user = userService.save(
+                getUserBuilder()
+                        .set(javaGetter(User::getRoles), Set.of(role, userRole))
+                        .sample()
+            );
 
             // GIVEN: Admin authentication header with wrong role id
             HttpHeaders headers = new HttpHeaders();
@@ -715,19 +781,22 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void should400_whenRemoveUserRole() {
             // GIVEN: New authority exists
-            String authorityName = "authority_" + UUID.randomUUID();
-            Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
+            Authority authority = authorityService.save(getAuthorityBuilder().sample());
 
             // GIVEN: Two new role exists (second one with authorities)
-            String roleName1 = "role_" + UUID.randomUUID();
-            String roleName2 = "role_" + UUID.randomUUID();
-            Role role1 = roleService.save(Role.builder().name(roleName1).build());
-            Role role2 = roleService.save(Role.builder().name(roleName2).authorities(Set.of(authority)).build());
+            Role role1 = roleService.save(getRoleBuilder().sample());
+            Role role2 = roleService.save(
+                getRoleBuilder()
+                    .set(javaGetter(Role::getAuthorities), Set.of(authority))
+                    .sample()
+            );
 
             // GIVEN: New user exists with new role
-            String username = "u_" + UUID.randomUUID();
-            User user = userService
-                    .save(User.builder().username(username).roles(Set.of(role1, role2, userRole)).build());
+            User user = userService.save(
+                getUserBuilder()
+                        .set(javaGetter(User::getRoles), Set.of(role1, role2, userRole))
+                        .sample()
+            );
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -789,8 +858,11 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void should404_whenNonexistentUser() {
             // GIVEN: New user exists
-            String username = "u_" + UUID.randomUUID();
-            User user = userService.save(User.builder().username(username).roles(Set.of(userRole)).build());
+            User user = userService.save(
+                getUserBuilder()
+                        .set(javaGetter(User::getRoles), Set.of(userRole))
+                        .sample()
+            );
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();

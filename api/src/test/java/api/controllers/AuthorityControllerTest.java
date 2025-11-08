@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URI;
 import java.util.List;
-import java.util.UUID;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -50,8 +49,9 @@ public class AuthorityControllerTest extends BasicContext {
         @Test
         public void shouldGetAuthorities() {
             // GIVEN: New authority exists
-            String newAuthorityName = "authority_" + UUID.randomUUID();
-            authorityService.save(Authority.builder().authority(newAuthorityName).build());
+            Authority authority = getAuthorityBuilder().sample();
+            String newAuthorityName = authority.getAuthority();
+            authorityService.save(authority);
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -107,8 +107,7 @@ public class AuthorityControllerTest extends BasicContext {
         @Test
         public void shouldGetAuthority() {
             // GIVEN: New authority exists
-            String newAuthorityName = "authority_" + UUID.randomUUID();
-            Authority newAuthority = authorityService.save(Authority.builder().authority(newAuthorityName).build());
+            Authority newAuthority = authorityService.save(getAuthorityBuilder().sample());
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -136,8 +135,7 @@ public class AuthorityControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: New authority exists
-            String newAuthorityName = "authority_" + UUID.randomUUID();
-            Authority newAuthority = authorityService.save(Authority.builder().authority(newAuthorityName).build());
+            Authority newAuthority = authorityService.save(getAuthorityBuilder().sample());
 
             // GIVEN: User authentication header
             AuthenticationDto auth = authenticationController.register(fixtureMonkey.giveMeOne(RegisterDto.class));
@@ -168,8 +166,7 @@ public class AuthorityControllerTest extends BasicContext {
         @Test
         public void should404_whenNonexistent() {
             // GIVEN: New authority exists
-            String newAuthorityName = "authority_" + UUID.randomUUID();
-            Authority newAuthority = authorityService.save(Authority.builder().authority(newAuthorityName).build());
+            Authority newAuthority = authorityService.save(getAuthorityBuilder().sample());
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
