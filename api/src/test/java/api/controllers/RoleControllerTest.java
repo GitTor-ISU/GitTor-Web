@@ -1,5 +1,6 @@
 package api.controllers;
 
+import static com.navercorp.fixturemonkey.api.expression.JavaGetterMethodPropertySelector.javaGetter;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -103,12 +104,7 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: User authentication header
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username("user_" + UUID.randomUUID())
-                    .password("password")
-                    .build()
-            );
+            AuthenticationDto auth = authenticationController.register(fixtureMonkey.giveMeOne(RegisterDto.class));
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(auth.getAccessToken());
             HttpEntity<Void> request = new HttpEntity<>(null, headers);
@@ -219,12 +215,7 @@ public class RoleControllerTest extends BasicContext {
             Role role = roleService.save(Role.builder().name(roleName).build());
 
             // GIVEN: User authentication header
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username("user_" + UUID.randomUUID())
-                    .password("password")
-                    .build()
-            );
+            AuthenticationDto auth = authenticationController.register(fixtureMonkey.giveMeOne(RegisterDto.class));
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(auth.getAccessToken());
             HttpEntity<Void> request = new HttpEntity<>(null, headers);
@@ -295,11 +286,10 @@ public class RoleControllerTest extends BasicContext {
             Authority authority = authorityService.save(Authority.builder().authority(authorityName).build());
 
             // GIVEN: Role with new authority id
-            String roleName = "role_" + UUID.randomUUID();
-            RoleDto role = RoleDto.builder()
-                .name(roleName)
-                .authorityIds(List.of(authority.getId()))
-                .build();
+            RoleDto role = fixtureMonkey.giveMeBuilder(RoleDto.class)
+                    .set(javaGetter(RoleDto::getAuthorityIds), List.of(authority.getId()))
+                    .sample();
+            String roleName = role.getName();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -328,11 +318,10 @@ public class RoleControllerTest extends BasicContext {
 
             // GIVEN: Role with wrong authority id
             int wrongId = authority.getId() + 1;
-            String roleName = "role_" + UUID.randomUUID();
-            RoleDto role = RoleDto.builder()
-                .name(roleName)
-                .authorityIds(List.of(wrongId))
-                .build();
+            RoleDto role = fixtureMonkey.giveMeBuilder(RoleDto.class)
+                    .set(javaGetter(RoleDto::getAuthorityIds), List.of(wrongId))
+                    .sample();
+            String roleName = role.getName();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -356,18 +345,10 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: Role
-            String roleName = "role_" + UUID.randomUUID();
-            RoleDto role = RoleDto.builder()
-                .name(roleName)
-                .build();
+            RoleDto role = fixtureMonkey.giveMeOne(RoleDto.class);
 
             // GIVEN: User authentication header
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username("user_" + UUID.randomUUID())
-                    .password("password")
-                    .build()
-            );
+            AuthenticationDto auth = authenticationController.register(fixtureMonkey.giveMeOne(RegisterDto.class));
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(auth.getAccessToken());
             HttpEntity<RoleDto> request = new HttpEntity<>(role, headers);
@@ -389,9 +370,10 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should400_whenNameEmpty() {
             // GIVEN: Role with empty name
-            RoleDto role = RoleDto.builder()
-                .name("")
-                .build();
+            RoleDto role = fixtureMonkey.giveMeBuilder(RoleDto.class)
+                    .set(javaGetter(RoleDto::getName), "")
+                    .validOnly(false)
+                    .sample();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -408,7 +390,7 @@ public class RoleControllerTest extends BasicContext {
                 () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Role name must not be empty.", responseEntity.getBody().getMessage())
+                () -> assertEquals("Name size must be between 1 and 255.", responseEntity.getBody().getMessage())
             );
         }
 
@@ -419,9 +401,9 @@ public class RoleControllerTest extends BasicContext {
             roleService.save(Role.builder().name(roleName).build());
 
             // GIVEN: Role with duplicate name
-            RoleDto role = RoleDto.builder()
-                .name(roleName)
-                .build();
+            RoleDto role = fixtureMonkey.giveMeBuilder(RoleDto.class)
+                    .set(javaGetter(RoleDto::getName), roleName)
+                    .sample();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -461,10 +443,10 @@ public class RoleControllerTest extends BasicContext {
             Role role = roleService.save(Role.builder().name(oldRoleName).authorities(Set.of(authority)).build());
 
             // GIVEN: Updated name, but some values null (id, authorities)
-            String roleName = "role_" + UUID.randomUUID();
-            RoleDto updated = RoleDto.builder()
-                .name(roleName)
-                .build();
+            RoleDto updated = fixtureMonkey.giveMeBuilder(RoleDto.class)
+                    .setNull(javaGetter(RoleDto::getAuthorityIds))
+                    .sample();
+            String roleName = updated.getName();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -505,9 +487,10 @@ public class RoleControllerTest extends BasicContext {
             Role role = roleService.save(Role.builder().name(roleName).build());
 
             // GIVEN: Updated authorities with new authority
-            RoleDto updated = RoleDto.builder()
-                .authorityIds(List.of(authority.getId()))
-                .build();
+            RoleDto updated = fixtureMonkey.giveMeBuilder(RoleDto.class)
+                    .setNull(javaGetter(RoleDto::getName))
+                    .set(javaGetter(RoleDto::getAuthorityIds), List.of(authority.getId()))
+                    .sample();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -548,11 +531,10 @@ public class RoleControllerTest extends BasicContext {
             Role role = roleService.save(Role.builder().name(oldRoleName).authorities(Set.of(authority)).build());
 
             // GIVEN: Updated name, but some values null (id, authorities)
-            String roleName = "role_" + UUID.randomUUID();
-            RoleDto updated = RoleDto.builder()
-                .id(role.getId() + 1)
-                .name(roleName)
-                .build();
+            RoleDto updated = fixtureMonkey.giveMeBuilder(RoleDto.class)
+                    .setNull(javaGetter(RoleDto::getAuthorityIds))
+                    .sample();
+            String roleName = updated.getName();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -593,10 +575,10 @@ public class RoleControllerTest extends BasicContext {
             Role role = roleService.save(Role.builder().name(roleName).build());
 
             // GIVEN: Updated authorities with new authority and insert same name
-            RoleDto updated = RoleDto.builder()
-                .name(roleName)
-                .authorityIds(List.of(authority.getId()))
-                .build();
+            RoleDto updated = fixtureMonkey.giveMeBuilder(RoleDto.class)
+                    .set(javaGetter(RoleDto::getName), roleName)
+                    .set(javaGetter(RoleDto::getAuthorityIds), List.of(authority.getId()))
+                    .sample();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -638,9 +620,10 @@ public class RoleControllerTest extends BasicContext {
 
             // GIVEN: Updated authorities with wrong id
             int wrongId = authority.getId() + 1;
-            RoleDto updated = RoleDto.builder()
-                .authorityIds(List.of(wrongId))
-                .build();
+            RoleDto updated = fixtureMonkey.giveMeBuilder(RoleDto.class)
+                    .setNull(javaGetter(RoleDto::getName))
+                    .set(javaGetter(RoleDto::getAuthorityIds), List.of(wrongId))
+                    .sample();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -673,9 +656,10 @@ public class RoleControllerTest extends BasicContext {
             Role role = roleService.save(Role.builder().name(oldRoleName).build());
 
             // GIVEN: Updated name to empty
-            RoleDto updated = RoleDto.builder()
-                .name("")
-                .build();
+            RoleDto updated = fixtureMonkey.giveMeBuilder(RoleDto.class)
+                    .set(javaGetter(RoleDto::getName), "")
+                    .validOnly(false)
+                    .sample();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -697,18 +681,17 @@ public class RoleControllerTest extends BasicContext {
                 () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Role name must not be empty.", responseEntity.getBody().getMessage())
+                () -> assertEquals("Name size must be between 1 and 255.", responseEntity.getBody().getMessage())
             );
         }
 
         @Test
         public void should400_whenAdminRole() {
-            // GIVEN: Adim role
+            // GIVEN: Admin role
             Role role = roleService.get(RoleService.ADMIN_ROLE_NAME);
 
             // GIVEN: Update
-            RoleDto updated = RoleDto.builder()
-                .build();
+            RoleDto updated = fixtureMonkey.giveMeOne(RoleDto.class);
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -744,18 +727,10 @@ public class RoleControllerTest extends BasicContext {
             Role role = roleService.save(Role.builder().name(oldRoleName).build());
 
             // GIVEN: Updated name
-            String roleName = "role_" + UUID.randomUUID();
-            RoleDto updated = RoleDto.builder()
-                .name(roleName)
-                .build();
+            RoleDto updated = fixtureMonkey.giveMeOne(RoleDto.class);
 
             // GIVEN: User authentication header
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username("user_" + UUID.randomUUID())
-                    .password("password")
-                    .build()
-            );
+            AuthenticationDto auth = authenticationController.register(fixtureMonkey.giveMeOne(RegisterDto.class));
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(auth.getAccessToken());
             HttpEntity<RoleDto> request = new HttpEntity<>(updated, headers);
@@ -786,10 +761,7 @@ public class RoleControllerTest extends BasicContext {
             Role role = roleService.save(Role.builder().name(oldRoleName).build());
 
             // GIVEN: Updated name
-            String roleName = "role_" + UUID.randomUUID();
-            RoleDto updated = RoleDto.builder()
-                .name(roleName)
-                .build();
+            RoleDto updated = fixtureMonkey.giveMeOne(RoleDto.class);
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -826,9 +798,9 @@ public class RoleControllerTest extends BasicContext {
             roleService.save(Role.builder().name(roleName2).build());
 
             // GIVEN: Updated name to other role name
-            RoleDto updated = RoleDto.builder()
-                .name(roleName2)
-                .build();
+            RoleDto updated = fixtureMonkey.giveMeBuilder(RoleDto.class)
+                    .set(javaGetter(RoleDto::getName), roleName2)
+                    .sample();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -909,13 +881,9 @@ public class RoleControllerTest extends BasicContext {
             Role role = roleService.save(Role.builder().name(roleName).authorities(Set.of(authority)).build());
 
             // GIVEN: New user exists with role
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
             User user = userService.get(username);
             Set<Role> roles = userService.getRoles(user);
             roles.add(role);
@@ -1019,12 +987,7 @@ public class RoleControllerTest extends BasicContext {
             Role role = roleService.save(Role.builder().name(roleName).build());
 
             // GIVEN: User authentication header
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username("user_" + UUID.randomUUID())
-                    .password("password")
-                    .build()
-            );
+            AuthenticationDto auth = authenticationController.register(fixtureMonkey.giveMeOne(RegisterDto.class));
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(auth.getAccessToken());
             HttpEntity<Void> request = new HttpEntity<>(null, headers);

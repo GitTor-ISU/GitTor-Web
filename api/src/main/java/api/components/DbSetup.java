@@ -40,6 +40,8 @@ public class DbSetup {
 
     @Value("${spring.profiles.active:default}")
     private String activeProfile;
+    @Value("${api.admin.email:admin@gittor}")
+    private String adminEmail;
     @Value("${api.admin.username:admin}")
     private String adminUsername;
     @Value("${api.admin.password:password}")
@@ -74,6 +76,7 @@ public class DbSetup {
         userService.find("admin")
             .orElseGet(() -> userService.save(
                 User.builder()
+                    .email(adminEmail)
                     .username(adminUsername)
                     .password(passwordEncoder.encode(adminPassword))
                     .roles(Set.of(adminRole, userRole))

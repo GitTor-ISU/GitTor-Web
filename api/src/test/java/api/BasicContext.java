@@ -16,6 +16,10 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import com.navercorp.fixturemonkey.FixtureMonkey;
+import com.navercorp.fixturemonkey.api.plugin.SimpleValueJqwikPlugin;
+import com.navercorp.fixturemonkey.jakarta.validation.plugin.JakartaValidationPlugin;
+
 import api.dtos.AuthenticationDto;
 import api.services.TokenService;
 
@@ -47,11 +51,19 @@ public abstract class BasicContext {
     protected ZoneId zone = ZoneId.of("UTC");
     protected Instant instant = Instant.EPOCH;
 
+    @Value("${api.admin.email:admin@gittor}")
+    protected String adminEmail;
     @Value("${api.admin.username:admin}")
-    private String adminUsername;
+    protected String adminUsername;
     @Value("${api.admin.password:password}")
-    private String adminPassword;
+    protected String adminPassword;
     protected AuthenticationDto adminAuth;
+
+    protected static final FixtureMonkey fixtureMonkey = FixtureMonkey.builder()
+            .defaultNullInjectGenerator(context -> 0.0)
+            .plugin(new JakartaValidationPlugin())
+            .plugin(new SimpleValueJqwikPlugin())
+            .build();
 
     @BeforeEach
     public void setup() {

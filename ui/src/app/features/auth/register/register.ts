@@ -37,8 +37,8 @@ export class Register implements OnDestroy {
         Validators.maxLength(20),
         Validators.pattern(/^[a-zA-Z0-9_-]*$/),
       ]),
-      email: new FormControl('', [Validators.required, Validators.email]),
-      password: new FormControl('', [Validators.required, Validators.minLength(8)]),
+      email: new FormControl('', [Validators.required, Validators.maxLength(255), Validators.email]),
+      password: new FormControl('', [Validators.required, Validators.minLength(8), Validators.maxLength(72)]),
       confirmPassword: new FormControl('', [Validators.required]),
     },
     { validators: passwordMatchValidator }

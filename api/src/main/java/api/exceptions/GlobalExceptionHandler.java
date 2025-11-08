@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -71,5 +73,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalStateException.class)
     public ResponseEntity<ErrorDto> handleIllegalStateException(IllegalStateException ex) {
         return new ResponseEntity<>(errorService.error(ex.getMessage()), HttpStatus.CONFLICT);
+    }
+
+    /**
+     * Handle {@link MethodArgumentNotValidException}.
+     *
+     * @param ex Exception
+     * @return {@link ResponseEntity}
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorDto> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        String field = StringUtils.capitalize(ex.getFieldError().getField());
+        String errorMessage = String.format("%s %s.", field, ex.getFieldError().getDefaultMessage());
+        return new ResponseEntity<>(errorService.error(errorMessage), HttpStatus.BAD_REQUEST);
     }
 }

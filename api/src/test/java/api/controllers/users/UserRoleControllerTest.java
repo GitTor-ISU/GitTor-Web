@@ -104,12 +104,9 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                    RegisterDto.builder()
-                            .username(username)
-                            .password("password")
-                            .build());
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            AuthenticationDto auth = authenticationController.register(register);
             User user = userService.get(username);
 
             // GIVEN: User authentication header
@@ -139,7 +136,7 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void should404_whenNonexistentUser() {
             // GIVEN: New user exists
-            String username = "user_" + UUID.randomUUID();
+            String username = "u_" + UUID.randomUUID();
             User user = userService.save(User.builder().username(username).roles(Set.of(userRole)).build());
 
             // GIVEN: Admin authentication header
@@ -189,7 +186,7 @@ public class UserRoleControllerTest extends BasicContext {
             Role role2 = roleService.save(Role.builder().name(roleName2).authorities(Set.of(authority)).build());
 
             // GIVEN: New user exists with new role
-            String username = "user_" + UUID.randomUUID();
+            String username = "u_" + UUID.randomUUID();
             User user = userService.save(User.builder().username(username).roles(Set.of(role1, userRole)).build());
 
             // GIVEN: Admin authentication header
@@ -236,7 +233,7 @@ public class UserRoleControllerTest extends BasicContext {
             Role role2 = roleService.save(Role.builder().name(roleName2).authorities(Set.of(authority)).build());
 
             // GIVEN: New user exists with new role
-            String username = "user_" + UUID.randomUUID();
+            String username = "u_" + UUID.randomUUID();
             User user = userService.save(User.builder().username(username).roles(Set.of(role1, userRole)).build());
 
             // GIVEN: Admin authentication header
@@ -281,7 +278,7 @@ public class UserRoleControllerTest extends BasicContext {
             Role role = roleService.save(Role.builder().name(roleName).authorities(Set.of(authority)).build());
 
             // GIVEN: New user exists with new role
-            String username = "user_" + UUID.randomUUID();
+            String username = "u_" + UUID.randomUUID();
             User user = userService.save(User.builder().username(username).roles(Set.of(role, userRole)).build());
 
             // GIVEN: Admin authentication header with wrong role id
@@ -310,12 +307,9 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                    RegisterDto.builder()
-                            .username(username)
-                            .password("password")
-                            .build());
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            AuthenticationDto auth = authenticationController.register(register);
             User user = userService.get(username);
 
             // GIVEN: User authentication header
@@ -345,7 +339,7 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void should404_whenNonexistentUser() {
             // GIVEN: New user exists
-            String username = "user_" + UUID.randomUUID();
+            String username = "u_" + UUID.randomUUID();
             User user = userService.save(User.builder().username(username).roles(Set.of(userRole)).build());
 
             // GIVEN: Admin authentication header
@@ -425,7 +419,7 @@ public class UserRoleControllerTest extends BasicContext {
             Role role2 = roleService.save(Role.builder().name(roleName2).authorities(Set.of(authority)).build());
 
             // GIVEN: New user exists with new role
-            String username = "user_" + UUID.randomUUID();
+            String username = "u_" + UUID.randomUUID();
             User user = userService.save(User.builder().username(username).roles(Set.of(role1, userRole)).build());
 
             // GIVEN: Admin authentication header
@@ -474,7 +468,7 @@ public class UserRoleControllerTest extends BasicContext {
             Role role = roleService.save(Role.builder().name(roleName).authorities(Set.of(authority)).build());
 
             // GIVEN: New user exists with new role
-            String username = "user_" + UUID.randomUUID();
+            String username = "u_" + UUID.randomUUID();
             User user = userService.save(User.builder().username(username).roles(Set.of(role, userRole)).build());
 
             // GIVEN: Admin authentication header with wrong role id
@@ -519,7 +513,7 @@ public class UserRoleControllerTest extends BasicContext {
             Role role = roleService.save(Role.builder().name(roleName).authorities(Set.of(authority)).build());
 
             // GIVEN: New user exists with new role
-            String username = "user_" + UUID.randomUUID();
+            String username = "u_" + UUID.randomUUID();
             User user = userService.save(User.builder().username(username).roles(Set.of(role, userRole)).build());
 
             // GIVEN: Admin authentication header with wrong role id
@@ -556,12 +550,9 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                    RegisterDto.builder()
-                            .username(username)
-                            .password("password")
-                            .build());
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            AuthenticationDto auth = authenticationController.register(register);
             User user = userService.get(username);
 
             // GIVEN: User authentication header
@@ -591,7 +582,7 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void should404_whenNonexistentUser() {
             // GIVEN: New user exists
-            String username = "user_" + UUID.randomUUID();
+            String username = "u_" + UUID.randomUUID();
             User user = userService.save(User.builder().username(username).roles(Set.of(userRole)).build());
 
             // GIVEN: Admin authentication header
@@ -641,7 +632,7 @@ public class UserRoleControllerTest extends BasicContext {
             Role role2 = roleService.save(Role.builder().name(roleName2).authorities(Set.of(authority)).build());
 
             // GIVEN: New user exists with new role
-            String username = "user_" + UUID.randomUUID();
+            String username = "u_" + UUID.randomUUID();
             User user = userService
                     .save(User.builder().username(username).roles(Set.of(role1, role2, userRole)).build());
 
@@ -687,7 +678,7 @@ public class UserRoleControllerTest extends BasicContext {
             Role role = roleService.save(Role.builder().name(roleName).authorities(Set.of(authority)).build());
 
             // GIVEN: New user exists with new role
-            String username = "user_" + UUID.randomUUID();
+            String username = "u_" + UUID.randomUUID();
             User user = userService.save(User.builder().username(username).roles(Set.of(role, userRole)).build());
 
             // GIVEN: Admin authentication header with wrong role id
@@ -734,7 +725,7 @@ public class UserRoleControllerTest extends BasicContext {
             Role role2 = roleService.save(Role.builder().name(roleName2).authorities(Set.of(authority)).build());
 
             // GIVEN: New user exists with new role
-            String username = "user_" + UUID.randomUUID();
+            String username = "u_" + UUID.randomUUID();
             User user = userService
                     .save(User.builder().username(username).roles(Set.of(role1, role2, userRole)).build());
 
@@ -766,12 +757,9 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                    RegisterDto.builder()
-                            .username(username)
-                            .password("password")
-                            .build());
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            AuthenticationDto auth = authenticationController.register(register);
             User user = userService.get(username);
 
             // GIVEN: User authentication header
@@ -801,7 +789,7 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void should404_whenNonexistentUser() {
             // GIVEN: New user exists
-            String username = "user_" + UUID.randomUUID();
+            String username = "u_" + UUID.randomUUID();
             User user = userService.save(User.builder().username(username).roles(Set.of(userRole)).build());
 
             // GIVEN: Admin authentication header

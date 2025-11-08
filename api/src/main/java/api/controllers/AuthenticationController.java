@@ -1,5 +1,7 @@
 package api.controllers;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,12 +18,15 @@ import api.dtos.RegisterDto;
 import api.entities.User;
 import api.services.AuthenticationService;
 import api.services.TokenService;
+import api.services.UserService;
+import ch.qos.logback.core.util.StringUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 /**
  * {@link AuthenticationController}.
@@ -32,6 +37,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class AuthenticationController {
     @Autowired
     private AuthenticationService authenticationService;
+    @Autowired
+    private UserService userService;
     @Autowired
     private TokenService tokenService;
     @Autowired
@@ -59,9 +66,15 @@ public class AuthenticationController {
     })
     // endregion
     @PostMapping("/login")
-    public AuthenticationDto login(@RequestBody LoginDto login) {
+    public AuthenticationDto login(@Valid @RequestBody LoginDto login) {
+        Optional<User> user = userService.find(
+            StringUtil.isNullOrEmpty(login.getUsername())
+            ? login.getEmail()
+            : login.getUsername()
+        );
+
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(login.getUsername(), login.getPassword()));
+            new UsernamePasswordAuthenticationToken(user.orElse(null), login.getPassword()));
 
         return tokenService.generateToken(authentication);
     }
@@ -102,11 +115,11 @@ public class AuthenticationController {
     })
     // endregion
     @PostMapping("/register")
-    public AuthenticationDto register(@RequestBody RegisterDto registerDto) {
+    public AuthenticationDto register(@Valid @RequestBody RegisterDto registerDto) {
         User user = authenticationService.register(registerDto);
 
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(user.getUsername(), registerDto.getPassword()));
+            new UsernamePasswordAuthenticationToken(user, registerDto.getPassword()));
 
         return tokenService.generateToken(authentication);
     }

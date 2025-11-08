@@ -77,12 +77,7 @@ public class AuthorityControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: User authentication header
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username("user_" + UUID.randomUUID())
-                    .password("password")
-                    .build()
-            );
+            AuthenticationDto auth = authenticationController.register(fixtureMonkey.giveMeOne(RegisterDto.class));
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(auth.getAccessToken());
             HttpEntity<Void> request = new HttpEntity<>(null, headers);
@@ -145,12 +140,8 @@ public class AuthorityControllerTest extends BasicContext {
             Authority newAuthority = authorityService.save(Authority.builder().authority(newAuthorityName).build());
 
             // GIVEN: User authentication header
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username("user_" + UUID.randomUUID())
-                    .password("password")
-                    .build()
-            );
+            AuthenticationDto auth = authenticationController.register(fixtureMonkey.giveMeOne(RegisterDto.class));
+
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(auth.getAccessToken());
             HttpEntity<Void> request = new HttpEntity<>(null, headers);
