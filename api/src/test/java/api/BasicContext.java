@@ -105,10 +105,10 @@ public abstract class BasicContext {
     protected ArbitraryBuilder<Role> getRoleBuilder() {
         return fixtureMonkey.giveMeBuilder(Role.class)
                 .setNull(javaGetter(Role::getId))
-                .setNull(javaGetter(Role::getAuthorities))
+                .set(javaGetter(Role::getAuthorities), Collections.emptySet())
                 .set(
                     javaGetter(Role::getName),
-                    Arbitraries.strings().ofMinLength(10).ofMaxLength(255)
+                    Arbitraries.strings().alpha().ofMinLength(12).ofMaxLength(255)
                 );
     }
 
@@ -123,11 +123,11 @@ public abstract class BasicContext {
                 .setNull(javaGetter(User::getId))
                 .set(
                     javaGetter(User::getEmail),
-                    Arbitraries.strings().ofMinLength(10).ofMaxLength(255)
+                    Arbitraries.strings().alpha().ofMinLength(12).ofMaxLength(255)
                 )
                 .set(
                     javaGetter(User::getUsername),
-                    Arbitraries.strings().ofMinLength(10).ofMaxLength(255)
+                    Arbitraries.strings().alpha().ofMinLength(12).ofMaxLength(255)
                 );
     }
 }
