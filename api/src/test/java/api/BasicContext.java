@@ -93,7 +93,7 @@ public abstract class BasicContext {
                 .setNull(javaGetter(Authority::getId))
                 .set(
                     javaGetter(Authority::getAuthority),
-                    Arbitraries.strings().ofMinLength(10).ofMaxLength(255)
+                    Arbitraries.strings().alpha().numeric().ofMinLength(12).ofMaxLength(255).withoutEdgeCases()
                 );
     }
 
@@ -108,7 +108,7 @@ public abstract class BasicContext {
                 .set(javaGetter(Role::getAuthorities), Collections.emptySet())
                 .set(
                     javaGetter(Role::getName),
-                    Arbitraries.strings().alpha().ofMinLength(12).ofMaxLength(255)
+                    Arbitraries.strings().alpha().numeric().ofMinLength(12).ofMaxLength(255).withoutEdgeCases()
                 );
     }
 
@@ -123,11 +123,11 @@ public abstract class BasicContext {
                 .setNull(javaGetter(User::getId))
                 .set(
                     javaGetter(User::getEmail),
-                    Arbitraries.strings().alpha().ofMinLength(12).ofMaxLength(255)
+                    Arbitraries.strings().alpha().numeric().ofMinLength(12).ofMaxLength(255).withoutEdgeCases()
                 )
                 .set(
                     javaGetter(User::getUsername),
-                    Arbitraries.strings().alpha().ofMinLength(12).ofMaxLength(255)
+                    Arbitraries.strings().alpha().numeric().ofMinLength(12).ofMaxLength(255).withoutEdgeCases()
                 );
     }
 }
