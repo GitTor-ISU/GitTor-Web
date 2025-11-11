@@ -49,7 +49,7 @@ public class AuthorityControllerTest extends BasicContext {
         @Test
         public void shouldGetAuthorities() {
             // GIVEN: New authority exists
-            Authority authority = getAuthorityBuilder().sample();
+            Authority authority = fixtureService.getAuthorityBuilder().sample();
             String newAuthorityName = authority.getAuthority();
             authorityService.save(authority);
 
@@ -107,7 +107,7 @@ public class AuthorityControllerTest extends BasicContext {
         @Test
         public void shouldGetAuthority() {
             // GIVEN: New authority exists
-            Authority newAuthority = authorityService.save(getAuthorityBuilder().sample());
+            Authority newAuthority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -135,7 +135,7 @@ public class AuthorityControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: New authority exists
-            Authority newAuthority = authorityService.save(getAuthorityBuilder().sample());
+            Authority newAuthority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
 
             // GIVEN: User authentication header
             AuthenticationDto auth = authenticationController.register(fixtureMonkey.giveMeOne(RegisterDto.class));
@@ -166,7 +166,7 @@ public class AuthorityControllerTest extends BasicContext {
         @Test
         public void should404_whenNonexistent() {
             // GIVEN: New authority exists
-            Authority newAuthority = authorityService.save(getAuthorityBuilder().sample());
+            Authority newAuthority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();

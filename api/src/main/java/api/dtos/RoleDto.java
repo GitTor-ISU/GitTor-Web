@@ -3,7 +3,6 @@ package api.dtos;
 import java.util.List;
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RoleDto {
-    @Null
+    @Nullable
     private Integer id;
 
     @Nullable

@@ -1,6 +1,5 @@
 package api;
 
-import static com.navercorp.fixturemonkey.api.expression.JavaGetterMethodPropertySelector.javaGetter;
 import static org.mockito.Mockito.when;
 
 import java.time.Clock;
@@ -8,6 +7,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Collections;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,17 +17,11 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import com.navercorp.fixturemonkey.ArbitraryBuilder;
 import com.navercorp.fixturemonkey.FixtureMonkey;
-import com.navercorp.fixturemonkey.api.plugin.SimpleValueJqwikPlugin;
-import com.navercorp.fixturemonkey.jakarta.validation.plugin.JakartaValidationPlugin;
 
 import api.dtos.AuthenticationDto;
-import api.entities.Authority;
-import api.entities.Role;
-import api.entities.User;
+import api.services.FixtureService;
 import api.services.TokenService;
-import net.jqwik.api.Arbitraries;
 
 /**
  * Baseline configurations for all controller tests.
@@ -42,6 +36,8 @@ import net.jqwik.api.Arbitraries;
 public abstract class BasicContext {
     @Autowired
     private TokenService tokenService;
+    @Autowired
+    protected FixtureService fixtureService;
 
     @LocalServerPort
     private int port;
@@ -65,11 +61,12 @@ public abstract class BasicContext {
     protected String adminPassword;
     protected AuthenticationDto adminAuth;
 
-    protected static final FixtureMonkey fixtureMonkey = FixtureMonkey.builder()
-            .defaultNullInjectGenerator(context -> 0.0)
-            .plugin(new JakartaValidationPlugin())
-            .plugin(new SimpleValueJqwikPlugin())
-            .build();
+    protected FixtureMonkey fixtureMonkey;
+
+    @BeforeAll
+    public void init() {
+        fixtureMonkey = fixtureService.getFixtureMonkey();
+    }
 
     @BeforeEach
     public void setup() {
@@ -81,53 +78,5 @@ public abstract class BasicContext {
         adminAuth = tokenService.generateToken(
             new UsernamePasswordAuthenticationToken(adminUsername, null, Collections.emptyList())
         );
-    }
-
-    /**
-     * Get authority fixture builder.
-     *
-     * @return {@link ArbitraryBuilder} {@link Authority}
-     */
-    protected ArbitraryBuilder<Authority> getAuthorityBuilder() {
-        return fixtureMonkey.giveMeBuilder(Authority.class)
-                .setNull(javaGetter(Authority::getId))
-                .set(
-                    javaGetter(Authority::getAuthority),
-                    Arbitraries.strings().alpha().numeric().ofMinLength(12).ofMaxLength(255).withoutEdgeCases()
-                );
-    }
-
-    /**
-     * Get role fixture builder.
-     *
-     * @return {@link ArbitraryBuilder} {@link Role}
-     */
-    protected ArbitraryBuilder<Role> getRoleBuilder() {
-        return fixtureMonkey.giveMeBuilder(Role.class)
-                .setNull(javaGetter(Role::getId))
-                .set(javaGetter(Role::getAuthorities), Collections.emptySet())
-                .set(
-                    javaGetter(Role::getName),
-                    Arbitraries.strings().alpha().numeric().ofMinLength(12).ofMaxLength(255).withoutEdgeCases()
-                );
-    }
-
-    /**
-     * Get user fixture builder.
-     *
-     * @return {@link ArbitraryBuilder} {@link User}
-     */
-    protected ArbitraryBuilder<User> getUserBuilder() {
-        return fixtureMonkey.giveMeBuilder(User.class)
-                .setNull(javaGetter(User::getAvatar))
-                .setNull(javaGetter(User::getId))
-                .set(
-                    javaGetter(User::getEmail),
-                    Arbitraries.strings().alpha().numeric().ofMinLength(12).ofMaxLength(255).withoutEdgeCases()
-                )
-                .set(
-                    javaGetter(User::getUsername),
-                    Arbitraries.strings().alpha().numeric().ofMinLength(12).ofMaxLength(255).withoutEdgeCases()
-                );
     }
 }

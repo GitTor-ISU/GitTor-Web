@@ -1,7 +1,7 @@
 package api.dtos;
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -17,10 +17,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDto {
-    @Null
+    @Nullable
     private Integer id;
 
-    @Null
+    @Nullable
+    @Size(min = 3, max = 255)
+    @Email
     private String email;
 
     @Nullable

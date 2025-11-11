@@ -59,12 +59,12 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void shouldGetUserRoles() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
             String authorityName = authority.getAuthority();
 
             // GIVEN: New role exists with new authority
             Role role = roleService.save(
-                getRoleBuilder()
+                fixtureService.getRoleBuilder()
                     .set(javaGetter(Role::getAuthorities), Set.of(authority))
                     .sample()
             );
@@ -72,7 +72,7 @@ public class UserRoleControllerTest extends BasicContext {
 
             // GIVEN: New user exists with new role
             User user = userService.save(
-                getUserBuilder()
+                fixtureService.getUserBuilder()
                         .set(javaGetter(User::getRoles), Set.of(role, userRole))
                         .sample()
             );
@@ -144,7 +144,7 @@ public class UserRoleControllerTest extends BasicContext {
         public void should404_whenNonexistentUser() {
             // GIVEN: New user exists
             User user = userService.save(
-                getUserBuilder()
+                fixtureService.getUserBuilder()
                         .set(javaGetter(User::getRoles), Set.of(userRole))
                         .sample()
             );
@@ -186,13 +186,13 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void shouldSetUserRoles() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
             String authorityName = authority.getAuthority();
 
             // GIVEN: Two new role exists (second one with authorities)
-            Role role1 = roleService.save(getRoleBuilder().sample());
+            Role role1 = roleService.save(fixtureService.getRoleBuilder().sample());
             Role role2 = roleService.save(
-                getRoleBuilder()
+                fixtureService.getRoleBuilder()
                     .set(javaGetter(Role::getAuthorities), Set.of(authority))
                     .sample()
             );
@@ -200,7 +200,7 @@ public class UserRoleControllerTest extends BasicContext {
 
             // GIVEN: New user exists with new role
             User user = userService.save(
-                getUserBuilder()
+                fixtureService.getUserBuilder()
                     .set(javaGetter(User::getRoles), Set.of(role1, userRole))
                     .sample()
             );
@@ -239,13 +239,13 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void shouldSetUserRoles_withoutUserRole() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
             String authorityName = authority.getAuthority();
 
             // GIVEN: Two new role exists (second one with authorities)
-            Role role1 = roleService.save(getRoleBuilder().sample());
+            Role role1 = roleService.save(fixtureService.getRoleBuilder().sample());
             Role role2 = roleService.save(
-                getRoleBuilder()
+                fixtureService.getRoleBuilder()
                     .set(javaGetter(Role::getAuthorities), Set.of(authority))
                     .sample()
             );
@@ -253,7 +253,7 @@ public class UserRoleControllerTest extends BasicContext {
 
             // GIVEN: New user exists with new role
             User user = userService.save(
-                getUserBuilder()
+                fixtureService.getUserBuilder()
                         .set(javaGetter(User::getRoles), Set.of(role1, userRole))
                         .sample()
             );
@@ -292,18 +292,18 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void shouldSetUserRoles_whenRolesNotFound() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
 
             // GIVEN: New role exists with new authority
             Role role = roleService.save(
-                getRoleBuilder()
+                fixtureService.getRoleBuilder()
                     .set(javaGetter(Role::getAuthorities), Set.of(authority))
                     .sample()
             );
 
             // GIVEN: New user exists with new role
             User user = userService.save(
-                getUserBuilder()
+                fixtureService.getUserBuilder()
                         .set(javaGetter(User::getRoles), Set.of(role, userRole))
                         .sample()
             );
@@ -367,7 +367,7 @@ public class UserRoleControllerTest extends BasicContext {
         public void should404_whenNonexistentUser() {
             // GIVEN: New user exists
             User user = userService.save(
-                getUserBuilder()
+                fixtureService.getUserBuilder()
                         .set(javaGetter(User::getRoles), Set.of(userRole))
                         .sample()
             );
@@ -439,13 +439,13 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void shouldAddUserRoles() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
             String authorityName = authority.getAuthority();
 
             // GIVEN: Two new role exists (second one with authorities)
-            Role role1 = roleService.save(getRoleBuilder().sample());
+            Role role1 = roleService.save(fixtureService.getRoleBuilder().sample());
             Role role2 = roleService.save(
-                getRoleBuilder()
+                fixtureService.getRoleBuilder()
                     .set(javaGetter(Role::getAuthorities), Set.of(authority))
                     .sample()
             );
@@ -454,7 +454,7 @@ public class UserRoleControllerTest extends BasicContext {
 
             // GIVEN: New user exists with new role
             User user = userService.save(
-                getUserBuilder()
+                fixtureService.getUserBuilder()
                     .set(javaGetter(User::getRoles), Set.of(role1, userRole))
                     .sample()
             );
@@ -497,12 +497,12 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void shouldAddUserRoles_whenRolesNotFound() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
             String authorityName = authority.getAuthority();
 
             // GIVEN: New role exists with new authority
             Role role = roleService.save(
-                getRoleBuilder()
+                fixtureService.getRoleBuilder()
                     .set(javaGetter(Role::getAuthorities), Set.of(authority))
                     .sample()
             );
@@ -510,7 +510,7 @@ public class UserRoleControllerTest extends BasicContext {
 
             // GIVEN: New user exists with new role
             User user = userService.save(
-                getUserBuilder()
+                fixtureService.getUserBuilder()
                     .set(javaGetter(User::getRoles), Set.of(role, userRole))
                     .sample()
             );
@@ -549,12 +549,12 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void shouldNotAddUserRoles_whenRolesAlreadyAdded() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
             String authorityName = authority.getAuthority();
 
             // GIVEN: New role exists with new authority
             Role role = roleService.save(
-                getRoleBuilder()
+                fixtureService.getRoleBuilder()
                     .set(javaGetter(Role::getAuthorities), Set.of(authority))
                     .sample()
             );
@@ -562,7 +562,7 @@ public class UserRoleControllerTest extends BasicContext {
 
             // GIVEN: New user exists with new role
             User user = userService.save(
-                getUserBuilder()
+                fixtureService.getUserBuilder()
                         .set(javaGetter(User::getRoles), Set.of(role, userRole))
                         .sample()
             );
@@ -634,7 +634,7 @@ public class UserRoleControllerTest extends BasicContext {
         public void should404_whenNonexistentUser() {
             // GIVEN: New user exists
             User user = userService.save(
-                getUserBuilder()
+                fixtureService.getUserBuilder()
                         .set(javaGetter(User::getRoles), Set.of(userRole))
                         .sample()
             );
@@ -676,13 +676,13 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void shouldRemoveUserRoles() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
             String authorityName = authority.getAuthority();
 
             // GIVEN: Two new role exists (second one with authorities)
-            Role role1 = roleService.save(getRoleBuilder().sample());
+            Role role1 = roleService.save(fixtureService.getRoleBuilder().sample());
             Role role2 = roleService.save(
-                getRoleBuilder()
+                fixtureService.getRoleBuilder()
                     .set(javaGetter(Role::getAuthorities), Set.of(authority))
                     .sample()
             );
@@ -690,7 +690,7 @@ public class UserRoleControllerTest extends BasicContext {
 
             // GIVEN: New user exists with new role
             User user = userService.save(
-                getUserBuilder()
+                fixtureService.getUserBuilder()
                         .set(javaGetter(User::getRoles), Set.of(role1, role2, userRole))
                         .sample()
             );
@@ -729,12 +729,12 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void shouldNotRemoveUserRoles_whenRolesNotFound() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
             String authorityName = authority.getAuthority();
 
             // GIVEN: New role exists with new authority
             Role role = roleService.save(
-                getRoleBuilder()
+                fixtureService.getRoleBuilder()
                     .set(javaGetter(Role::getAuthorities), Set.of(authority))
                     .sample()
             );
@@ -742,7 +742,7 @@ public class UserRoleControllerTest extends BasicContext {
 
             // GIVEN: New user exists with new role
             User user = userService.save(
-                getUserBuilder()
+                fixtureService.getUserBuilder()
                         .set(javaGetter(User::getRoles), Set.of(role, userRole))
                         .sample()
             );
@@ -781,19 +781,19 @@ public class UserRoleControllerTest extends BasicContext {
         @Test
         public void should400_whenRemoveUserRole() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
 
             // GIVEN: Two new role exists (second one with authorities)
-            Role role1 = roleService.save(getRoleBuilder().sample());
+            Role role1 = roleService.save(fixtureService.getRoleBuilder().sample());
             Role role2 = roleService.save(
-                getRoleBuilder()
+                fixtureService.getRoleBuilder()
                     .set(javaGetter(Role::getAuthorities), Set.of(authority))
                     .sample()
             );
 
             // GIVEN: New user exists with new role
             User user = userService.save(
-                getUserBuilder()
+                fixtureService.getUserBuilder()
                         .set(javaGetter(User::getRoles), Set.of(role1, role2, userRole))
                         .sample()
             );
@@ -859,7 +859,7 @@ public class UserRoleControllerTest extends BasicContext {
         public void should404_whenNonexistentUser() {
             // GIVEN: New user exists
             User user = userService.save(
-                getUserBuilder()
+                fixtureService.getUserBuilder()
                         .set(javaGetter(User::getRoles), Set.of(userRole))
                         .sample()
             );
