@@ -2,11 +2,12 @@ import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Auth } from '@core/auth';
+import { Logo } from '@shared/components/logo/logo';
 import { ZardButtonComponent } from '@shared/components/z-button/button.component';
 import { ZardCardComponent } from '@shared/components/z-card/card.component';
 import { ZardFormModule } from '@shared/components/z-form/form.module';
 import { ZardInputDirective } from '@shared/components/z-input/input.directive';
-import { GitBranchIcon, LucideAngularModule } from 'lucide-angular';
+import { LucideAngularModule } from 'lucide-angular';
 
 /**
  * Login component.
@@ -21,12 +22,11 @@ import { GitBranchIcon, LucideAngularModule } from 'lucide-angular';
     ZardButtonComponent,
     ZardInputDirective,
     RouterLink,
+    Logo,
   ],
   templateUrl: './login.html',
 })
 export class Login {
-  protected readonly logoIcon = GitBranchIcon;
-
   protected loginForm = new FormGroup({
     usernameOrEmail: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required]),
