@@ -30,8 +30,8 @@ services:
 
   api:
     build:
-      context: ./api
-      dockerfile: containerfile
+      context: ./
+      dockerfile: containerfile.api
     restart: always
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/fullstack
@@ -63,8 +63,8 @@ services:
 
   ui:
     build:
-      context: ./ui
-      dockerfile: containerfile
+      context: ./
+      dockerfile: containerfile.ui
     restart: always
     ports:
       - "80:80"
