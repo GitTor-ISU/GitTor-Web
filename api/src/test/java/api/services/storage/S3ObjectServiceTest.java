@@ -5,13 +5,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.ByteArrayInputStream;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-
 import api.BasicContext;
 import api.entities.S3Object;
 import api.services.S3ObjectService;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * {@link S3ObjectService} test.
@@ -28,9 +28,7 @@ public class S3ObjectServiceTest extends BasicContext {
         int size = (int) (maxObjectSize + 1);
         byte[] content = new byte[size];
 
-        S3Object object = S3Object.builder()
-            .size(size)
-            .build();
+        S3Object object = S3Object.builder().size(size).build();
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
             () -> s3ObjectService.save(object, new ByteArrayInputStream(content)));

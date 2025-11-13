@@ -7,6 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.UUID;
 
+import api.BasicContext;
+import api.dtos.AuthenticationDto;
+import api.dtos.ErrorDto;
+import api.dtos.LoginDto;
+import api.dtos.RegisterDto;
+
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,12 +21,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import api.BasicContext;
-import api.dtos.AuthenticationDto;
-import api.dtos.ErrorDto;
-import api.dtos.LoginDto;
-import api.dtos.RegisterDto;
 
 /**
  * {@link AuthenticationController} test.
@@ -41,67 +41,49 @@ public class AuthenticationControllerTest extends BasicContext {
         @Test
         public void shouldLogin_whenAdmin() {
             // GIVEN: Login info for admin
-            LoginDto login = LoginDto.builder()
-                .username(adminUsername)
-                .password(adminPassword)
-                .build();
+            LoginDto login = LoginDto.builder().username(adminUsername).password(adminPassword).build();
             HttpEntity<LoginDto> request = new HttpEntity<>(login, null);
 
             // WHEN: Login
-            ResponseEntity<AuthenticationDto> responseEntity = testRestTemplate.exchange(
-                url + ENDPOINT, HttpMethod.POST, request, new ParameterizedTypeReference<AuthenticationDto>() {}
-            );
+            ResponseEntity<AuthenticationDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT,
+                HttpMethod.POST, request, new ParameterizedTypeReference<AuthenticationDto>() {});
 
             // THEN: Returns a bearer token
-            assertAll(
-                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertNotNull(responseEntity.getBody().getAccessToken()),
                 () -> assertNotNull(responseEntity.getBody().getExpires()),
-                () -> assertEquals("Bearer", responseEntity.getBody().getTokenType())
-            );
+                () -> assertEquals("Bearer", responseEntity.getBody().getTokenType()));
         }
 
         @Test
         public void should401_whenIncorrectUsername() {
             // GIVEN: Incorrect username
-            LoginDto login = LoginDto.builder()
-                .username(adminUsername + "_incorrect")
-                .password(adminPassword)
-                .build();
+            LoginDto login = LoginDto.builder().username(adminUsername + "_incorrect").password(adminPassword).build();
             HttpEntity<LoginDto> request = new HttpEntity<>(login, null);
 
             // WHEN: Login
-            ResponseEntity<String> responseEntity = testRestTemplate.exchange(
-                url + ENDPOINT, HttpMethod.POST, request, new ParameterizedTypeReference<String>() {}
-            );
+            ResponseEntity<String> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.POST, request,
+                new ParameterizedTypeReference<String>() {});
 
             // THEN: Responds unauthorized
-            assertAll(
-                () -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
-                () -> assertNull(responseEntity.getBody())
-            );
+            assertAll(() -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
+                () -> assertNull(responseEntity.getBody()));
         }
 
         @Test
         public void should401_whenIncorrectPassword() {
             // GIVEN: Incorrect password
-            LoginDto login = LoginDto.builder()
-                .username(adminUsername)
-                .password(adminPassword + "_incorrect")
-                .build();
+            LoginDto login = LoginDto.builder().username(adminUsername).password(adminPassword + "_incorrect").build();
             HttpEntity<LoginDto> request = new HttpEntity<>(login, null);
 
             // WHEN: Login
-            ResponseEntity<String> responseEntity = testRestTemplate.exchange(
-                url + ENDPOINT, HttpMethod.POST, request, new ParameterizedTypeReference<String>() {}
-            );
+            ResponseEntity<String> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.POST, request,
+                new ParameterizedTypeReference<String>() {});
 
             // THEN: Responds unauthorized
-            assertAll(
-                () -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
-                () -> assertNull(responseEntity.getBody())
-            );
+            assertAll(() -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
+                () -> assertNull(responseEntity.getBody()));
         }
     }
 
@@ -115,97 +97,73 @@ public class AuthenticationControllerTest extends BasicContext {
         @Test
         public void shouldRegister_whenNewUser() {
             // GIVEN: User info
-            RegisterDto login = RegisterDto.builder()
-                .username("user_" + UUID.randomUUID())
-                .password("password")
-                .build();
+            RegisterDto login =
+                RegisterDto.builder().username("user_" + UUID.randomUUID()).password("password").build();
             HttpEntity<RegisterDto> request = new HttpEntity<>(login, null);
 
             // WHEN: Register
-            ResponseEntity<AuthenticationDto> responseEntity = testRestTemplate.exchange(
-                url + ENDPOINT, HttpMethod.POST, request, new ParameterizedTypeReference<AuthenticationDto>() {}
-            );
+            ResponseEntity<AuthenticationDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT,
+                HttpMethod.POST, request, new ParameterizedTypeReference<AuthenticationDto>() {});
 
             // THEN: Returns a bearer token
-            assertAll(
-                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertNotNull(responseEntity.getBody().getAccessToken()),
                 () -> assertNotNull(responseEntity.getBody().getExpires()),
-                () -> assertEquals("Bearer", responseEntity.getBody().getTokenType())
-            );
+                () -> assertEquals("Bearer", responseEntity.getBody().getTokenType()));
         }
 
         @Test
         public void should400_whenEmptyUsername() {
             // GIVEN: Empty username
-            RegisterDto login = RegisterDto.builder()
-                .username("")
-                .password("password")
-                .build();
+            RegisterDto login = RegisterDto.builder().username("").password("password").build();
             HttpEntity<RegisterDto> request = new HttpEntity<>(login, null);
 
             // WHEN: Register
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                url + ENDPOINT, HttpMethod.POST, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.POST,
+                request, new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds bad request
-            assertAll(
-                () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Username must not be empty.", responseEntity.getBody().getMessage())
-            );
+                () -> assertEquals("Username must not be empty.", responseEntity.getBody().getMessage()));
         }
 
         @Test
         public void should400_whenEmptyPassword() {
             // GIVEN: Empty password
-            RegisterDto login = RegisterDto.builder()
-                .username("user_" + UUID.randomUUID())
-                .password("")
-                .build();
+            RegisterDto login = RegisterDto.builder().username("user_" + UUID.randomUUID()).password("").build();
             HttpEntity<RegisterDto> request = new HttpEntity<>(login, null);
 
             // WHEN: Register
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                url + ENDPOINT, HttpMethod.POST, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.POST,
+                request, new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds bad request
-            assertAll(
-                () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Password must not be empty.", responseEntity.getBody().getMessage())
-            );
+                () -> assertEquals("Password must not be empty.", responseEntity.getBody().getMessage()));
         }
 
         @Test
         public void should409_whenDuplicateUsername() {
             // GIVEN: Existing username
-            RegisterDto login = RegisterDto.builder()
-                .username(adminUsername)
-                .password(adminPassword + "_different")
-                .build();
+            RegisterDto login =
+                RegisterDto.builder().username(adminUsername).password(adminPassword + "_different").build();
             HttpEntity<RegisterDto> request = new HttpEntity<>(login, null);
 
             // WHEN: Register
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                url + ENDPOINT, HttpMethod.POST, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.POST,
+                request, new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds conflict
-            assertAll(
-                () -> assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals(
-                    "User '" + adminUsername + "' already exists.",
-                    responseEntity.getBody().getMessage()
-                )
-            );
+                () -> assertEquals("User '" + adminUsername + "' already exists.",
+                    responseEntity.getBody().getMessage()));
         }
     }
 }

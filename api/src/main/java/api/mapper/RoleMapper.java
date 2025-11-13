@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import api.dtos.RoleDto;
+import api.entities.Authority;
+import api.entities.Role;
+import api.services.AuthorityService;
+
 import org.mapstruct.Condition;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,11 +18,6 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import api.dtos.RoleDto;
-import api.entities.Authority;
-import api.entities.Role;
-import api.services.AuthorityService;
 
 /**
  * {@link RoleMapper}.
@@ -52,12 +52,8 @@ public abstract class RoleMapper {
      * @param roleDto Update information
      */
     @Mapping(target = "id", ignore = true)
-    @Mapping(
-        target = "authorities",
-        source = "authorityIds",
-        qualifiedByName = "AuthorityIdstoAuthorities",
-        conditionQualifiedByName = "notNull"
-    )
+    @Mapping(target = "authorities", source = "authorityIds", qualifiedByName = "AuthorityIdstoAuthorities",
+        conditionQualifiedByName = "notNull")
     public abstract void update(@MappingTarget Role role, RoleDto roleDto);
 
     /**
@@ -83,9 +79,7 @@ public abstract class RoleMapper {
         if (authorities == null) {
             return new ArrayList<>();
         }
-        return authorities.stream()
-            .map(Authority::getId)
-            .collect(Collectors.toList());
+        return authorities.stream().map(Authority::getId).collect(Collectors.toList());
     }
 
     /**

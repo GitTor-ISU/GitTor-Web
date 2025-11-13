@@ -2,16 +2,16 @@ package api.services;
 
 import java.util.Set;
 
+import api.dtos.RegisterDto;
+import api.entities.Role;
+import api.entities.User;
+import api.exceptions.DuplicateEntityException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import api.dtos.RegisterDto;
-import api.entities.Role;
-import api.entities.User;
-import api.exceptions.DuplicateEntityException;
 
 /**
  * {@link AuthenticationService}.
@@ -45,11 +45,8 @@ public class AuthenticationService {
 
         Role userRole = roleService.get(RoleService.USER_ROLE_NAME);
 
-        User user = User.builder()
-            .username(registerDto.getUsername())
-            .password(encoder.encode(registerDto.getPassword()))
-            .roles(Set.of(userRole))
-            .build();
+        User user = User.builder().username(registerDto.getUsername())
+            .password(encoder.encode(registerDto.getPassword())).roles(Set.of(userRole)).build();
 
         return userService.save(user);
     }

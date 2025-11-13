@@ -1,12 +1,12 @@
 package api.mapper;
 
+import api.dtos.UserDto;
+import api.entities.User;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
-
-import api.dtos.UserDto;
-import api.entities.User;
 
 /**
  * {@link UserMapper}.

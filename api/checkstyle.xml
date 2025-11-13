@@ -331,7 +331,7 @@
       <property name="separateLineBetweenGroups" value="true"/>
       <property name="customImportOrderRules"
         value="STATIC, STANDARD_JAVA_PACKAGE, THIRD_PARTY_PACKAGE"/>
-      <property name="thirdPartyPackageRegExp" value="^org\."/>
+      <property name="thirdPartyPackageRegExp" value="^api\."/>
     </module>
     <module name="MethodParamPad">
       <property name="tokens"

@@ -1,9 +1,9 @@
 package api.repositories;
 
+import api.entities.S3Object;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import api.entities.S3Object;
 
 /**
  * {@link S3ObjectRepository}.
