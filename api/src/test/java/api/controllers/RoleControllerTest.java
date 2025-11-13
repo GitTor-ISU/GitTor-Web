@@ -63,12 +63,12 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldGetRoles() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureMonkey.giveMeOne(Authority.class));
             String authorityName = authority.getAuthority();
 
             // GIVEN: New role exists with new authority
             Role role = roleService.save(
-                fixtureService.getRoleBuilder()
+                fixtureMonkey.giveMeBuilder(Role.class)
                     .set(javaGetter(Role::getAuthorities), Set.of(authority))
                     .sample()
             );
@@ -137,12 +137,12 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldGetRole() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureMonkey.giveMeOne(Authority.class));
             String authorityName = authority.getAuthority();
 
             // GIVEN: New role exists with new authority
             Role role = roleService.save(
-                fixtureService.getRoleBuilder()
+                fixtureMonkey.giveMeBuilder(Role.class)
                     .set(javaGetter(Role::getAuthorities), Set.of(authority))
                     .sample()
             );
@@ -218,7 +218,7 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: New role exists
-            Role role = roleService.save(fixtureService.getRoleBuilder().sample());
+            Role role = roleService.save(fixtureMonkey.giveMeOne(Role.class));
 
             // GIVEN: User authentication header
             AuthenticationDto auth = authenticationController.register(fixtureMonkey.giveMeOne(RegisterDto.class));
@@ -248,7 +248,7 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should404_whenNonexistent() {
             // GIVEN: New role exists
-            Role role = roleService.save(fixtureService.getRoleBuilder().sample());
+            Role role = roleService.save(fixtureMonkey.giveMeOne(Role.class));
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -287,7 +287,7 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldCreateRole() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureMonkey.giveMeOne(Authority.class));
 
             // GIVEN: Role with new authority id
             RoleDto role = fixtureMonkey.giveMeBuilder(RoleDto.class)
@@ -317,7 +317,7 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldCreateWithoutAuthority_whenAuthorityNonexistent() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureMonkey.giveMeOne(Authority.class));
 
             // GIVEN: Role with wrong authority id
             int wrongId = authority.getId() + 1;
@@ -400,7 +400,7 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should409_whenDuplicateRoleName() {
             // GIVEN: Role exists
-            Role savedRole = roleService.save(fixtureService.getRoleBuilder().sample());
+            Role savedRole = roleService.save(fixtureMonkey.giveMeOne(Role.class));
             String roleName = savedRole.getName();
 
             // GIVEN: Role with duplicate name
@@ -438,12 +438,12 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldUpdateRole_whenUpdateName() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureMonkey.giveMeOne(Authority.class));
             String authorityName = authority.getAuthority();
 
             // GIVEN: New role exists with new authority
             Role role = roleService.save(
-                fixtureService.getRoleBuilder()
+                fixtureMonkey.giveMeBuilder(Role.class)
                     .set(javaGetter(Role::getAuthorities), Set.of(authority))
                     .sample()
             );
@@ -486,11 +486,11 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldUpdateRole_whenUpdateAuthorities() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureMonkey.giveMeOne(Authority.class));
             String authorityName = authority.getAuthority();
 
             // GIVEN: New role exists
-            Role role = roleService.save(fixtureService.getRoleBuilder().sample());
+            Role role = roleService.save(fixtureMonkey.giveMeOne(Role.class));
             String roleName = role.getName();
 
             // GIVEN: Updated authorities with new authority
@@ -530,12 +530,12 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldUpdateRole_whenBodyIdIncorrect() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureMonkey.giveMeOne(Authority.class));
             String authorityName = authority.getAuthority();
 
             // GIVEN: New role exists with new authority
             Role role = roleService.save(
-                fixtureService.getRoleBuilder()
+                fixtureMonkey.giveMeBuilder(Role.class)
                     .set(javaGetter(Role::getAuthorities), Set.of(authority))
                     .sample()
             );
@@ -578,11 +578,11 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldUpdateRole_whenNameNotChanged() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureMonkey.giveMeOne(Authority.class));
             String authorityName = authority.getAuthority();
 
             // GIVEN: New role exists
-            Role role = roleService.save(fixtureService.getRoleBuilder().sample());
+            Role role = roleService.save(fixtureMonkey.giveMeOne(Role.class));
             String roleName = role.getName();
 
             // GIVEN: Updated authorities with new authority and insert same name
@@ -622,10 +622,10 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldUpdateWithoutAuthority_whenAuthorityNonexistent() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureMonkey.giveMeOne(Authority.class));
 
             // GIVEN: New role exists
-            Role role = roleService.save(fixtureService.getRoleBuilder().sample());
+            Role role = roleService.save(fixtureMonkey.giveMeOne(Role.class));
             String roleName = role.getName();
 
             // GIVEN: Updated authorities with wrong id
@@ -662,7 +662,7 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should400_whenNameEmpty() {
             // GIVEN: New role exists
-            Role role = roleService.save(fixtureService.getRoleBuilder().sample());
+            Role role = roleService.save(fixtureMonkey.giveMeOne(Role.class));
 
             // GIVEN: Updated name to empty
             RoleDto updated = fixtureMonkey.giveMeBuilder(RoleDto.class)
@@ -732,7 +732,7 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: New role exists
-            Role role = roleService.save(fixtureService.getRoleBuilder().sample());
+            Role role = roleService.save(fixtureMonkey.giveMeOne(Role.class));
 
             // GIVEN: Updated name
             RoleDto updated = fixtureMonkey.giveMeOne(RoleDto.class);
@@ -765,7 +765,7 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should404_whenRoleNonexistent() {
             // GIVEN: New role exists
-            Role role = roleService.save(fixtureService.getRoleBuilder().sample());
+            Role role = roleService.save(fixtureMonkey.giveMeOne(Role.class));
 
             // GIVEN: Updated name
             RoleDto updated = fixtureMonkey.giveMeOne(RoleDto.class);
@@ -799,8 +799,8 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should409_whenDuplicateName() {
             // GIVEN: Two new role exists
-            Role role1 = roleService.save(fixtureService.getRoleBuilder().sample());
-            Role role2 = roleService.save(fixtureService.getRoleBuilder().sample());
+            Role role1 = roleService.save(fixtureMonkey.giveMeOne(Role.class));
+            Role role2 = roleService.save(fixtureMonkey.giveMeOne(Role.class));
             String roleName2 = role2.getName();
 
             // GIVEN: Updated name to other role name
@@ -843,11 +843,11 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldDeleteRole() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureMonkey.giveMeOne(Authority.class));
 
             // GIVEN: New role exists with new authority
             Role role = roleService.save(
-                fixtureService.getRoleBuilder()
+                fixtureMonkey.giveMeBuilder(Role.class)
                     .set(javaGetter(Role::getAuthorities), Set.of(authority))
                     .sample()
             );
@@ -882,11 +882,11 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void shouldDeleteRole_whenUsed() {
             // GIVEN: New authority exists
-            Authority authority = authorityService.save(fixtureService.getAuthorityBuilder().sample());
+            Authority authority = authorityService.save(fixtureMonkey.giveMeOne(Authority.class));
 
             // GIVEN: New role exists with new authority
             Role role = roleService.save(
-                fixtureService.getRoleBuilder()
+                fixtureMonkey.giveMeBuilder(Role.class)
                     .set(javaGetter(Role::getAuthorities), Set.of(authority))
                     .sample()
             );
@@ -994,7 +994,7 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: New role exists
-            Role role = roleService.save(fixtureService.getRoleBuilder().sample());
+            Role role = roleService.save(fixtureMonkey.giveMeOne(Role.class));
 
             // GIVEN: User authentication header
             AuthenticationDto auth = authenticationController.register(fixtureMonkey.giveMeOne(RegisterDto.class));
@@ -1024,7 +1024,7 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should404_whenNonexistent() {
             // GIVEN: New role exists
-            Role role = roleService.save(fixtureService.getRoleBuilder().sample());
+            Role role = roleService.save(fixtureMonkey.giveMeOne(Role.class));
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();

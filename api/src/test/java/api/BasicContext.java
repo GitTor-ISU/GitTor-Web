@@ -7,7 +7,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Collections;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +21,7 @@ import com.navercorp.fixturemonkey.FixtureMonkey;
 import api.dtos.AuthenticationDto;
 import api.services.FixtureService;
 import api.services.TokenService;
+import jakarta.annotation.PostConstruct;
 
 /**
  * Baseline configurations for all controller tests.
@@ -60,10 +60,9 @@ public abstract class BasicContext {
     @Value("${api.admin.password:password}")
     protected String adminPassword;
     protected AuthenticationDto adminAuth;
-
     protected FixtureMonkey fixtureMonkey;
 
-    @BeforeAll
+    @PostConstruct
     public void init() {
         fixtureMonkey = fixtureService.getFixtureMonkey();
     }

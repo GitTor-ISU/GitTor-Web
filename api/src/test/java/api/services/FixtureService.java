@@ -3,6 +3,7 @@ package api.services;
 import static com.navercorp.fixturemonkey.api.expression.JavaGetterMethodPropertySelector.javaGetter;
 
 import java.util.Collections;
+import java.util.function.Function;
 
 import org.springframework.stereotype.Service;
 
@@ -16,46 +17,46 @@ import api.entities.Role;
 import api.entities.User;
 import lombok.Getter;
 import net.jqwik.api.Arbitraries;
+import net.jqwik.api.Arbitrary;
 
 /**
  * {@link FixtureService}.
  */
 @Service
 public class FixtureService {
-    @Getter
-    private final FixtureMonkey fixtureMonkey = FixtureMonkey.builder()
-            .defaultNullInjectGenerator(context -> 0.0)
-            .plugin(new JakartaValidationPlugin())
-            .plugin(new SimpleValueJqwikPlugin())
-            .build();
+    private static final Arbitrary<String> DEFAULT_STRING_ARBITRARY = Arbitraries
+        .strings()
+        .alpha()
+        .numeric()
+        .ofMinLength(12)
+        .ofMaxLength(255)
+        .withoutEdgeCases();
 
-    @Getter
-    private final ArbitraryBuilder<Authority> authorityBuilder = fixtureMonkey.giveMeBuilder(Authority.class)
+    private final Function<FixtureMonkey, ? extends ArbitraryBuilder<?>> authorityBuilderFunc = fm ->
+        fm.giveMeBuilder(Authority.class)
             .setNull(javaGetter(Authority::getId))
-            .set(
-                javaGetter(Authority::getAuthority),
-                Arbitraries.strings().alpha().numeric().ofMinLength(12).ofMaxLength(255).withoutEdgeCases()
-            );
+            .set(javaGetter(Authority::getAuthority), DEFAULT_STRING_ARBITRARY);
 
-    @Getter
-    private final ArbitraryBuilder<Role> roleBuilder = fixtureMonkey.giveMeBuilder(Role.class)
+    private final Function<FixtureMonkey, ? extends ArbitraryBuilder<?>> roleBuilderFunc = fm ->
+        fm.giveMeBuilder(Role.class)
             .setNull(javaGetter(Role::getId))
             .set(javaGetter(Role::getAuthorities), Collections.emptySet())
-            .set(
-                javaGetter(Role::getName),
-                Arbitraries.strings().alpha().numeric().ofMinLength(12).ofMaxLength(255).withoutEdgeCases()
-            );
+            .set(javaGetter(Role::getName), DEFAULT_STRING_ARBITRARY);
 
-    @Getter
-    private final ArbitraryBuilder<User> userBuilder = fixtureMonkey.giveMeBuilder(User.class)
+    private final Function<FixtureMonkey, ? extends ArbitraryBuilder<?>> userBuilderFunc = fm ->
+        fm.giveMeBuilder(User.class)
             .setNull(javaGetter(User::getAvatar))
             .setNull(javaGetter(User::getId))
-            .set(
-                javaGetter(User::getEmail),
-                Arbitraries.strings().alpha().numeric().ofMinLength(12).ofMaxLength(255).withoutEdgeCases()
-            )
-            .set(
-                javaGetter(User::getUsername),
-                Arbitraries.strings().alpha().numeric().ofMinLength(12).ofMaxLength(255).withoutEdgeCases()
-            );
+            .set(javaGetter(User::getEmail), DEFAULT_STRING_ARBITRARY)
+            .set(javaGetter(User::getUsername), DEFAULT_STRING_ARBITRARY);
+
+    @Getter
+    private final FixtureMonkey fixtureMonkey = FixtureMonkey.builder()
+            .plugin(new JakartaValidationPlugin())
+            .plugin(new SimpleValueJqwikPlugin())
+            .defaultNullInjectGenerator(context -> 0.0)
+            .register(Authority.class, authorityBuilderFunc)
+            .register(Role.class, roleBuilderFunc)
+            .register(User.class, userBuilderFunc)
+            .build();
 }

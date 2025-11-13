@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 
 /**
  * {@link LoginDto}.
+ * <p>
+ * Validations defined only apply on incoming request bodies
  */
 @Data
 @Builder

@@ -3,6 +3,7 @@ package api.dtos;
 import java.util.List;
 
 import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,13 +12,15 @@ import lombok.NoArgsConstructor;
 
 /**
  * {@link RoleDto}.
+ * <p>
+ * Validations defined only apply on incoming request bodies
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class RoleDto {
-    @Nullable
+    @Null
     private Integer id;
 
     @Nullable
