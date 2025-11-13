@@ -3,13 +3,13 @@ package api.controllers;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import api.BasicContext;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import api.BasicContext;
 
 /**
  * {@link HeartbeatController} test..
@@ -22,14 +22,11 @@ public class HeartbeatControllerTest extends BasicContext {
     public void shouldReturnTrue_whenHeartbeat() {
         // GIVEN:
         // WHEN: Call endpoint
-        ResponseEntity<Boolean> responseEntity = testRestTemplate.exchange(
-            url + "/", HttpMethod.GET, null, new ParameterizedTypeReference<Boolean>() {}
-        );
+        ResponseEntity<Boolean> responseEntity =
+            testRestTemplate.exchange(url + "/", HttpMethod.GET, null, new ParameterizedTypeReference<Boolean>() {});
 
         // THEN: Returns OK and true
-        assertAll(
-            () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
-            () -> assertEquals(true, responseEntity.getBody())
-        );
+        assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+            () -> assertEquals(true, responseEntity.getBody()));
     }
 }

@@ -13,17 +13,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.util.UriComponentsBuilder;
-
 import api.BasicContext;
 import api.components.DbSetup;
 import api.dtos.AuthenticationDto;
@@ -37,6 +26,17 @@ import api.mapper.RoleMapper;
 import api.services.AuthorityService;
 import api.services.RoleService;
 import api.services.UserService;
+
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.util.UriComponentsBuilder;
 
 /**
  * {@link RoleController} test.
@@ -76,55 +76,38 @@ public class RoleControllerTest extends BasicContext {
             HttpEntity<Void> request = new HttpEntity<>(null, headers);
 
             // WHEN: Get roles
-            ResponseEntity<List<RoleDto>> responseEntity = testRestTemplate.exchange(
-                url + ENDPOINT, HttpMethod.GET, request, new ParameterizedTypeReference<List<RoleDto>>() {}
-            );
+            ResponseEntity<List<RoleDto>> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET,
+                request, new ParameterizedTypeReference<List<RoleDto>>() {});
 
             // THEN: New role should be in list
-            assertAll(
-                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
-                () -> assertTrue(
-                    responseEntity.getBody().stream().anyMatch(a -> roleName.equals(a.getName())),
-                    "Expected role '" + roleName + "' not found"
-                ),
-                () -> assertTrue(
-                    responseEntity.getBody().stream()
-                        .anyMatch(a -> {
-                            return role.getId() == a.getId()
-                                && a.getAuthorityIds().size() == 1
-                                && a.getAuthorityIds().contains(authority.getId());
-                        }),
-                    "Expected authority '" + authorityName + "' not found in role '" + roleName + "'"
-                )
-            );
+                () -> assertTrue(responseEntity.getBody().stream().anyMatch(a -> roleName.equals(a.getName())),
+                    "Expected role '" + roleName + "' not found"),
+                () -> assertTrue(responseEntity.getBody().stream().anyMatch(a -> {
+                    return role.getId() == a.getId() && a.getAuthorityIds().size() == 1
+                        && a.getAuthorityIds().contains(authority.getId());
+                }), "Expected authority '" + authorityName + "' not found in role '" + roleName + "'"));
         }
 
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: User authentication header
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username("user_" + UUID.randomUUID())
-                    .password("password")
-                    .build()
-            );
+            AuthenticationDto auth = authenticationController
+                .register(RegisterDto.builder().username("user_" + UUID.randomUUID()).password("password").build());
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(auth.getAccessToken());
             HttpEntity<Void> request = new HttpEntity<>(null, headers);
 
             // WHEN: Get roles
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                url + ENDPOINT, HttpMethod.GET, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET, request,
+                new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds forbidden
-            assertAll(
-                () -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage())
-            );
+                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage()));
         }
     }
 
@@ -150,27 +133,19 @@ public class RoleControllerTest extends BasicContext {
             headers.setBearerAuth(adminAuth.getAccessToken());
             HttpEntity<Void> request = new HttpEntity<>(null, headers);
 
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(role.getId())
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(role.getId()).toUri();
 
             // WHEN: Get role
-            ResponseEntity<RoleDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.GET, request, new ParameterizedTypeReference<RoleDto>() {}
-            );
+            ResponseEntity<RoleDto> responseEntity =
+                testRestTemplate.exchange(uri, HttpMethod.GET, request, new ParameterizedTypeReference<RoleDto>() {});
 
             // THEN: New role should be returned
-            assertAll(
-                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(roleMapper.toDto(role), responseEntity.getBody()),
                 () -> assertEquals(1, responseEntity.getBody().getAuthorityIds().size()),
-                () -> assertTrue(
-                    responseEntity.getBody().getAuthorityIds().contains(authority.getId()),
-                    "Expected authority '" + authorityName + "' not found in role '" + roleName + "'"
-                )
-            );
+                () -> assertTrue(responseEntity.getBody().getAuthorityIds().contains(authority.getId()),
+                    "Expected authority '" + authorityName + "' not found in role '" + roleName + "'"));
         }
 
         @Test
@@ -182,34 +157,21 @@ public class RoleControllerTest extends BasicContext {
 
             // GIVEN: Admin role id
             Role role = roleService.get(RoleService.ADMIN_ROLE_NAME);
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(role.getId())
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(role.getId()).toUri();
 
             // WHEN: Get role
-            ResponseEntity<RoleDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.GET, request, new ParameterizedTypeReference<RoleDto>() {}
-            );
+            ResponseEntity<RoleDto> responseEntity =
+                testRestTemplate.exchange(uri, HttpMethod.GET, request, new ParameterizedTypeReference<RoleDto>() {});
 
             // THEN: Admin role should be returned and contain all authorities
-            assertAll(
-                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(roleMapper.toDto(role), responseEntity.getBody()),
                 () -> assertEquals(DbSetup.authorityNames().size(), responseEntity.getBody().getAuthorityIds().size()),
                 () -> assertTrue(
-                    responseEntity
-                        .getBody()
-                        .getAuthorityIds()
-                        .stream()
-                        .map(authorityService::get)
-                        .map(Authority::getAuthority)
-                        .toList()
-                        .containsAll(DbSetup.authorityNames()),
-                    "Admin role does not contain all authorities"
-                )
-            );
+                    responseEntity.getBody().getAuthorityIds().stream().map(authorityService::get)
+                        .map(Authority::getAuthority).toList().containsAll(DbSetup.authorityNames()),
+                    "Admin role does not contain all authorities"));
         }
 
         @Test
@@ -219,33 +181,23 @@ public class RoleControllerTest extends BasicContext {
             Role role = roleService.save(Role.builder().name(roleName).build());
 
             // GIVEN: User authentication header
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username("user_" + UUID.randomUUID())
-                    .password("password")
-                    .build()
-            );
+            AuthenticationDto auth = authenticationController
+                .register(RegisterDto.builder().username("user_" + UUID.randomUUID()).password("password").build());
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(auth.getAccessToken());
             HttpEntity<Void> request = new HttpEntity<>(null, headers);
 
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(role.getId())
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(role.getId()).toUri();
 
             // WHEN: Get role
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.GET, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity =
+                testRestTemplate.exchange(uri, HttpMethod.GET, request, new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds forbidden
-            assertAll(
-                () -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage())
-            );
+                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage()));
         }
 
         @Test
@@ -261,23 +213,17 @@ public class RoleControllerTest extends BasicContext {
 
             // GIVEN: Wrong role id
             int wrongId = role.getId() + 1;
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(wrongId)
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(wrongId).toUri();
 
             // WHEN: Get role
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.GET, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity =
+                testRestTemplate.exchange(uri, HttpMethod.GET, request, new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds not found
-            assertAll(
-                () -> assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Role " + wrongId + " not found.", responseEntity.getBody().getMessage())
-            );
+                () -> assertEquals("Role " + wrongId + " not found.", responseEntity.getBody().getMessage()));
         }
     }
 
@@ -296,10 +242,7 @@ public class RoleControllerTest extends BasicContext {
 
             // GIVEN: Role with new authority id
             String roleName = "role_" + UUID.randomUUID();
-            RoleDto role = RoleDto.builder()
-                .name(roleName)
-                .authorityIds(List.of(authority.getId()))
-                .build();
+            RoleDto role = RoleDto.builder().name(roleName).authorityIds(List.of(authority.getId())).build();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -307,17 +250,14 @@ public class RoleControllerTest extends BasicContext {
             HttpEntity<RoleDto> request = new HttpEntity<>(role, headers);
 
             // WHEN: Create role
-            ResponseEntity<RoleDto> responseEntity = testRestTemplate.exchange(
-                url + ENDPOINT, HttpMethod.POST, request, new ParameterizedTypeReference<RoleDto>() {}
-            );
+            ResponseEntity<RoleDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.POST, request,
+                new ParameterizedTypeReference<RoleDto>() {});
 
             // THEN: New role should be created
-            assertAll(
-                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(roleName, responseEntity.getBody().getName()),
-                () -> assertEquals(List.of(authority.getId()), responseEntity.getBody().getAuthorityIds())
-            );
+                () -> assertEquals(List.of(authority.getId()), responseEntity.getBody().getAuthorityIds()));
         }
 
         @Test
@@ -329,10 +269,7 @@ public class RoleControllerTest extends BasicContext {
             // GIVEN: Role with wrong authority id
             int wrongId = authority.getId() + 1;
             String roleName = "role_" + UUID.randomUUID();
-            RoleDto role = RoleDto.builder()
-                .name(roleName)
-                .authorityIds(List.of(wrongId))
-                .build();
+            RoleDto role = RoleDto.builder().name(roleName).authorityIds(List.of(wrongId)).build();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -340,58 +277,44 @@ public class RoleControllerTest extends BasicContext {
             HttpEntity<RoleDto> request = new HttpEntity<>(role, headers);
 
             // WHEN: Create role
-            ResponseEntity<RoleDto> responseEntity = testRestTemplate.exchange(
-                url + ENDPOINT, HttpMethod.POST, request, new ParameterizedTypeReference<RoleDto>() {}
-            );
+            ResponseEntity<RoleDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.POST, request,
+                new ParameterizedTypeReference<RoleDto>() {});
 
             // THEN: New role should be created without authorities
-            assertAll(
-                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(roleName, responseEntity.getBody().getName()),
-                () -> assertEquals(Collections.emptyList(), responseEntity.getBody().getAuthorityIds())
-            );
+                () -> assertEquals(Collections.emptyList(), responseEntity.getBody().getAuthorityIds()));
         }
 
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: Role
             String roleName = "role_" + UUID.randomUUID();
-            RoleDto role = RoleDto.builder()
-                .name(roleName)
-                .build();
+            RoleDto role = RoleDto.builder().name(roleName).build();
 
             // GIVEN: User authentication header
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username("user_" + UUID.randomUUID())
-                    .password("password")
-                    .build()
-            );
+            AuthenticationDto auth = authenticationController
+                .register(RegisterDto.builder().username("user_" + UUID.randomUUID()).password("password").build());
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(auth.getAccessToken());
             HttpEntity<RoleDto> request = new HttpEntity<>(role, headers);
 
             // WHEN: Create role
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                url + ENDPOINT, HttpMethod.POST, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.POST,
+                request, new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds forbidden
-            assertAll(
-                () -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage())
-            );
+                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage()));
         }
 
         @Test
         public void should400_whenNameEmpty() {
             // GIVEN: Role with empty name
-            RoleDto role = RoleDto.builder()
-                .name("")
-                .build();
+            RoleDto role = RoleDto.builder().name("").build();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -399,17 +322,14 @@ public class RoleControllerTest extends BasicContext {
             HttpEntity<RoleDto> request = new HttpEntity<>(role, headers);
 
             // WHEN: Create role
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                url + ENDPOINT, HttpMethod.POST, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.POST,
+                request, new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds bad request
-            assertAll(
-                () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Role name must not be empty.", responseEntity.getBody().getMessage())
-            );
+                () -> assertEquals("Role name must not be empty.", responseEntity.getBody().getMessage()));
         }
 
         @Test
@@ -419,9 +339,7 @@ public class RoleControllerTest extends BasicContext {
             roleService.save(Role.builder().name(roleName).build());
 
             // GIVEN: Role with duplicate name
-            RoleDto role = RoleDto.builder()
-                .name(roleName)
-                .build();
+            RoleDto role = RoleDto.builder().name(roleName).build();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -429,17 +347,14 @@ public class RoleControllerTest extends BasicContext {
             HttpEntity<RoleDto> request = new HttpEntity<>(role, headers);
 
             // WHEN: Create role
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                url + ENDPOINT, HttpMethod.POST, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.POST,
+                request, new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds conflict
-            assertAll(
-                () -> assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Role '" + roleName + "' already exists.", responseEntity.getBody().getMessage())
-            );
+                () -> assertEquals("Role '" + roleName + "' already exists.", responseEntity.getBody().getMessage()));
         }
     }
 
@@ -462,36 +377,26 @@ public class RoleControllerTest extends BasicContext {
 
             // GIVEN: Updated name, but some values null (id, authorities)
             String roleName = "role_" + UUID.randomUUID();
-            RoleDto updated = RoleDto.builder()
-                .name(roleName)
-                .build();
+            RoleDto updated = RoleDto.builder().name(roleName).build();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(adminAuth.getAccessToken());
             HttpEntity<RoleDto> request = new HttpEntity<>(updated, headers);
 
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(role.getId())
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(role.getId()).toUri();
 
             // WHEN: Update role
-            ResponseEntity<RoleDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.PUT, request, new ParameterizedTypeReference<RoleDto>() {}
-            );
+            ResponseEntity<RoleDto> responseEntity =
+                testRestTemplate.exchange(uri, HttpMethod.PUT, request, new ParameterizedTypeReference<RoleDto>() {});
 
             // THEN: Updated role should be returned
-            assertAll(
-                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(roleName, responseEntity.getBody().getName()),
                 () -> assertEquals(1, responseEntity.getBody().getAuthorityIds().size()),
-                () -> assertTrue(
-                    responseEntity.getBody().getAuthorityIds().contains(authority.getId()),
-                    "Expected authority '" + authorityName + "' not found in role '" + oldRoleName + "'"
-                )
-            );
+                () -> assertTrue(responseEntity.getBody().getAuthorityIds().contains(authority.getId()),
+                    "Expected authority '" + authorityName + "' not found in role '" + oldRoleName + "'"));
         }
 
         @Test
@@ -505,36 +410,26 @@ public class RoleControllerTest extends BasicContext {
             Role role = roleService.save(Role.builder().name(roleName).build());
 
             // GIVEN: Updated authorities with new authority
-            RoleDto updated = RoleDto.builder()
-                .authorityIds(List.of(authority.getId()))
-                .build();
+            RoleDto updated = RoleDto.builder().authorityIds(List.of(authority.getId())).build();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(adminAuth.getAccessToken());
             HttpEntity<RoleDto> request = new HttpEntity<>(updated, headers);
 
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(role.getId())
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(role.getId()).toUri();
 
             // WHEN: Update role
-            ResponseEntity<RoleDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.PUT, request, new ParameterizedTypeReference<RoleDto>() {}
-            );
+            ResponseEntity<RoleDto> responseEntity =
+                testRestTemplate.exchange(uri, HttpMethod.PUT, request, new ParameterizedTypeReference<RoleDto>() {});
 
             // THEN: Updated role should be returned
-            assertAll(
-                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(roleName, responseEntity.getBody().getName()),
                 () -> assertEquals(1, responseEntity.getBody().getAuthorityIds().size()),
-                () -> assertTrue(
-                    responseEntity.getBody().getAuthorityIds().contains(authority.getId()),
-                    "Expected authority '" + authorityName + "' not found in role '" + roleName + "'"
-                )
-            );
+                () -> assertTrue(responseEntity.getBody().getAuthorityIds().contains(authority.getId()),
+                    "Expected authority '" + authorityName + "' not found in role '" + roleName + "'"));
         }
 
         @Test
@@ -549,37 +444,26 @@ public class RoleControllerTest extends BasicContext {
 
             // GIVEN: Updated name, but some values null (id, authorities)
             String roleName = "role_" + UUID.randomUUID();
-            RoleDto updated = RoleDto.builder()
-                .id(role.getId() + 1)
-                .name(roleName)
-                .build();
+            RoleDto updated = RoleDto.builder().id(role.getId() + 1).name(roleName).build();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(adminAuth.getAccessToken());
             HttpEntity<RoleDto> request = new HttpEntity<>(updated, headers);
 
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(role.getId())
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(role.getId()).toUri();
 
             // WHEN: Update role
-            ResponseEntity<RoleDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.PUT, request, new ParameterizedTypeReference<RoleDto>() {}
-            );
+            ResponseEntity<RoleDto> responseEntity =
+                testRestTemplate.exchange(uri, HttpMethod.PUT, request, new ParameterizedTypeReference<RoleDto>() {});
 
             // THEN: Updated role should be returned
-            assertAll(
-                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(roleName, responseEntity.getBody().getName()),
                 () -> assertEquals(1, responseEntity.getBody().getAuthorityIds().size()),
-                () -> assertTrue(
-                    responseEntity.getBody().getAuthorityIds().contains(authority.getId()),
-                    "Expected authority '" + authorityName + "' not found in role '" + oldRoleName + "'"
-                )
-            );
+                () -> assertTrue(responseEntity.getBody().getAuthorityIds().contains(authority.getId()),
+                    "Expected authority '" + authorityName + "' not found in role '" + oldRoleName + "'"));
         }
 
         @Test
@@ -593,37 +477,26 @@ public class RoleControllerTest extends BasicContext {
             Role role = roleService.save(Role.builder().name(roleName).build());
 
             // GIVEN: Updated authorities with new authority and insert same name
-            RoleDto updated = RoleDto.builder()
-                .name(roleName)
-                .authorityIds(List.of(authority.getId()))
-                .build();
+            RoleDto updated = RoleDto.builder().name(roleName).authorityIds(List.of(authority.getId())).build();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(adminAuth.getAccessToken());
             HttpEntity<RoleDto> request = new HttpEntity<>(updated, headers);
 
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(role.getId())
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(role.getId()).toUri();
 
             // WHEN: Update role
-            ResponseEntity<RoleDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.PUT, request, new ParameterizedTypeReference<RoleDto>() {}
-            );
+            ResponseEntity<RoleDto> responseEntity =
+                testRestTemplate.exchange(uri, HttpMethod.PUT, request, new ParameterizedTypeReference<RoleDto>() {});
 
             // THEN: Updated role should be returned
-            assertAll(
-                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(roleName, responseEntity.getBody().getName()),
                 () -> assertEquals(1, responseEntity.getBody().getAuthorityIds().size()),
-                () -> assertTrue(
-                    responseEntity.getBody().getAuthorityIds().contains(authority.getId()),
-                    "Expected authority '" + authorityName + "' not found in role '" + roleName + "'"
-                )
-            );
+                () -> assertTrue(responseEntity.getBody().getAuthorityIds().contains(authority.getId()),
+                    "Expected authority '" + authorityName + "' not found in role '" + roleName + "'"));
         }
 
         @Test
@@ -638,32 +511,24 @@ public class RoleControllerTest extends BasicContext {
 
             // GIVEN: Updated authorities with wrong id
             int wrongId = authority.getId() + 1;
-            RoleDto updated = RoleDto.builder()
-                .authorityIds(List.of(wrongId))
-                .build();
+            RoleDto updated = RoleDto.builder().authorityIds(List.of(wrongId)).build();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(adminAuth.getAccessToken());
             HttpEntity<RoleDto> request = new HttpEntity<>(updated, headers);
 
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(role.getId())
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(role.getId()).toUri();
 
             // WHEN: Update role
-            ResponseEntity<RoleDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.PUT, request, new ParameterizedTypeReference<RoleDto>() {}
-            );
+            ResponseEntity<RoleDto> responseEntity =
+                testRestTemplate.exchange(uri, HttpMethod.PUT, request, new ParameterizedTypeReference<RoleDto>() {});
 
             // THEN: Updated role should be returned
-            assertAll(
-                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(roleName, responseEntity.getBody().getName()),
-                () -> assertEquals(0, responseEntity.getBody().getAuthorityIds().size())
-            );
+                () -> assertEquals(0, responseEntity.getBody().getAuthorityIds().size()));
         }
 
         @Test
@@ -673,32 +538,24 @@ public class RoleControllerTest extends BasicContext {
             Role role = roleService.save(Role.builder().name(oldRoleName).build());
 
             // GIVEN: Updated name to empty
-            RoleDto updated = RoleDto.builder()
-                .name("")
-                .build();
+            RoleDto updated = RoleDto.builder().name("").build();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(adminAuth.getAccessToken());
             HttpEntity<RoleDto> request = new HttpEntity<>(updated, headers);
 
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(role.getId())
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(role.getId()).toUri();
 
             // WHEN: Update role
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity =
+                testRestTemplate.exchange(uri, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds bad request
-            assertAll(
-                () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Role name must not be empty.", responseEntity.getBody().getMessage())
-            );
+                () -> assertEquals("Role name must not be empty.", responseEntity.getBody().getMessage()));
         }
 
         @Test
@@ -707,34 +564,25 @@ public class RoleControllerTest extends BasicContext {
             Role role = roleService.get(RoleService.ADMIN_ROLE_NAME);
 
             // GIVEN: Update
-            RoleDto updated = RoleDto.builder()
-                .build();
+            RoleDto updated = RoleDto.builder().build();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(adminAuth.getAccessToken());
             HttpEntity<RoleDto> request = new HttpEntity<>(updated, headers);
 
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(role.getId())
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(role.getId()).toUri();
 
             // WHEN: Update role
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity =
+                testRestTemplate.exchange(uri, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds bad request
-            assertAll(
-                () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals(
-                    "Role '" + RoleService.ADMIN_ROLE_NAME + "' cannot be editted.",
-                    responseEntity.getBody().getMessage()
-                )
-            );
+                () -> assertEquals("Role '" + RoleService.ADMIN_ROLE_NAME + "' cannot be editted.",
+                    responseEntity.getBody().getMessage()));
         }
 
         @Test
@@ -745,38 +593,26 @@ public class RoleControllerTest extends BasicContext {
 
             // GIVEN: Updated name
             String roleName = "role_" + UUID.randomUUID();
-            RoleDto updated = RoleDto.builder()
-                .name(roleName)
-                .build();
+            RoleDto updated = RoleDto.builder().name(roleName).build();
 
             // GIVEN: User authentication header
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username("user_" + UUID.randomUUID())
-                    .password("password")
-                    .build()
-            );
+            AuthenticationDto auth = authenticationController
+                .register(RegisterDto.builder().username("user_" + UUID.randomUUID()).password("password").build());
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(auth.getAccessToken());
             HttpEntity<RoleDto> request = new HttpEntity<>(updated, headers);
 
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(role.getId())
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(role.getId()).toUri();
 
             // WHEN: Update role
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity =
+                testRestTemplate.exchange(uri, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds forbidden
-            assertAll(
-                () -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage())
-            );
+                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage()));
         }
 
         @Test
@@ -787,9 +623,7 @@ public class RoleControllerTest extends BasicContext {
 
             // GIVEN: Updated name
             String roleName = "role_" + UUID.randomUUID();
-            RoleDto updated = RoleDto.builder()
-                .name(roleName)
-                .build();
+            RoleDto updated = RoleDto.builder().name(roleName).build();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -798,23 +632,17 @@ public class RoleControllerTest extends BasicContext {
 
             // GIVEN: Wrong role id
             int wrongId = role.getId() + 1;
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(wrongId)
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(wrongId).toUri();
 
             // WHEN: Update role
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity =
+                testRestTemplate.exchange(uri, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds not found
-            assertAll(
-                () -> assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Role " + wrongId + " not found.", responseEntity.getBody().getMessage())
-            );
+                () -> assertEquals("Role " + wrongId + " not found.", responseEntity.getBody().getMessage()));
         }
 
         @Test
@@ -826,32 +654,24 @@ public class RoleControllerTest extends BasicContext {
             roleService.save(Role.builder().name(roleName2).build());
 
             // GIVEN: Updated name to other role name
-            RoleDto updated = RoleDto.builder()
-                .name(roleName2)
-                .build();
+            RoleDto updated = RoleDto.builder().name(roleName2).build();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(adminAuth.getAccessToken());
             HttpEntity<RoleDto> request = new HttpEntity<>(updated, headers);
 
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(role1.getId())
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(role1.getId()).toUri();
 
             // WHEN: Update role
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity =
+                testRestTemplate.exchange(uri, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds conflict
-            assertAll(
-                () -> assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Role '" + roleName2 + "' already exists.", responseEntity.getBody().getMessage())
-            );
+                () -> assertEquals("Role '" + roleName2 + "' already exists.", responseEntity.getBody().getMessage()));
         }
     }
 
@@ -877,25 +697,16 @@ public class RoleControllerTest extends BasicContext {
             headers.setBearerAuth(adminAuth.getAccessToken());
             HttpEntity<Void> request = new HttpEntity<>(null, headers);
 
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(role.getId())
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(role.getId()).toUri();
 
             // WHEN: Delete role
-            ResponseEntity<String> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.DELETE, request, new ParameterizedTypeReference<String>() {}
-            );
+            ResponseEntity<String> responseEntity =
+                testRestTemplate.exchange(uri, HttpMethod.DELETE, request, new ParameterizedTypeReference<String>() {});
 
             // THEN: Returns nothing and role doesn't exist
-            assertAll(
-                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                 () -> assertNull(responseEntity.getBody()),
-                () -> assertFalse(
-                    roleService.exists(roleName),
-                    "Unexpected user '" + roleName + "' found"
-                )
-            );
+                () -> assertFalse(roleService.exists(roleName), "Unexpected user '" + roleName + "' found"));
         }
 
         @Test
@@ -910,12 +721,7 @@ public class RoleControllerTest extends BasicContext {
 
             // GIVEN: New user exists with role
             String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            authenticationController.register(RegisterDto.builder().username(username).password("password").build());
             User user = userService.get(username);
             Set<Role> roles = userService.getRoles(user);
             roles.add(role);
@@ -927,25 +733,16 @@ public class RoleControllerTest extends BasicContext {
             headers.setBearerAuth(adminAuth.getAccessToken());
             HttpEntity<Void> request = new HttpEntity<>(null, headers);
 
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(role.getId())
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(role.getId()).toUri();
 
             // WHEN: Delete role
-            ResponseEntity<String> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.DELETE, request, new ParameterizedTypeReference<String>() {}
-            );
+            ResponseEntity<String> responseEntity =
+                testRestTemplate.exchange(uri, HttpMethod.DELETE, request, new ParameterizedTypeReference<String>() {});
 
             // THEN: Returns nothing and role doesn't exist
-            assertAll(
-                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                 () -> assertNull(responseEntity.getBody()),
-                () -> assertFalse(
-                    roleService.exists(roleName),
-                    "Unexpected user '" + roleName + "' found"
-                )
-            );
+                () -> assertFalse(roleService.exists(roleName), "Unexpected user '" + roleName + "' found"));
         }
 
         @Test
@@ -959,25 +756,18 @@ public class RoleControllerTest extends BasicContext {
             Role role = roleService.get(RoleService.ADMIN_ROLE_NAME);
             role.setName("NEW_NAME");
 
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(role.getId())
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(role.getId()).toUri();
 
             // WHEN: Delete role
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.DELETE, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(uri, HttpMethod.DELETE, request,
+                new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds bad request
-            assertAll(
-                () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals(
-                    "Role " + role.getId() + " cannot be deleted.", responseEntity.getBody().getMessage()
-                )
-            );
+                () -> assertEquals("Role " + role.getId() + " cannot be deleted.",
+                    responseEntity.getBody().getMessage()));
         }
 
         @Test
@@ -991,25 +781,18 @@ public class RoleControllerTest extends BasicContext {
             Role role = roleService.get(RoleService.USER_ROLE_NAME);
             role.setName("NEW_NAME");
 
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(role.getId())
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(role.getId()).toUri();
 
             // WHEN: Delete role
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.DELETE, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(uri, HttpMethod.DELETE, request,
+                new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds bad request
-            assertAll(
-                () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals(
-                    "Role " + role.getId() + " cannot be deleted.", responseEntity.getBody().getMessage()
-                )
-            );
+                () -> assertEquals("Role " + role.getId() + " cannot be deleted.",
+                    responseEntity.getBody().getMessage()));
         }
 
         @Test
@@ -1019,33 +802,23 @@ public class RoleControllerTest extends BasicContext {
             Role role = roleService.save(Role.builder().name(roleName).build());
 
             // GIVEN: User authentication header
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username("user_" + UUID.randomUUID())
-                    .password("password")
-                    .build()
-            );
+            AuthenticationDto auth = authenticationController
+                .register(RegisterDto.builder().username("user_" + UUID.randomUUID()).password("password").build());
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(auth.getAccessToken());
             HttpEntity<Void> request = new HttpEntity<>(null, headers);
 
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(role.getId())
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(role.getId()).toUri();
 
             // WHEN: Delete role
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.DELETE, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(uri, HttpMethod.DELETE, request,
+                new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds forbidden
-            assertAll(
-                () -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage())
-            );
+                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage()));
         }
 
         @Test
@@ -1061,23 +834,17 @@ public class RoleControllerTest extends BasicContext {
 
             // GIVEN: Wrong role id
             int wrongId = role.getId() + 1;
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(wrongId)
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(wrongId).toUri();
 
             // WHEN: Delete role
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.DELETE, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(uri, HttpMethod.DELETE, request,
+                new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds not found
-            assertAll(
-                () -> assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Role " + wrongId + " not found.", responseEntity.getBody().getMessage())
-            );
+                () -> assertEquals("Role " + wrongId + " not found.", responseEntity.getBody().getMessage()));
         }
     }
 }

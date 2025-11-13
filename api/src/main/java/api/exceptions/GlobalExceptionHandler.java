@@ -1,14 +1,14 @@
 package api.exceptions;
 
+import api.dtos.ErrorDto;
+import api.services.ErrorService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import api.dtos.ErrorDto;
-import api.services.ErrorService;
 
 /**
  * {@link GlobalExceptionHandler}.

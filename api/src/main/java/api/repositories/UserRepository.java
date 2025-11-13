@@ -3,13 +3,13 @@ package api.repositories;
 import java.util.Optional;
 import java.util.Set;
 
+import api.entities.Role;
+import api.entities.User;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
-import api.entities.Role;
-import api.entities.User;
 
 /**
  * {@link UserRepository}.

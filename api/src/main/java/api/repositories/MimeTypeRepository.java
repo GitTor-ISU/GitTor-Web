@@ -2,10 +2,10 @@ package api.repositories;
 
 import java.util.Optional;
 
+import api.entities.MimeType;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import api.entities.MimeType;
 
 /**
  * {@link MimeTypeRepository}.

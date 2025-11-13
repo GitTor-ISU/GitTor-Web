@@ -1,10 +1,10 @@
 package api.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.NullValuePropertyMappingStrategy;
-
 import api.dtos.AuthorityDto;
 import api.entities.Authority;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 /**
  * {@link AuthorityMapper}.

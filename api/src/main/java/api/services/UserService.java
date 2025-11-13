@@ -6,6 +6,17 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import api.dtos.UserDto;
+import api.entities.MimeType;
+import api.entities.Role;
+import api.entities.S3Object;
+import api.entities.User;
+import api.exceptions.DuplicateEntityException;
+import api.exceptions.EntityNotFoundException;
+import api.mapper.UserMapper;
+import api.repositories.UserRepository;
+
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,17 +29,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-
-import api.dtos.UserDto;
-import api.entities.MimeType;
-import api.entities.Role;
-import api.entities.S3Object;
-import api.entities.User;
-import api.exceptions.DuplicateEntityException;
-import api.exceptions.EntityNotFoundException;
-import api.mapper.UserMapper;
-import api.repositories.UserRepository;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link UserService}.
@@ -50,12 +50,8 @@ public class UserService implements UserDetailsService {
     @Value("${api.s3.avatar.max:5000000}")
     private long maxAvatarSize;
 
-    private static final Set<MediaType> ALLOWED_AVATAR_TYPES = Set.of(
-        MediaType.IMAGE_PNG,
-        MediaType.IMAGE_JPEG,
-        MediaType.parseMediaType("image/svg+xml"),
-        MediaType.IMAGE_GIF
-    );
+    private static final Set<MediaType> ALLOWED_AVATAR_TYPES = Set.of(MediaType.IMAGE_PNG, MediaType.IMAGE_JPEG,
+        MediaType.parseMediaType("image/svg+xml"), MediaType.IMAGE_GIF);
 
     /**
      * Load user with authorities by username.
@@ -145,8 +141,7 @@ public class UserService implements UserDetailsService {
      */
     @Transactional(readOnly = true)
     public User get(int id) {
-        return find(id)
-            .orElseThrow(() -> EntityNotFoundException.fromUser(id));
+        return find(id).orElseThrow(() -> EntityNotFoundException.fromUser(id));
     }
 
     /**
@@ -157,8 +152,7 @@ public class UserService implements UserDetailsService {
      */
     @Transactional(readOnly = true)
     public User get(String username) {
-        return find(username)
-            .orElseThrow(() -> EntityNotFoundException.fromUser(username));
+        return find(username).orElseThrow(() -> EntityNotFoundException.fromUser(username));
     }
 
     /**
@@ -199,10 +193,8 @@ public class UserService implements UserDetailsService {
             throw new IllegalArgumentException("Username must not be empty.");
         }
 
-        if (StringUtils.hasText(dto.getUsername())
-            && !Objects.equals(dto.getUsername(), user.getUsername())
-            && exists(dto.getUsername())
-        ) {
+        if (StringUtils.hasText(dto.getUsername()) && !Objects.equals(dto.getUsername(), user.getUsername())
+            && exists(dto.getUsername())) {
             throw DuplicateEntityException.fromUser(dto.getUsername());
         }
 
@@ -223,9 +215,8 @@ public class UserService implements UserDetailsService {
         }
         if (!user.getRoles().contains(roleService.get(RoleService.ADMIN_ROLE_NAME))
             && getAllContainingRole(roleService.get(RoleService.ADMIN_ROLE_NAME)).size() == 1
-            && getAllContainingRole(roleService.get(RoleService.ADMIN_ROLE_NAME)).iterator().next().getId() 
-                == user.getId()
-        ) {
+            && getAllContainingRole(roleService.get(RoleService.ADMIN_ROLE_NAME)).iterator().next().getId() == user
+                .getId()) {
             throw new IllegalStateException("User must exist in the system with admin role.");
         }
         User saved = userRepository.save(user);
@@ -244,8 +235,7 @@ public class UserService implements UserDetailsService {
             throw EntityNotFoundException.fromUser(id);
         }
         if (getRoles(id).contains(roleService.get(RoleService.ADMIN_ROLE_NAME))
-            && getAllContainingRole(roleService.get(RoleService.ADMIN_ROLE_NAME)).size() == 1
-        ) {
+            && getAllContainingRole(roleService.get(RoleService.ADMIN_ROLE_NAME)).size() == 1) {
             throw new IllegalStateException("Last admin user cannot be removed from the system.");
         }
         userRepository.deleteById(id);
@@ -260,8 +250,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void delete(User user) {
         if (user.getRoles().contains(roleService.get(RoleService.ADMIN_ROLE_NAME))
-            && getAllContainingRole(roleService.get(RoleService.ADMIN_ROLE_NAME)).size() == 1
-        ) {
+            && getAllContainingRole(roleService.get(RoleService.ADMIN_ROLE_NAME)).size() == 1) {
             throw new IllegalStateException("Last admin user cannot be removed from the system.");
 
         }
@@ -327,11 +316,8 @@ public class UserService implements UserDetailsService {
 
         final S3Object oldAvatar = user.getAvatar();
         MimeType mimeType = mimeTypeService.getOrCreateByName(contentType);
-        S3Object newAvatar = S3Object.builder()
-            .key(S3ObjectService.AVATAR_DIR + user.getId() + "_" + UUID.randomUUID())
-            .size(avatar.getSize())
-            .mimeType(mimeType)
-            .build();
+        S3Object newAvatar = S3Object.builder().key(S3ObjectService.AVATAR_DIR + user.getId() + "_" + UUID.randomUUID())
+            .size(avatar.getSize()).mimeType(mimeType).build();
 
         s3ObjectService.save(newAvatar, avatar.getInputStream());
         user.setAvatar(newAvatar);
