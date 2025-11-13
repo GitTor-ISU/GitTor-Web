@@ -62,6 +62,9 @@ public abstract class BasicContext {
     protected AuthenticationDto adminAuth;
     protected FixtureMonkey fixtureMonkey;
 
+    /**
+     * Context initialization.
+     */
     @PostConstruct
     public void init() {
         fixtureMonkey = fixtureService.getFixtureMonkey();

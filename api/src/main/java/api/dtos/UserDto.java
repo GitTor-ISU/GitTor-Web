@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 
 /**
  * {@link UserDto}.
- * <p>
- * Validations defined only apply on incoming request bodies
+ *
+ * <p>Validations defined only apply on incoming request bodies.
  */
 @Data
 @Builder
