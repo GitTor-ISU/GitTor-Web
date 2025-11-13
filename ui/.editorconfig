@@ -17,3 +17,6 @@ trim_trailing_whitespace = false
 
 [src/app/generated/**]
 indent_size = 4
+
+[containerfile]
+indent_size = 4

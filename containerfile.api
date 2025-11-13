@@ -1,0 +1,22 @@
+FROM maven:3.9.9-eclipse-temurin-17 AS build-api
+WORKDIR /app
+COPY api/mvnw ./
+COPY api/.mvn .mvn
+COPY api/pom.xml ./
+RUN ./mvnw -B dependency:go-offline
+RUN ./mvnw -B dependency:resolve dependency:resolve-plugins
+COPY api/src src
+RUN ./mvnw -B \
+    resources:resources \
+    compiler:compile \
+    jar:jar \
+    spring-boot:repackage \
+    spring-boot:start \
+    springdoc-openapi:generate \
+    spring-boot:stop
+
+FROM eclipse-temurin:17-jre AS runtime
+WORKDIR /app
+COPY --from=build-api /app/target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT [ "java", "-jar", "app.jar"]
