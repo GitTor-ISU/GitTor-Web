@@ -42,6 +42,10 @@ public class User implements UserDetails {
 
     @NonNull
     @Column(unique = true, nullable = false)
+    private String email;
+
+    @NonNull
+    @Column(unique = true, nullable = false)
     private String username;
     private String password;
 

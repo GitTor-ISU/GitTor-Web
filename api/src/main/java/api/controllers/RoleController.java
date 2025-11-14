@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +28,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 /**
  * {@link RoleController}.
@@ -169,9 +169,9 @@ public class RoleController {
     // endregion
     @PostMapping("")
     @PreAuthorize("hasAuthority('ROLE_WRITE')")
-    public RoleDto createRole(@RequestBody RoleDto roleDto) {
-        if (!StringUtils.hasText(roleDto.getName())) {
-            throw new IllegalArgumentException("Role name must not be empty.");
+    public RoleDto createRole(@Valid @RequestBody RoleDto roleDto) {
+        if (roleDto.getName() == null) {
+            throw new IllegalArgumentException("Role name must not be null.");
         }
         if (roleService.exists(roleDto.getName())) {
             throw DuplicateEntityException.fromRole(roleDto.getName());
@@ -237,14 +237,12 @@ public class RoleController {
     // endregion
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority(@DbSetup.ROLE_READ) and hasAuthority('ROLE_WRITE')")
-    public RoleDto updateRole(@PathVariable int id, @RequestBody RoleDto roleDto) {
+    public RoleDto updateRole(@PathVariable int id, @Valid @RequestBody RoleDto roleDto) {
         Role role = roleService.get(id);
         if (RoleService.ADMIN_ROLE_NAME.equals(role.getName())) {
             throw new IllegalArgumentException("Role '" + RoleService.ADMIN_ROLE_NAME + "' cannot be editted.");
         }
-        if (roleDto.getName() != null && !StringUtils.hasText(roleDto.getName())) {
-            throw new IllegalArgumentException("Role name must not be empty.");
-        } else if (!Objects.equals(roleDto.getName(), role.getName()) && roleService.exists(roleDto.getName())) {
+        if (!Objects.equals(roleDto.getName(), role.getName()) && roleService.exists(roleDto.getName())) {
             throw DuplicateEntityException.fromRole(roleDto.getName());
         }
 

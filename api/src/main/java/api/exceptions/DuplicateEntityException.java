@@ -19,8 +19,18 @@ public class DuplicateEntityException extends RuntimeException {
      * @param username username
      * @return {@link DuplicateEntityException}
      */
-    public static DuplicateEntityException fromUser(String username) {
+    public static DuplicateEntityException fromUsername(String username) {
         return new DuplicateEntityException("User '" + username + "' already exists.");
+    }
+
+    /**
+     * Generate exception from email.
+     *
+     * @param email email
+     * @return {@link DuplicateEntityException}
+     */
+    public static DuplicateEntityException fromEmail(String email) {
+        return new DuplicateEntityException("Email '" + email + "' already in use.");
     }
 
     /**

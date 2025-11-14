@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -72,13 +71,8 @@ public class UserAvatarControllerTest extends BasicContext {
         })
         public void shouldGetMyAvatar(String extension, String expectedMediaType) {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: JWT authentication
             HttpHeaders putHeaders = new HttpHeaders();
@@ -134,13 +128,8 @@ public class UserAvatarControllerTest extends BasicContext {
         })
         public void shouldGetMyAvatar_whenAvatarChanged(String extension, String expectedMediaType) {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: JWT authentication
             HttpHeaders putHeaders = new HttpHeaders();
@@ -206,13 +195,9 @@ public class UserAvatarControllerTest extends BasicContext {
         @Test
         public void should404_whenNonexistent() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -245,13 +230,8 @@ public class UserAvatarControllerTest extends BasicContext {
         @CsvSource({".png", ".jpeg", ".jpg", ".gif", ".svg"})
         public void shouldUpdateMyAvatar(String extension) {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -276,6 +256,7 @@ public class UserAvatarControllerTest extends BasicContext {
             );
 
             // THEN: Returns nothing and file is in storage
+            String username = register.getUsername();
             User user = userService.get(username);
             S3Object avatarObject = user.getAvatar();
             assertAll(
@@ -289,13 +270,8 @@ public class UserAvatarControllerTest extends BasicContext {
         @CsvSource({".csv", ".txt", ".xml", "''"})
         public void should400_whenMediaTypeInvalid(String extension) {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -334,13 +310,8 @@ public class UserAvatarControllerTest extends BasicContext {
         @CsvSource({".png", ".jpeg", ".jpg", ".gif", ".svg"})
         public void should400_whenFileNull(String extension) {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -379,13 +350,8 @@ public class UserAvatarControllerTest extends BasicContext {
         @CsvSource({".png", ".jpeg", ".jpg", ".gif", ".svg"})
         public void should400_whenTooLarge(String extension) {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -433,13 +399,8 @@ public class UserAvatarControllerTest extends BasicContext {
         @CsvSource({".png", ".jpeg", ".jpg", ".gif", ".svg"})
         public void shouldDeleteMyAvatar(String extension) {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: JWT authentication
             HttpHeaders putHeaders = new HttpHeaders();
@@ -462,6 +423,7 @@ public class UserAvatarControllerTest extends BasicContext {
             testRestTemplate.exchange(
                 url + ENDPOINT, HttpMethod.PUT, putRequest, new ParameterizedTypeReference<String>() {}
             );
+            String username = register.getUsername();
             User user = userService.get(username);
             S3Object avatarObject = user.getAvatar();
 
@@ -486,13 +448,8 @@ public class UserAvatarControllerTest extends BasicContext {
         @Test
         public void shouldDeleteAvatar_whenUserDeleted() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: JWT authentication
             HttpHeaders putHeaders = new HttpHeaders();
@@ -515,6 +472,7 @@ public class UserAvatarControllerTest extends BasicContext {
             testRestTemplate.exchange(
                 url + ENDPOINT, HttpMethod.PUT, putRequest, new ParameterizedTypeReference<String>() {}
             );
+            String username = register.getUsername();
             User user = userService.get(username);
             S3Object avatarObject = user.getAvatar();
 
@@ -535,13 +493,9 @@ public class UserAvatarControllerTest extends BasicContext {
         @Test
         public void should404_whenNonexistent() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -580,13 +534,8 @@ public class UserAvatarControllerTest extends BasicContext {
         })
         public void shouldGetUserAvatar(String extension, String expectedMediaType) {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: JWT authentication
             HttpHeaders putHeaders = new HttpHeaders();
@@ -615,6 +564,7 @@ public class UserAvatarControllerTest extends BasicContext {
             getHeaders.setBearerAuth(adminAuth.getAccessToken());
 
             // GIVEN: New user id in path
+            String username = register.getUsername();
             User user = userService.get(username);
             URI uri = UriComponentsBuilder.fromUriString(url)
                 .path(ENDPOINT)
@@ -642,13 +592,9 @@ public class UserAvatarControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: User authentication
             HttpHeaders headers = new HttpHeaders();
@@ -679,13 +625,9 @@ public class UserAvatarControllerTest extends BasicContext {
         @Test
         public void should404_whenAvatarNonexistent() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -716,13 +658,9 @@ public class UserAvatarControllerTest extends BasicContext {
         @Test
         public void should404_whenUserNonexistent() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -763,13 +701,8 @@ public class UserAvatarControllerTest extends BasicContext {
         @CsvSource({".png", ".jpeg", ".jpg", ".gif", ".svg"})
         public void shouldUpdateUserAvatar(String extension) {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            authenticationController.register(register);
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -789,6 +722,7 @@ public class UserAvatarControllerTest extends BasicContext {
             HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
 
             // GIVEN: New user id in path
+            String username = register.getUsername();
             User user = userService.get(username);
             URI uri = UriComponentsBuilder.fromUriString(url)
                 .path(ENDPOINT)
@@ -814,13 +748,8 @@ public class UserAvatarControllerTest extends BasicContext {
         @CsvSource({".png", ".jpeg", ".jpg", ".gif", ".svg"})
         public void shouldReplaceOldAvatar(String extension) {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            authenticationController.register(register);
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -840,6 +769,7 @@ public class UserAvatarControllerTest extends BasicContext {
             HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
 
             // GIVEN: New user id in path
+            String username = register.getUsername();
             User user = userService.get(username);
             URI uri = UriComponentsBuilder.fromUriString(url)
                 .path(ENDPOINT)
@@ -885,13 +815,8 @@ public class UserAvatarControllerTest extends BasicContext {
         @CsvSource({".csv", ".txt", ".xml", "''"})
         public void should400_whenMediaTypeInvalid(String extension) {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            authenticationController.register(register);
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -911,6 +836,7 @@ public class UserAvatarControllerTest extends BasicContext {
             HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
 
             // GIVEN: New user id in path
+            String username = register.getUsername();
             User user = userService.get(username);
             URI uri = UriComponentsBuilder.fromUriString(url)
                 .path(ENDPOINT)
@@ -937,13 +863,8 @@ public class UserAvatarControllerTest extends BasicContext {
         @CsvSource({".png", ".jpeg", ".jpg", ".gif", ".svg"})
         public void should400_whenFileNull(String extension) {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            authenticationController.register(register);
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -963,6 +884,7 @@ public class UserAvatarControllerTest extends BasicContext {
             HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
 
             // GIVEN: New user id in path
+            String username = register.getUsername();
             User user = userService.get(username);
             URI uri = UriComponentsBuilder.fromUriString(url)
                 .path(ENDPOINT)
@@ -989,13 +911,8 @@ public class UserAvatarControllerTest extends BasicContext {
         @CsvSource({".png", ".jpeg", ".jpg", ".gif", ".svg"})
         public void should400_whenTooLarge(String extension) {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            authenticationController.register(register);
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -1016,6 +933,7 @@ public class UserAvatarControllerTest extends BasicContext {
             HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
 
             // GIVEN: New user id in path
+            String username = register.getUsername();
             User user = userService.get(username);
             URI uri = UriComponentsBuilder.fromUriString(url)
                 .path(ENDPOINT)
@@ -1041,13 +959,9 @@ public class UserAvatarControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: User authentication
             HttpHeaders headers = new HttpHeaders();
@@ -1089,13 +1003,8 @@ public class UserAvatarControllerTest extends BasicContext {
         @Test
         public void should404_whenUserNonexistent() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            authenticationController.register(register);
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -1114,6 +1023,7 @@ public class UserAvatarControllerTest extends BasicContext {
             HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
 
             // GIVEN: Wrong user id in path
+            String username = register.getUsername();
             User user = userService.get(username);
             int wrongId = user.getId() + 1;
             URI uri = UriComponentsBuilder.fromUriString(url)
@@ -1147,13 +1057,8 @@ public class UserAvatarControllerTest extends BasicContext {
         @CsvSource({".png", ".jpeg", ".jpg", ".gif", ".svg"})
         public void shouldGetUserAvatar(String extension) {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: JWT authentication
             HttpHeaders putHeaders = new HttpHeaders();
@@ -1176,6 +1081,7 @@ public class UserAvatarControllerTest extends BasicContext {
             testRestTemplate.exchange(
                 url + "/users/me/avatar", HttpMethod.PUT, putRequest, new ParameterizedTypeReference<String>() {}
             );
+            String username = register.getUsername();
             User user = userService.get(username);
             S3Object avatarObject = user.getAvatar();
 
@@ -1206,13 +1112,9 @@ public class UserAvatarControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeBuilder(RegisterDto.class).sample();
+            String username = register.getUsername();
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: User authentication
             HttpHeaders headers = new HttpHeaders();
@@ -1243,13 +1145,9 @@ public class UserAvatarControllerTest extends BasicContext {
         @Test
         public void should404_whenAvatarNonexistent() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -1280,13 +1178,9 @@ public class UserAvatarControllerTest extends BasicContext {
         @Test
         public void should404_whenUserNonexistent() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();

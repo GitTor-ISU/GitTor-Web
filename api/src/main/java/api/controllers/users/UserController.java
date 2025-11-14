@@ -37,6 +37,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 /**
  * {@link UserController}.
@@ -154,7 +155,7 @@ public class UserController {
     })
     // endregion
     @PutMapping("/me")
-    public UserDto updateMe(@AuthenticationPrincipal User user, @RequestBody UserDto userDto) {
+    public UserDto updateMe(@AuthenticationPrincipal User user, @Valid @RequestBody UserDto userDto) {
         return userMapper.toDto(userService.update(user, userDto));
     }
 
@@ -359,7 +360,7 @@ public class UserController {
     // endregion
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority(@DbSetup.USER_READ) and hasAuthority(@DbSetup.USER_WRITE)")
-    public UserDto updateUser(@PathVariable int id, @RequestBody UserDto userDto) {
+    public UserDto updateUser(@PathVariable int id, @Valid @RequestBody UserDto userDto) {
         return userMapper.toDto(userService.update(id, userDto));
     }
 

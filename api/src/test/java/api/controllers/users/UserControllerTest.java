@@ -1,5 +1,6 @@
 package api.controllers.users;
 
+import static com.navercorp.fixturemonkey.api.expression.JavaGetterMethodPropertySelector.javaGetter;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,7 +14,6 @@ import java.net.URI;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Nested;
@@ -71,13 +71,9 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void shouldGetMe_whenJwtAuthentication() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -101,14 +97,10 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void shouldGetMe_whenBasicAuthentication() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            String password = "password";
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password(password)
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            String password = register.getPassword();
+            authenticationController.register(register);
 
             // GIVEN: Basic authentication
             HttpHeaders headers = new HttpHeaders();
@@ -147,13 +139,9 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should401_whenJwtAuthenticationExpires() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
 
             // GIVEN: JWT authentication
             AuthenticationDto auth = tokenService.generateToken(
@@ -181,13 +169,9 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should401_whenJwtAuthenticationInvalid() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
 
             // GIVEN: Invalid JWT authentication
             String invalidToken = Jwts.builder()
@@ -213,14 +197,10 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should401_whenBasicAuthenticationIncorrectUsername() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            String password = "password";
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password(password)
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            String password = register.getPassword();
+            authenticationController.register(register);
 
             // GIVEN: Basic authentication with incorrect username
             HttpHeaders headers = new HttpHeaders();
@@ -242,14 +222,10 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should401_whenBasicAuthenticationIncorrectPassword() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            String password = "password";
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password(password)
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            String password = register.getPassword();
+            authenticationController.register(register);
 
             // GIVEN: Basic authentication with incorrect password
             HttpHeaders headers = new HttpHeaders();
@@ -279,13 +255,8 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void shouldGetMyAuthoritiesWhenJwtAuthentication() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -310,14 +281,10 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void shouldGetMyAuthoritiesWhenBasicAuthentication() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            String password = "password";
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password(password)
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            String password = register.getPassword();
+            authenticationController.register(register);
 
             // GIVEN: Basic authentication
             HttpHeaders headers = new HttpHeaders();
@@ -361,13 +328,9 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should401WhenJwtAuthenticationExpires() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
 
             // GIVEN: JWT authentication
             AuthenticationDto auth = tokenService.generateToken(
@@ -398,13 +361,9 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should401WhenJwtAuthenticationInvalid() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
 
             // GIVEN: Invalid JWT authentication
             String invalidToken = Jwts.builder()
@@ -433,14 +392,10 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should401WhenBasicAuthenticationIncorrectUsername() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            String password = "password";
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password(password)
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            String password = register.getPassword();
+            authenticationController.register(register);
 
             // GIVEN: Basic authentication with incorrect username
             HttpHeaders headers = new HttpHeaders();
@@ -465,14 +420,10 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should401WhenBasicAuthenticationIncorrectPassword() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            String password = "password";
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password(password)
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            String password = register.getPassword();
+            authenticationController.register(register);
 
             // GIVEN: Basic authentication with incorrect password
             HttpHeaders headers = new HttpHeaders();
@@ -497,13 +448,9 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void shouldReturnEmptyAuthoritiesWhenUserHasDefaultUserRole() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: Remove default roles and assign empty role
             User user = userService.getWithRoles(username);
@@ -573,21 +520,17 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void shouldUpdateMe_whenSomeNullValues() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: Updated user info, but some values null (id, username)
-            String firstname = "Foo";
-            String lastname = "Bar";
-            UserDto updated = UserDto.builder()
-                .firstname(firstname)
-                .lastname(lastname)
-                .build();
+            UserDto updated = fixtureMonkey.giveMeBuilder(UserDto.class)
+                    .setNull(javaGetter(UserDto::getId))
+                    .setNull(javaGetter(UserDto::getUsername))
+                    .sample();
+            String firstname = updated.getFirstname();
+            String lastname = updated.getLastname();
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -613,22 +556,16 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void shouldUpdateMe_whenIdIncorrect() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: Updated user info, but with an incorrect ID
-            String firstname = "Foo";
-            String lastname = "Bar";
-            UserDto updated = UserDto.builder()
-                .id(0)
-                .firstname(firstname)
-                .lastname(lastname)
-                .build();
+            UserDto updated = fixtureMonkey.giveMeBuilder(UserDto.class)
+                    .setNull(javaGetter(UserDto::getUsername))
+                    .sample();
+            String firstname = updated.getFirstname();
+            String lastname = updated.getLastname();
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -654,23 +591,14 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void shouldUpdateMe_whenUsernameChanged() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: Updated user info with new username
-            String newUsername = "user_" + UUID.randomUUID();
-            String firstname = "Foo";
-            String lastname = "Bar";
-            UserDto updated = UserDto.builder()
-                .username(newUsername)
-                .firstname(firstname)
-                .lastname(lastname)
-                .build();
+            UserDto updated = fixtureMonkey.giveMeOne(UserDto.class);
+            String newUsername = updated.getUsername();
+            String firstname = updated.getFirstname();
+            String lastname = updated.getLastname();
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -696,22 +624,16 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void shouldUpdateMe_whenUsernameNotChanged() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: Updated user info with same username
-            String firstname = "Foo";
-            String lastname = "Bar";
-            UserDto updated = UserDto.builder()
-                .username(username)
-                .firstname(firstname)
-                .lastname(lastname)
-                .build();
+            UserDto updated = fixtureMonkey.giveMeBuilder(UserDto.class)
+                                .set(javaGetter(UserDto::getUsername), username)
+                                .sample();
+            String firstname = updated.getFirstname();
+            String lastname = updated.getLastname();
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -737,18 +659,14 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should400_whenUsernameEmpty() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: Updated username to empty
-            UserDto updated = UserDto.builder()
-                .username("")
-                .build();
+            UserDto updated = fixtureMonkey.giveMeBuilder(UserDto.class)
+                                .set(javaGetter(UserDto::getUsername), "")
+                                .validOnly(false)
+                                .sample();
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -765,36 +683,54 @@ public class UserControllerTest extends BasicContext {
                 () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Username must not be empty.", responseEntity.getBody().getMessage())
+                () -> assertEquals("Username size must be between 3 and 20.", responseEntity.getBody().getMessage())
+            );
+        }
+
+        @Test
+        public void should400_whenUsernameInvalid() {
+            // GIVEN: New user registered
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            AuthenticationDto auth = authenticationController.register(register);
+
+            // GIVEN: Updated username to empty
+            UserDto updated = fixtureMonkey.giveMeBuilder(UserDto.class)
+                                .set(javaGetter(UserDto::getUsername), "invalidusername!")
+                                .validOnly(false)
+                                .sample();
+
+            // GIVEN: JWT authentication
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(auth.getAccessToken());
+            HttpEntity<UserDto> request = new HttpEntity<>(updated, headers);
+
+            // WHEN: Update me
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                url + ENDPOINT, HttpMethod.PUT, request, new ParameterizedTypeReference<ErrorDto>() {}
+            );
+
+            // THEN: Responds bad request
+            assertAll(
+                () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals("Username must match \"^[a-zA-Z0-9_-]*$\".", responseEntity.getBody().getMessage())
             );
         }
 
         @Test
         public void should409_whenDuplicateUsername() {
             // GIVEN: Two new users registered
-            String username1 = "user_" + UUID.randomUUID();
-            String username2 = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username1)
-                    .password("password")
-                    .build()
-            );
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username2)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register1 = fixtureMonkey.giveMeOne(RegisterDto.class);
+            RegisterDto register2 = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username2 = register2.getUsername();
+            AuthenticationDto auth = authenticationController.register(register1);
+            authenticationController.register(register2);
 
             // GIVEN: Updated user info with username of other user
-            String firstname = "Foo";
-            String lastname = "Bar";
-            UserDto updated = UserDto.builder()
-                .username(username2)
-                .firstname(firstname)
-                .lastname(lastname)
-                .build();
+            UserDto updated = fixtureMonkey.giveMeBuilder(UserDto.class)
+                                .set(javaGetter(UserDto::getUsername), username2)
+                                .sample();
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -829,14 +765,10 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void shouldUpdateMyPassword() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            String oldPassword = "password";
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password(oldPassword)
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            String oldPassword = register.getPassword();
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: New password is different
             String newPassword = "newPassword";
@@ -857,13 +789,19 @@ public class UserControllerTest extends BasicContext {
                 () -> assertNull(responseEntity.getBody()),
                 () -> assertDoesNotThrow(
                     () -> authenticationController.login(
-                        LoginDto.builder().username(username).password(newPassword).build()
+                        fixtureMonkey.giveMeBuilder(LoginDto.class)
+                            .set(javaGetter(LoginDto::getUsername), username)
+                            .set(javaGetter(LoginDto::getPassword), newPassword)
+                            .sample()
                     )
                 ),
                 () -> assertThrows(
                     BadCredentialsException.class,
                     () -> authenticationController.login(
-                        LoginDto.builder().username(username).password(oldPassword).build()
+                        fixtureMonkey.giveMeBuilder(LoginDto.class)
+                            .set(javaGetter(LoginDto::getUsername), username)
+                            .set(javaGetter(LoginDto::getPassword), oldPassword)
+                            .sample()
                     )
                 )
             );
@@ -872,14 +810,9 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should400_whenPasswordUnchanged() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            String oldPassword = "password";
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password(oldPassword)
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String oldPassword = register.getPassword();
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: New password is same
             String newPassword = oldPassword;
@@ -914,13 +847,9 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void shouldDeleteMe_whenJwtAuthentication() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -946,14 +875,10 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void shouldDeleteMe_whenBasicAuthentication() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            String password = "password";
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password(password)
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            String password = register.getPassword();
+            authenticationController.register(register);
 
             // GIVEN: Basic authentication
             HttpHeaders headers = new HttpHeaders();
@@ -979,13 +904,9 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should401_whenNoAuthentication() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
 
             // GIVEN: No authentication
             // WHEN: Delete me
@@ -1007,13 +928,9 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should401_whenJwtAuthenticationInvalid() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
 
             // GIVEN: Invalid JWT authentication
             String invalidToken = Jwts.builder()
@@ -1039,13 +956,9 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should401_whenJwtAuthenticationExpires() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
 
             // GIVEN: JWT authentication
             AuthenticationDto auth = tokenService.generateToken(
@@ -1077,14 +990,10 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should401_whenBasicAuthenticationIncorrectUsername() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            String password = "password";
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            String password = register.getPassword();
+            authenticationController.register(register);
 
             // GIVEN: Basic authentication with incorrect username
             HttpHeaders headers = new HttpHeaders();
@@ -1110,14 +1019,10 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should401_whenBasicAuthenticationIncorrectPassword() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            String password = "password";
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            String password = register.getPassword();
+            authenticationController.register(register);
 
             // GIVEN: Basic authentication with incorrect password
             HttpHeaders headers = new HttpHeaders();
@@ -1273,13 +1178,8 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            AuthenticationDto auth = authenticationController.register(register);
 
             // GIVEN: User authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -1311,13 +1211,9 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void shouldGetUser() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
             User user = userService.get(username);
 
             // GIVEN: Admin authentication header
@@ -1348,13 +1244,9 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            AuthenticationDto auth = authenticationController.register(register);
             User user = userService.get(username);
 
             // GIVEN: JWT authentication
@@ -1385,13 +1277,9 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should404_whenNonexistent() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
             User user = userService.get(username);
 
             // GIVEN: Admin authentication header
@@ -1431,22 +1319,18 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void shouldUpdateUser_whenSomeNullValues() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
             User user = userService.get(username);
 
             // GIVEN: Updated user info, but some values null (id, username)
-            String firstname = "Foo";
-            String lastname = "Bar";
-            UserDto updated = UserDto.builder()
-                .firstname(firstname)
-                .lastname(lastname)
-                .build();
+            UserDto updated = fixtureMonkey.giveMeBuilder(UserDto.class)
+                    .setNull(javaGetter(UserDto::getId))
+                    .setNull(javaGetter(UserDto::getUsername))
+                    .sample();
+            String firstname = updated.getFirstname();
+            String lastname = updated.getLastname();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -1478,23 +1362,17 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void shouldUpdateUser_whenBodyIdIncorrect() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
             User user = userService.get(username);
 
             // GIVEN: Updated user info, but with an incorrect ID
-            String firstname = "Foo";
-            String lastname = "Bar";
-            UserDto updated = UserDto.builder()
-                .id(0)
-                .firstname(firstname)
-                .lastname(lastname)
-                .build();
+            UserDto updated = fixtureMonkey.giveMeBuilder(UserDto.class)
+                    .setNull(javaGetter(UserDto::getUsername))
+                    .sample();
+            String firstname = updated.getFirstname();
+            String lastname = updated.getLastname();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -1526,24 +1404,16 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void shouldUpdateUser_whenUsernameChanged() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
             User user = userService.get(username);
 
             // GIVEN: Updated user info with new username
-            String newUsername = "user_" + UUID.randomUUID();
-            String firstname = "Foo";
-            String lastname = "Bar";
-            UserDto updated = UserDto.builder()
-                .username(newUsername)
-                .firstname(firstname)
-                .lastname(lastname)
-                .build();
+            UserDto updated = fixtureMonkey.giveMeOne(UserDto.class);
+            String newUsername = updated.getUsername();
+            String firstname = updated.getFirstname();
+            String lastname = updated.getLastname();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -1575,23 +1445,17 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void shouldUpdateUser_whenUsernameNotChanged() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
             User user = userService.get(username);
 
             // GIVEN: Updated user info with same username
-            String firstname = "Foo";
-            String lastname = "Bar";
-            UserDto updated = UserDto.builder()
-                .username(username)
-                .firstname(firstname)
-                .lastname(lastname)
-                .build();
+            UserDto updated = fixtureMonkey.giveMeBuilder(UserDto.class)
+                                .set("username", username)
+                                .sample();
+            String firstname = updated.getFirstname();
+            String lastname = updated.getLastname();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -1623,19 +1487,16 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should400_whenUsernameEmpty() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
             User user = userService.get(username);
 
             // GIVEN: Updated username to empty
-            UserDto updated = UserDto.builder()
-                .username("")
-                .build();
+            UserDto updated = fixtureMonkey.giveMeBuilder(UserDto.class)
+                                .set(javaGetter(UserDto::getUsername), "")
+                                .validOnly(false)
+                                .sample();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -1658,24 +1519,20 @@ public class UserControllerTest extends BasicContext {
                 () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Username must not be empty.", responseEntity.getBody().getMessage())
+                () -> assertEquals("Username size must be between 3 and 20.", responseEntity.getBody().getMessage())
             );
         }
 
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            AuthenticationDto auth = authenticationController.register(register);
             User user = userService.get(username);
 
             // GIVEN: Any userDto
-            UserDto updated = UserDto.builder().build();
+            UserDto updated = fixtureMonkey.giveMeOne(UserDto.class);
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -1705,22 +1562,16 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should404_whenNonexistent() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
             User user = userService.get(username);
 
             // GIVEN: Updated user info, but some values null (id, username)
-            String firstname = "Foo";
-            String lastname = "Bar";
-            UserDto updated = UserDto.builder()
-                .firstname(firstname)
-                .lastname(lastname)
-                .build();
+            UserDto updated = fixtureMonkey.giveMeBuilder(UserDto.class)
+                    .setNull(javaGetter(UserDto::getId))
+                    .setNull(javaGetter(UserDto::getUsername))
+                    .sample();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -1751,30 +1602,18 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should409_whenDuplicateUsername() {
             // GIVEN: Two new users registered
-            String username1 = "user_" + UUID.randomUUID();
-            String username2 = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username1)
-                    .password("password")
-                    .build()
-            );
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username2)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register1 = fixtureMonkey.giveMeOne(RegisterDto.class);
+            RegisterDto register2 = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username1 = register1.getUsername();
+            String username2 = register2.getUsername();
+            authenticationController.register(register1);
+            authenticationController.register(register2);
             User user1 = userService.get(username1);
 
             // GIVEN: Updated user info with username of other user
-            String firstname = "Foo";
-            String lastname = "Bar";
-            UserDto updated = UserDto.builder()
-                .username(username2)
-                .firstname(firstname)
-                .lastname(lastname)
-                .build();
+            UserDto updated = fixtureMonkey.giveMeBuilder(UserDto.class)
+                                .set(javaGetter(UserDto::getUsername), username2)
+                                .sample();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -1815,13 +1654,9 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void shouldDeleteUser() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
             User user = userService.get(username);
 
             // GIVEN: Admin authentication header
@@ -1854,13 +1689,9 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            AuthenticationDto auth = authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            AuthenticationDto auth = authenticationController.register(register);
             User user = userService.get(username);
 
             // GIVEN: JWT authentication
@@ -1891,13 +1722,9 @@ public class UserControllerTest extends BasicContext {
         @Test
         public void should404_whenNonexistent() {
             // GIVEN: New user registered
-            String username = "user_" + UUID.randomUUID();
-            authenticationController.register(
-                RegisterDto.builder()
-                    .username(username)
-                    .password("password")
-                    .build()
-            );
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register);
             User user = userService.get(username);
 
             // GIVEN: Admin authentication header

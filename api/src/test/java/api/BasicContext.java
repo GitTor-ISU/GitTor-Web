@@ -16,8 +16,12 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
+import com.navercorp.fixturemonkey.FixtureMonkey;
+
 import api.dtos.AuthenticationDto;
+import api.services.FixtureService;
 import api.services.TokenService;
+import jakarta.annotation.PostConstruct;
 
 /**
  * Baseline configurations for all controller tests.
@@ -32,6 +36,8 @@ import api.services.TokenService;
 public abstract class BasicContext {
     @Autowired
     private TokenService tokenService;
+    @Autowired
+    protected FixtureService fixtureService;
 
     @LocalServerPort
     private int port;
@@ -47,11 +53,22 @@ public abstract class BasicContext {
     protected ZoneId zone = ZoneId.of("UTC");
     protected Instant instant = Instant.EPOCH;
 
+    @Value("${api.admin.email:admin@gittor}")
+    protected String adminEmail;
     @Value("${api.admin.username:admin}")
-    private String adminUsername;
+    protected String adminUsername;
     @Value("${api.admin.password:password}")
-    private String adminPassword;
+    protected String adminPassword;
     protected AuthenticationDto adminAuth;
+    protected FixtureMonkey fixtureMonkey;
+
+    /**
+     * Context initialization.
+     */
+    @PostConstruct
+    public void init() {
+        fixtureMonkey = fixtureService.getFixtureMonkey();
+    }
 
     @BeforeEach
     public void setup() {

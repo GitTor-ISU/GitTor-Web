@@ -85,12 +85,12 @@ public class UserService implements UserDetailsService {
     /**
      * Find user.
      *
-     * @param username Username
+     * @param identifier Username or email
      * @return {@link Optional} {@link User}
      */
     @Transactional(readOnly = true)
-    public Optional<User> find(String username) {
-        return userRepository.findByUsername(username);
+    public Optional<User> find(String identifier) {
+        return userRepository.findByUsername(identifier).or(() -> userRepository.findByEmail(identifier));
     }
 
     /**
@@ -107,12 +107,12 @@ public class UserService implements UserDetailsService {
     /**
      * Check if user exists.
      *
-     * @param username Username
+     * @param identifier Username or email
      * @return true if user exists
      */
     @Transactional(readOnly = true)
-    public boolean exists(String username) {
-        return find(username).isPresent();
+    public boolean exists(String identifier) {
+        return find(identifier).isPresent();
     }
 
     /**
@@ -152,13 +152,13 @@ public class UserService implements UserDetailsService {
     /**
      * Get user.
      *
-     * @param username Username
+     * @param identifier Username or email
      * @return {@link User}
      */
     @Transactional(readOnly = true)
-    public User get(String username) {
-        return find(username)
-            .orElseThrow(() -> EntityNotFoundException.fromUser(username));
+    public User get(String identifier) {
+        return find(identifier)
+            .orElseThrow(() -> EntityNotFoundException.fromUser(identifier));
     }
 
     /**
@@ -203,7 +203,7 @@ public class UserService implements UserDetailsService {
             && !Objects.equals(dto.getUsername(), user.getUsername())
             && exists(dto.getUsername())
         ) {
-            throw DuplicateEntityException.fromUser(dto.getUsername());
+            throw DuplicateEntityException.fromUsername(dto.getUsername());
         }
 
         userMapper.update(user, dto);
@@ -223,7 +223,7 @@ public class UserService implements UserDetailsService {
         }
         if (!user.getRoles().contains(roleService.get(RoleService.ADMIN_ROLE_NAME))
             && getAllContainingRole(roleService.get(RoleService.ADMIN_ROLE_NAME)).size() == 1
-            && getAllContainingRole(roleService.get(RoleService.ADMIN_ROLE_NAME)).iterator().next().getId() 
+            && getAllContainingRole(roleService.get(RoleService.ADMIN_ROLE_NAME)).iterator().next().getId()
                 == user.getId()
         ) {
             throw new IllegalStateException("User must exist in the system with admin role.");
