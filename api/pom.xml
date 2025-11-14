@@ -307,13 +307,12 @@
         <version>1.5</version>
         <executions>
           <execution>
-            <id>integration-test</id>
+            <id>generate-openapi</id>
             <goals>
               <goal>generate</goal>
             </goals>
             <configuration>
               <outputFileName>openapi.json</outputFileName>
-              <outputDir>${project.build.directory}/openapi</outputDir>
               <skip>false</skip>
             </configuration>
           </execution>
