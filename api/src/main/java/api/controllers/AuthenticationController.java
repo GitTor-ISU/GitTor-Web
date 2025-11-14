@@ -1,11 +1,14 @@
 package api.controllers;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,10 +18,12 @@ import api.dtos.AuthenticationDto;
 import api.dtos.ErrorDto;
 import api.dtos.LoginDto;
 import api.dtos.RegisterDto;
+import api.entities.RefreshToken;
 import api.entities.User;
 import api.services.AuthenticationService;
 import api.services.TokenService;
 import api.services.UserService;
+import api.utils.CookieUtils;
 import ch.qos.logback.core.util.StringUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -48,7 +53,7 @@ public class AuthenticationController {
      * Login.
      *
      * @param login {@link LoginDto}
-     * @return {@link AuthenticationDto}
+     * @return {@link ResponseEntity} {@link AuthenticationDto}
      */
     // region
     @Operation(
@@ -66,24 +71,29 @@ public class AuthenticationController {
     })
     // endregion
     @PostMapping("/login")
-    public AuthenticationDto login(@Valid @RequestBody LoginDto login) {
-        Optional<User> user = userService.find(
+    public ResponseEntity<AuthenticationDto> login(@Valid @RequestBody LoginDto login) {
+        User user = userService.find(
             StringUtil.isNullOrEmpty(login.getUsername())
             ? login.getEmail()
             : login.getUsername()
-        );
+        ).orElse(null);
 
         Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(user.orElse(null), login.getPassword()));
+            new UsernamePasswordAuthenticationToken(user, login.getPassword()));
 
-        return tokenService.generateToken(authentication);
+        RefreshToken refreshToken = tokenService.getOrGenerateRefreshToken(user);
+        AuthenticationDto authDto = tokenService.generateAccessToken(authentication.getName());
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, CookieUtils.generateRefreshTokenCookie(refreshToken).toString())
+            .body(authDto);
     }
 
     /**
      * Register.
      *
      * @param registerDto {@link RegisterDto}
-     * @return {@link AuthenticationDto}
+     * @return {@link ResponseEntity} {@link AuthenticationDto}
      */
     // region
     @Operation(
@@ -115,12 +125,83 @@ public class AuthenticationController {
     })
     // endregion
     @PostMapping("/register")
-    public AuthenticationDto register(@Valid @RequestBody RegisterDto registerDto) {
+    public ResponseEntity<AuthenticationDto> register(@Valid @RequestBody RegisterDto registerDto) {
         User user = authenticationService.register(registerDto);
 
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(user, registerDto.getPassword()));
 
-        return tokenService.generateToken(authentication);
+        RefreshToken refreshToken = tokenService.getOrGenerateRefreshToken(user);
+        AuthenticationDto authDto = tokenService.generateAccessToken(authentication.getName());
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, CookieUtils.generateRefreshTokenCookie(refreshToken).toString())
+            .body(authDto);
+    }
+
+    /**
+     * Refresh a user.
+     *
+     * @param refreshToken {@link String}
+     * @return {@link AuthenticationDto}
+     */
+    // region
+    @Operation(
+        summary = "Refresh",
+        description = "Refresh a user."
+    )
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "200",
+            content = @Content(
+                schema = @Schema(implementation = AuthenticationDto.class),
+                mediaType = "application/json"
+            )
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            content = @Content(
+                schema = @Schema(implementation = ErrorDto.class),
+                mediaType = "application/json"
+            )
+        )
+    })
+    // endregion
+    @GetMapping("/refresh")
+    public AuthenticationDto refresh(@CookieValue(CookieUtils.REFRESH_COOKIE_NAME) String refreshToken) {
+        String username = tokenService.validate(refreshToken);
+        return tokenService.generateAccessToken(username);
+    }
+
+    /**
+     * Logout a user.
+     *
+     * @param refreshToken {@link String}
+     * @return {@link ResponseEntity} {@link Void}
+     */
+    // region
+    @Operation(
+        summary = "Logout",
+        description = "Logout a user."
+    )
+    @ApiResponses({
+        @ApiResponse(
+            responseCode = "204"
+        ),
+        @ApiResponse(
+            responseCode = "401",
+            content = @Content(
+                schema = @Schema(implementation = ErrorDto.class),
+                mediaType = "application/json"
+            )
+        ),
+    })
+    // endregion
+    @DeleteMapping("/logout")
+    public ResponseEntity<Void> logout(@CookieValue(CookieUtils.REFRESH_COOKIE_NAME) String refreshToken) {
+        tokenService.invalidate(refreshToken);
+        return ResponseEntity.noContent()
+            .header(HttpHeaders.SET_COOKIE, CookieUtils.generateEmptyCookie().toString())
+            .build();
     }
 }

@@ -107,7 +107,9 @@ public class RoleControllerTest extends BasicContext {
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: User authentication header
-            AuthenticationDto auth = authenticationController.register(fixtureMonkey.giveMeOne(RegisterDto.class));
+            AuthenticationDto auth = authenticationController
+                .register(fixtureMonkey.giveMeOne(RegisterDto.class))
+                .getBody();
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(auth.getAccessToken());
             HttpEntity<Void> request = new HttpEntity<>(null, headers);
@@ -221,7 +223,9 @@ public class RoleControllerTest extends BasicContext {
             Role role = roleService.save(fixtureMonkey.giveMeOne(Role.class));
 
             // GIVEN: User authentication header
-            AuthenticationDto auth = authenticationController.register(fixtureMonkey.giveMeOne(RegisterDto.class));
+            AuthenticationDto auth = authenticationController
+                .register(fixtureMonkey.giveMeOne(RegisterDto.class))
+                .getBody();
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(auth.getAccessToken());
             HttpEntity<Void> request = new HttpEntity<>(null, headers);
@@ -351,7 +355,9 @@ public class RoleControllerTest extends BasicContext {
             RoleDto role = fixtureMonkey.giveMeOne(RoleDto.class);
 
             // GIVEN: User authentication header
-            AuthenticationDto auth = authenticationController.register(fixtureMonkey.giveMeOne(RegisterDto.class));
+            AuthenticationDto auth = authenticationController
+                .register(fixtureMonkey.giveMeOne(RegisterDto.class))
+                .getBody();
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(auth.getAccessToken());
             HttpEntity<RoleDto> request = new HttpEntity<>(role, headers);
@@ -738,7 +744,9 @@ public class RoleControllerTest extends BasicContext {
             RoleDto updated = fixtureMonkey.giveMeOne(RoleDto.class);
 
             // GIVEN: User authentication header
-            AuthenticationDto auth = authenticationController.register(fixtureMonkey.giveMeOne(RegisterDto.class));
+            AuthenticationDto auth = authenticationController
+                .register(fixtureMonkey.giveMeOne(RegisterDto.class))
+                .getBody();
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(auth.getAccessToken());
             HttpEntity<RoleDto> request = new HttpEntity<>(updated, headers);
@@ -894,7 +902,7 @@ public class RoleControllerTest extends BasicContext {
             // GIVEN: New user exists with role
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
             String username = register.getUsername();
-            authenticationController.register(register);
+            authenticationController.register(register).getBody();
             User user = userService.get(username);
             Set<Role> roles = userService.getRoles(user);
             roles.add(role);
@@ -997,7 +1005,9 @@ public class RoleControllerTest extends BasicContext {
             Role role = roleService.save(fixtureMonkey.giveMeOne(Role.class));
 
             // GIVEN: User authentication header
-            AuthenticationDto auth = authenticationController.register(fixtureMonkey.giveMeOne(RegisterDto.class));
+            AuthenticationDto auth = authenticationController
+                .register(fixtureMonkey.giveMeOne(RegisterDto.class))
+                .getBody();
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(auth.getAccessToken());
             HttpEntity<Void> request = new HttpEntity<>(null, headers);
