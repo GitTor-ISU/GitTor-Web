@@ -194,7 +194,10 @@ public class AuthenticationControllerTest extends BasicContext {
                 () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Email size must be between 3 and 255.", responseEntity.getBody().getMessage())
+                () -> assertEquals(
+                    "Email size must be between 3 and 255.",
+                    responseEntity.getBody().getMessage()
+                )
             );
         }
 
@@ -217,7 +220,10 @@ public class AuthenticationControllerTest extends BasicContext {
                 () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Username size must be between 3 and 20.", responseEntity.getBody().getMessage())
+                () -> assertEquals(
+                    "Username size must be between 3 and 20.",
+                    responseEntity.getBody().getMessage()
+                )
             );
         }
 
@@ -240,7 +246,10 @@ public class AuthenticationControllerTest extends BasicContext {
                 () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Password size must be between 8 and 72.", responseEntity.getBody().getMessage())
+                () -> assertEquals(
+                    "Password size must be between 8 and 72.",
+                    responseEntity.getBody().getMessage()
+                )
             );
         }
 
@@ -286,7 +295,10 @@ public class AuthenticationControllerTest extends BasicContext {
                 () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Email must be a well-formed email address.", responseEntity.getBody().getMessage())
+                () -> assertEquals(
+                    "Email must be a well-formed email address.",
+                    responseEntity.getBody().getMessage()
+                )
             );
         }
 
