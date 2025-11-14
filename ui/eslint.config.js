@@ -136,7 +136,6 @@ module.exports = [
       '@angular-eslint/template/prefer-self-closing-tags': 'error',
       '@angular-eslint/template/attributes-order': 'error',
       '@angular-eslint/template/no-interpolation-in-attributes': 'error',
-      '@angular-eslint/template/prefer-ngsrc': 'error',
       '@angular-eslint/template/prefer-template-literal': 'error',
       '@angular-eslint/template/prefer-static-string-properties': 'error',
     },
