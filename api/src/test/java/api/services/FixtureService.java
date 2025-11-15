@@ -47,6 +47,7 @@ public class FixtureService {
         fm.giveMeBuilder(User.class)
             .setNull(javaGetter(User::getAvatar))
             .setNull(javaGetter(User::getId))
+            .setNull(javaGetter(User::getRefreshToken))
             .set(javaGetter(User::getEmail), DEFAULT_STRING_ARBITRARY)
             .set(javaGetter(User::getUsername), DEFAULT_STRING_ARBITRARY);
 

@@ -1,6 +1,6 @@
 import { Component, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ThemeService } from '@core/theme';
+import ThemeService from '@core/theme-service';
 
 /**
  * GitTor Logo Component.
