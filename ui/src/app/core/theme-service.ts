@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
 @Injectable({
   providedIn: 'root',
 })
-export class ThemeService {
+export default class ThemeService {
   private readonly THEME_KEY = 'theme';
 
   public initTheme(): void {

@@ -5,6 +5,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestCookieException;
@@ -113,5 +114,16 @@ public class GlobalExceptionHandler {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.SET_COOKIE, CookieUtils.generateEmptyCookie().toString());
         return new ResponseEntity<>(errorService.error(ex.getMessage()), headers, HttpStatus.UNAUTHORIZED);
+    }
+
+    /**
+     * Handle {@link BadCredentialsException}.
+     *
+     * @param ex Exception
+     * @return {@link ResponseEntity}
+     */
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorDto> handleBadCredentialsException(BadCredentialsException ex) {
+        return new ResponseEntity<>(errorService.error(ex.getMessage()), HttpStatus.UNAUTHORIZED);
     }
 }

@@ -4,7 +4,6 @@ import static com.navercorp.fixturemonkey.api.expression.JavaGetterMethodPropert
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.temporal.ChronoUnit;
@@ -111,14 +110,19 @@ public class AuthenticationControllerTest extends BasicContext {
             HttpEntity<LoginDto> request = new HttpEntity<>(login, null);
 
             // WHEN: Login
-            ResponseEntity<String> responseEntity = testRestTemplate.exchange(
-                url + ENDPOINT, HttpMethod.POST, request, new ParameterizedTypeReference<String>() {}
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                url + ENDPOINT, HttpMethod.POST, request, new ParameterizedTypeReference<ErrorDto>() {}
             );
 
             // THEN: Responds unauthorized
             assertAll(
                 () -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
-                () -> assertNull(responseEntity.getBody())
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals(
+                    "Bad credentials",
+                    responseEntity.getBody().getMessage()
+                )
             );
         }
 
@@ -131,14 +135,19 @@ public class AuthenticationControllerTest extends BasicContext {
             HttpEntity<LoginDto> request = new HttpEntity<>(login, null);
 
             // WHEN: Login
-            ResponseEntity<String> responseEntity = testRestTemplate.exchange(
-                url + ENDPOINT, HttpMethod.POST, request, new ParameterizedTypeReference<String>() {}
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
+                url + ENDPOINT, HttpMethod.POST, request, new ParameterizedTypeReference<ErrorDto>() {}
             );
 
             // THEN: Responds unauthorized
             assertAll(
                 () -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
-                () -> assertNull(responseEntity.getBody())
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals(
+                    "Bad credentials",
+                    responseEntity.getBody().getMessage()
+                )
             );
         }
     }
