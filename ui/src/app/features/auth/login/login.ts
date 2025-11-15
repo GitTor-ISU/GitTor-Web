@@ -1,7 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { Auth } from '@core/auth';
+import SessionService from '@core/session-service';
+import { LoginDto } from '@generated/openapi/models/login-dto';
 import { Logo } from '@shared/components/logo/logo';
 import { ZardButtonComponent } from '@shared/components/z-button/button.component';
 import { ZardCardComponent } from '@shared/components/z-card/card.component';
@@ -28,20 +29,26 @@ import { LucideAngularModule } from 'lucide-angular';
 })
 export class Login {
   protected loginForm = new FormGroup({
-    usernameOrEmail: new FormControl('', [Validators.required]),
-    password: new FormControl('', [Validators.required]),
+    usernameOrEmail: new FormControl<string>('', { validators: [Validators.required], nonNullable: true }),
+    password: new FormControl<string>('', { validators: [Validators.required], nonNullable: true }),
   });
 
   private readonly router: Router = inject(Router);
-  private readonly auth: Auth = inject(Auth);
+  private readonly sessionService: SessionService = inject(SessionService);
 
   protected onSubmit(): void {
     if (this.loginForm.invalid) {
       return;
     }
 
-    console.log('Form submitted:', this.loginForm.value);
-    this.auth.setToken('token');
-    this.router.navigate(['']);
+    const { usernameOrEmail, password } = this.loginForm.getRawValue();
+
+    const login: LoginDto = usernameOrEmail.includes('@')
+      ? { email: usernameOrEmail, password: password }
+      : { username: usernameOrEmail, password: password };
+
+    this.sessionService.login(login).then(() => {
+      this.router.navigate(['/']);
+    });
   }
 }

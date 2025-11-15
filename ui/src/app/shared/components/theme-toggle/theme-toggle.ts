@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { ThemeService } from '@core/theme';
+import ThemeService from '@core/theme-service';
 import { LucideAngularModule, MoonIcon, SunIcon } from 'lucide-angular';
 import { ZardButtonComponent } from '../z-button/button.component';
 

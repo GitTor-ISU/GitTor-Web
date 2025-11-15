@@ -113,7 +113,7 @@ public class UserRoleControllerTest extends BasicContext {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
             String username = register.getUsername();
-            AuthenticationDto auth = authenticationController.register(register);
+            AuthenticationDto auth = authenticationController.register(register).getBody();
             User user = userService.get(username);
 
             // GIVEN: User authentication header
@@ -336,7 +336,7 @@ public class UserRoleControllerTest extends BasicContext {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
             String username = register.getUsername();
-            AuthenticationDto auth = authenticationController.register(register);
+            AuthenticationDto auth = authenticationController.register(register).getBody();
             User user = userService.get(username);
 
             // GIVEN: User authentication header
@@ -603,7 +603,7 @@ public class UserRoleControllerTest extends BasicContext {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
             String username = register.getUsername();
-            AuthenticationDto auth = authenticationController.register(register);
+            AuthenticationDto auth = authenticationController.register(register).getBody();
             User user = userService.get(username);
 
             // GIVEN: User authentication header
@@ -828,7 +828,7 @@ public class UserRoleControllerTest extends BasicContext {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
             String username = register.getUsername();
-            AuthenticationDto auth = authenticationController.register(register);
+            AuthenticationDto auth = authenticationController.register(register).getBody();
             User user = userService.get(username);
 
             // GIVEN: User authentication header
