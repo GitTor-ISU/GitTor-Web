@@ -1,4 +1,4 @@
-import { computed, effect, inject, Injectable, signal, WritableSignal } from '@angular/core';
+import { computed, effect, inject, Injectable, Signal, signal, WritableSignal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthenticationDto } from '@generated/openapi/models/authentication-dto';
 import { LoginDto } from '@generated/openapi/models/login-dto';
@@ -14,9 +14,7 @@ import { firstValueFrom } from 'rxjs';
 })
 export default class SessionService {
   public readonly accessToken: WritableSignal<AuthenticationDto | undefined> = signal(undefined);
-  public readonly isLoggedIn = computed(() => {
-    return !!this.accessToken();
-  });
+  public readonly isLoggedIn: Signal<boolean> = computed(() => !!this.accessToken());
 
   private readonly TOKEN_KEY = 'accessToken';
   private readonly authService: AuthenticationService = inject(AuthenticationService);

@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 export default class ThemeService {
   private readonly THEME_KEY = 'theme';
 
-  public initTheme(): void {
+  public constructor() {
     const savedTheme = localStorage.getItem(this.THEME_KEY);
     const isDark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
 

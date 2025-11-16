@@ -23,8 +23,6 @@ export class App implements OnInit {
   private readonly usersService = inject(UsersService);
 
   public ngOnInit(): void {
-    this.themeService.initTheme();
-
     firstValueFrom(this.heartbeatService.heartbeat())
       .then(() => toast.success('API: Connected'))
       .catch(() => toast.error('API: Failed to connect'));
