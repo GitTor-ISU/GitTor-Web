@@ -442,7 +442,7 @@ public class AuthenticationControllerTest extends BasicContext {
                 () -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Refresh token is invalid.", responseEntity.getBody().getMessage()),
+                () -> assertEquals("Login has expired.", responseEntity.getBody().getMessage()),
                 () -> assertTrue(responseEntity.getHeaders().containsKey(HttpHeaders.SET_COOKIE)),
                 () -> assertTrue(responseEntity.getHeaders().getFirst(HttpHeaders.SET_COOKIE).contains("Max-Age=0"))
             );
@@ -466,7 +466,7 @@ public class AuthenticationControllerTest extends BasicContext {
                 () -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Refresh token is invalid.", responseEntity.getBody().getMessage()),
+                () -> assertEquals("Login has expired.", responseEntity.getBody().getMessage()),
                 () -> assertTrue(responseEntity.getHeaders().containsKey(HttpHeaders.SET_COOKIE)),
                 () -> assertTrue(responseEntity.getHeaders().getFirst(HttpHeaders.SET_COOKIE).contains("Max-Age=0"))
             );
@@ -509,7 +509,7 @@ public class AuthenticationControllerTest extends BasicContext {
                 () -> assertEquals(HttpStatus.UNAUTHORIZED, refreshResponseEntity.getStatusCode()),
                 () -> assertNotNull(refreshResponseEntity.getBody()),
                 () -> assertEquals(clock.instant(), refreshResponseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Refresh token is invalid.", refreshResponseEntity.getBody().getMessage())
+                () -> assertEquals("Login has expired.", refreshResponseEntity.getBody().getMessage())
             );
         }
 
@@ -544,7 +544,7 @@ public class AuthenticationControllerTest extends BasicContext {
                 () -> assertEquals(HttpStatus.UNAUTHORIZED, refreshResponseEntity.getStatusCode()),
                 () -> assertNotNull(refreshResponseEntity.getBody()),
                 () -> assertEquals(clock.instant(), refreshResponseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Refresh token is invalid.", refreshResponseEntity.getBody().getMessage())
+                () -> assertEquals("Login has expired.", refreshResponseEntity.getBody().getMessage())
             );
         }
 
@@ -574,7 +574,7 @@ public class AuthenticationControllerTest extends BasicContext {
                 () -> assertEquals(HttpStatus.UNAUTHORIZED, refreshResponseEntity.getStatusCode()),
                 () -> assertNotNull(refreshResponseEntity.getBody()),
                 () -> assertEquals(clock.instant(), refreshResponseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Refresh token is invalid.", refreshResponseEntity.getBody().getMessage())
+                () -> assertEquals("Login has expired.", refreshResponseEntity.getBody().getMessage())
             );
         }
 
