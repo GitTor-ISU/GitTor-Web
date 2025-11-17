@@ -26,16 +26,24 @@
   <div class="flex items-center">
     <app-theme-toggle />
     <z-divider zOrientation="vertical" class="mx-2 h-6" />
-    <button z-button z-menu zType="ghost" zShape="circle" zSize="icon" [zMenuTriggerFor]="userMenu">
+    <button
+      z-button
+      z-menu
+      zType="ghost"
+      zShape="circle"
+      zSize="icon"
+      data-test="navbar-user-button"
+      [zMenuTriggerFor]="userMenu"
+    >
       <lucide-angular [img]="userIcon" />
     </button>
   </div>
   <ng-template #userMenu>
     <div z-menu-content class="bg-background-light w-24">
       @if (sessionService.isLoggedIn()) {
-        <button z-menu-item (click)="showUser()">Profile</button>
+        <button z-menu-item data-test="navbar-profile-button" (click)="showUser()">Profile</button>
         <button z-menu-item>Settings</button>
-        <button z-menu-item (click)="sessionService.logout()">Logout</button>
+        <button z-menu-item data-test="navbar-logout-button" (click)="sessionService.logout()">Logout</button>
       } @else {
         <a z-menu-item routerLink="/login">Login</a>
       }

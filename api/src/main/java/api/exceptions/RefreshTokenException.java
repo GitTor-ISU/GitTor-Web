@@ -8,7 +8,7 @@ public class RefreshTokenException extends RuntimeException {
      * RefreshTokenException.
      */
     public RefreshTokenException() {
-        super("Refresh token is invalid.");
+        super("Login has expired.");
     }
 
     /**
