@@ -2,12 +2,11 @@ package api.configs;
 
 import java.time.Clock;
 
+import io.minio.MinioClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-
-import io.minio.MinioClient;
 
 /**
  * {@link ApplicationConfig}.

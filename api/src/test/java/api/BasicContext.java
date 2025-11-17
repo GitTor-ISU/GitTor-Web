@@ -7,6 +7,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Collections;
 
+import com.navercorp.fixturemonkey.FixtureMonkey;
+import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,8 +21,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import api.dtos.AuthenticationDto;
 import api.services.FixtureService;
 import api.services.TokenService;
-import com.navercorp.fixturemonkey.FixtureMonkey;
-import jakarta.annotation.PostConstruct;
 
 /**
  * Baseline configurations for all controller tests.

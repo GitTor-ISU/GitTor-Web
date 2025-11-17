@@ -5,11 +5,6 @@ import static com.navercorp.fixturemonkey.api.expression.JavaGetterMethodPropert
 import java.util.Collections;
 import java.util.function.Function;
 
-import org.springframework.stereotype.Service;
-
-import api.entities.Authority;
-import api.entities.Role;
-import api.entities.User;
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
 import com.navercorp.fixturemonkey.FixtureMonkey;
 import com.navercorp.fixturemonkey.api.plugin.SimpleValueJqwikPlugin;
@@ -17,6 +12,11 @@ import com.navercorp.fixturemonkey.jakarta.validation.plugin.JakartaValidationPl
 import lombok.Getter;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
+import org.springframework.stereotype.Service;
+
+import api.entities.Authority;
+import api.entities.Role;
+import api.entities.User;
 
 /**
  * {@link FixtureService}.

@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +29,6 @@ import api.exceptions.DuplicateEntityException;
 import api.exceptions.EntityNotFoundException;
 import api.mapper.UserMapper;
 import api.repositories.UserRepository;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link UserService}.

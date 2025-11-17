@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +14,6 @@ import api.entities.User;
 import api.exceptions.EntityNotFoundException;
 import api.repositories.RoleRepository;
 import api.repositories.UserRepository;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link RoleService}.

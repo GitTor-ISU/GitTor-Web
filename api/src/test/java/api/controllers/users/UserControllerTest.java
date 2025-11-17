@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +42,6 @@ import api.dtos.UserDto;
 import api.entities.User;
 import api.services.TokenService;
 import api.services.UserService;
-import io.jsonwebtoken.Jwts;
 
 /**
  * {@link UserController} test.

@@ -3,6 +3,8 @@ package api.components;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,8 +16,6 @@ import api.entities.User;
 import api.services.AuthorityService;
 import api.services.RoleService;
 import api.services.UserService;
-import jakarta.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link DbSetup}.
