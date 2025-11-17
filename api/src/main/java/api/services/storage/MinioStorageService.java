@@ -59,16 +59,10 @@ public class MinioStorageService implements SimpleStorageService {
         }
 
         try {
-            minioClient.putObject(
-                PutObjectArgs.builder()
-                    .bucket(bucket)
-                    .object(key)
-                    .stream(stream, size, -1)
-                    .build()
-            );
+            minioClient.putObject(PutObjectArgs.builder().bucket(bucket).object(key).stream(stream, size, -1).build());
         } catch (InvalidKeyException | ErrorResponseException | InsufficientDataException | InternalException
-                | InvalidResponseException | NoSuchAlgorithmException | ServerException | XmlParserException
-                | IllegalArgumentException | IOException e) {
+            | InvalidResponseException | NoSuchAlgorithmException | ServerException | XmlParserException
+            | IllegalArgumentException | IOException e) {
             throw new StorageException(e);
         }
         log.info("S3 object uploaded: " + bucket + "/" + key);
@@ -82,14 +76,10 @@ public class MinioStorageService implements SimpleStorageService {
     private InputStream downloadObject(String bucket, String key) {
         validateKey(key);
         try {
-            return minioClient.getObject(GetObjectArgs.builder()
-                .bucket(bucket)
-                .object(key)
-                .build()
-            );
+            return minioClient.getObject(GetObjectArgs.builder().bucket(bucket).object(key).build());
         } catch (InvalidKeyException | ErrorResponseException | InsufficientDataException | InternalException
-                | InvalidResponseException | NoSuchAlgorithmException | ServerException | XmlParserException
-                | IllegalArgumentException | IOException e) {
+            | InvalidResponseException | NoSuchAlgorithmException | ServerException | XmlParserException
+            | IllegalArgumentException | IOException e) {
             throw new StorageException(e);
         }
     }
@@ -102,14 +92,10 @@ public class MinioStorageService implements SimpleStorageService {
     private void deleteObject(String bucket, String key) {
         validateKey(key);
         try {
-            minioClient.removeObject(RemoveObjectArgs.builder()
-                .bucket(bucket)
-                .object(key)
-                .build()
-            );
+            minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucket).object(key).build());
         } catch (InvalidKeyException | ErrorResponseException | InsufficientDataException | InternalException
-                | InvalidResponseException | NoSuchAlgorithmException | ServerException | XmlParserException
-                | IllegalArgumentException | IOException e) {
+            | InvalidResponseException | NoSuchAlgorithmException | ServerException | XmlParserException
+            | IllegalArgumentException | IOException e) {
             throw new StorageException(e);
         }
         log.info("S3 object deleted: " + bucket + "/" + key);
@@ -122,18 +108,14 @@ public class MinioStorageService implements SimpleStorageService {
      */
     public void createBucket(String bucket) {
         try {
-            boolean exists = minioClient.bucketExists(
-                BucketExistsArgs.builder().bucket(bucket).build()
-            );
+            boolean exists = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
             if (!exists) {
-                minioClient.makeBucket(
-                    MakeBucketArgs.builder().bucket(bucket).build()
-                );
+                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
                 log.info("S3 bucket created: " + bucket);
             }
         } catch (InvalidKeyException | ErrorResponseException | InsufficientDataException | InternalException
-                | InvalidResponseException | NoSuchAlgorithmException | ServerException | XmlParserException
-                | IllegalArgumentException | IOException e) {
+            | InvalidResponseException | NoSuchAlgorithmException | ServerException | XmlParserException
+            | IllegalArgumentException | IOException e) {
             throw new StorageException(e);
         }
     }

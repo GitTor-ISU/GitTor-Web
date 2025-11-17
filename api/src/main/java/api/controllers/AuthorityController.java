@@ -27,10 +27,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
  */
 @RestController
 @RequestMapping("/authorities")
-@Tag(
-    name = "Authorities",
-    description = "Authorites can be applied to roles and specify what functionality that role has access to."
-)
+@Tag(name = "Authorities",
+    description = "Authorites can be applied to roles and specify what functionality that role has access to.")
 public class AuthorityController {
     @Autowired
     private AuthorityService authorityService;
@@ -43,33 +41,18 @@ public class AuthorityController {
      * @return {@link List} of {@link AuthorityDto}
      */
     // region
-    @Operation(
-        summary = "Get Authorities",
-        description = "Get list of all authorities."
-    )
+    @Operation(summary = "Get Authorities", description = "Get list of all authorities.")
     @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            content = @Content(
-                array = @ArraySchema(schema = @Schema(implementation = AuthorityDto.class)),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "403",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-    })
+        @ApiResponse(responseCode = "200",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = AuthorityDto.class)),
+                mediaType = "application/json")),
+        @ApiResponse(responseCode = "403",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @GetMapping("")
     @PreAuthorize("hasAuthority(@DbSetup.AUTHORITY_READ)")
     public List<AuthorityDto> getAuthorities() {
-        return authorityService.getAll().stream()
-            .map(authorityMapper::toDto)
-            .collect(Collectors.toList());
+        return authorityService.getAll().stream().map(authorityMapper::toDto).collect(Collectors.toList());
     }
 
     /**
@@ -79,33 +62,14 @@ public class AuthorityController {
      * @return {@link AuthorityDto}
      */
     // region
-    @Operation(
-        summary = "Get Authority",
-        description = "Get specific authority."
-    )
+    @Operation(summary = "Get Authority", description = "Get specific authority.")
     @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            content = @Content(
-                schema = @Schema(implementation = AuthorityDto.class),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "403",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-    })
+        @ApiResponse(responseCode = "200",
+            content = @Content(schema = @Schema(implementation = AuthorityDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "403",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "404",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority(@DbSetup.AUTHORITY_READ)")

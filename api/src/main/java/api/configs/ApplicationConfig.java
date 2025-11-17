@@ -34,14 +34,8 @@ public class ApplicationConfig {
      */
     @Bean
     @Profile("prod")
-    public MinioClient minioClient(
-        @Value("${s3.url}") String url,
-        @Value("${s3.username:s3_user}") String username,
-        @Value("${s3.password:s3_password}") String password
-    ) {
-        return MinioClient.builder()
-            .endpoint(url)
-            .credentials(username, password)
-            .build();
+    public MinioClient minioClient(@Value("${s3.url}") String url, @Value("${s3.username:s3_user}") String username,
+        @Value("${s3.password:s3_password}") String password) {
+        return MinioClient.builder().endpoint(url).credentials(username, password).build();
     }
 }

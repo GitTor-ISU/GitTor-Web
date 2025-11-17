@@ -32,11 +32,8 @@ public class TokenFilter extends OncePerRequestFilter {
     private UserService userService;
 
     @Override
-    protected void doFilterInternal(
-        @NonNull HttpServletRequest request,
-        @NonNull HttpServletResponse response,
-        @NonNull FilterChain filterChain
-    ) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+        @NonNull FilterChain filterChain) throws ServletException, IOException {
         try {
             String token = getTokenFromRequest(request);
 
@@ -60,8 +57,6 @@ public class TokenFilter extends OncePerRequestFilter {
     private String getTokenFromRequest(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
 
-        return StringUtils.hasText(token) && token.startsWith("Bearer ")
-            ? token.substring(7, token.length())
-            : null;
+        return StringUtils.hasText(token) && token.startsWith("Bearer ") ? token.substring(7, token.length()) : null;
     }
 }

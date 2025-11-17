@@ -58,9 +58,7 @@ public class LocalStorageService implements SimpleStorageService {
             }
 
             Files.createDirectories(target.getParent());
-            Files.write(target, data,
-                StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING);
+            Files.write(target, data, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
             log.info("S3 object uploaded: " + target.toAbsolutePath());
         } catch (IOException e) {
             throw new StorageException(e);

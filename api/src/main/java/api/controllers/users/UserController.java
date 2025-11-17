@@ -67,19 +67,9 @@ public class UserController {
      * @return {@link UserDto}
      */
     // region
-    @Operation(
-        summary = "Get Me",
-        description = "Get the current user's information."
-    )
-    @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            content = @Content(
-                schema = @Schema(implementation = UserDto.class),
-                mediaType = "application/json"
-            )
-        ),
-    })
+    @Operation(summary = "Get Me", description = "Get the current user's information.")
+    @ApiResponses({@ApiResponse(responseCode = "200",
+        content = @Content(schema = @Schema(implementation = UserDto.class), mediaType = "application/json"))})
     // endregion
     @GetMapping("/me")
     public UserDto getMe(@AuthenticationPrincipal User user) {
@@ -93,24 +83,14 @@ public class UserController {
      * @return {@link List} of {@link AuthorityDto}
      */
     // region
-    @Operation(
-        summary = "Get My Authorities",
-        description = "Get a list of the current user's authorities."
-    )
-    @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            content = @Content(
-                array = @ArraySchema(schema = @Schema(implementation = AuthorityDto.class)),
-                mediaType = "application/json"
-            )
-        ),
-    })
+    @Operation(summary = "Get My Authorities", description = "Get a list of the current user's authorities.")
+    @ApiResponses({@ApiResponse(responseCode = "200",
+        content = @Content(array = @ArraySchema(schema = @Schema(implementation = AuthorityDto.class)),
+            mediaType = "application/json"))})
     // endregion
     @GetMapping("/me/authorities")
     public List<AuthorityDto> getMyAuthorities(@AuthenticationPrincipal User user) {
-        return user.getAuthorities().stream()
-            .map((GrantedAuthority a) -> authorityMapper.toDto((Authority) a))
+        return user.getAuthorities().stream().map((GrantedAuthority a) -> authorityMapper.toDto((Authority) a))
             .collect(Collectors.toList());
     }
 
@@ -122,37 +102,16 @@ public class UserController {
      * @return {@link UserDto}
      */
     // region
-    @Operation(
-        summary = "Update Me",
-        description = "Update the current user's information."
-            + "<ul>"
-                + "<li>Ignores <em>id</em> and <em>password</em> from request body.</li>"
-                + "<li>Any field missing or null from request body will be left unchanged in user information.</li>"
-            + "</ul>"
-    )
+    @Operation(summary = "Update Me", description = "Update the current user's information." + "<ul>"
+        + "<li>Ignores <em>id</em> and <em>password</em> from request body.</li>"
+        + "<li>Any field missing or null from request body will be left unchanged in user information.</li>" + "</ul>")
     @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            content = @Content(
-                schema = @Schema(implementation = UserDto.class),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "409",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-    })
+        @ApiResponse(responseCode = "200",
+            content = @Content(schema = @Schema(implementation = UserDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "400",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "409",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @PutMapping("/me")
     public UserDto updateMe(@AuthenticationPrincipal User user, @Valid @RequestBody UserDto userDto) {
@@ -166,22 +125,10 @@ public class UserController {
      * @param password New password
      */
     // region
-    @Operation(
-        summary = "Update My Password",
-        description = "Updates the current user's password."
-    )
-    @ApiResponses({
-        @ApiResponse(
-            responseCode = "200"
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-    })
+    @Operation(summary = "Update My Password", description = "Updates the current user's password.")
+    @ApiResponses({@ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "400",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @PutMapping("/me/password")
     public void updateMyPassword(@AuthenticationPrincipal User user, @RequestBody String password) {
@@ -199,22 +146,10 @@ public class UserController {
      * @param user User
      */
     // region
-    @Operation(
-        summary = "Delete Me",
-        description = "Deletes the current user."
-    )
-    @ApiResponses({
-        @ApiResponse(
-            responseCode = "200"
-        ),
-        @ApiResponse(
-            responseCode = "409",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-    })
+    @Operation(summary = "Delete Me", description = "Deletes the current user.")
+    @ApiResponses({@ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "409",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @DeleteMapping("/me")
     public void deleteMe(@AuthenticationPrincipal User user) {
@@ -229,43 +164,25 @@ public class UserController {
      * @return {@link List} of {@link UserDto}
      */
     // region
-    @Operation(
-        summary = "Get Users",
-        description = "Get paginated list of user's information."
-            + "<ul>"
-                + "<li>If <em>size</em> excedes limit, response will contain up to limit.</li>"
-            + "</ul>"
-    )
+    @Operation(summary = "Get Users",
+        description = "Get paginated list of user's information." + "<ul>"
+            + "<li>If <em>size</em> excedes limit, response will contain up to limit.</li>" + "</ul>")
     @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            content = @Content(
-                array = @ArraySchema(schema = @Schema(implementation = UserDto.class)),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "403",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-    })
+        @ApiResponse(responseCode = "200",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserDto.class)),
+                mediaType = "application/json")),
+        @ApiResponse(responseCode = "403",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @GetMapping("")
     @PreAuthorize("hasAuthority(@DbSetup.USER_READ)")
-    public List<UserDto> getUsers(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(required = false) Integer size
-    ) {
+    public List<UserDto> getUsers(@RequestParam(defaultValue = "0") int page,
+        @RequestParam(required = false) Integer size) {
         int requestedSize = size != null ? size : defaultPageSize;
         int safeSize = Math.min(requestedSize, maxPageSize);
 
         Pageable pageable = PageRequest.of(page, safeSize, Sort.by("id").ascending());
-        return userService.getAll(pageable)
-            .map(userMapper::toDto)
-            .getContent();
+        return userService.getAll(pageable).map(userMapper::toDto).getContent();
     }
 
     /**
@@ -275,33 +192,14 @@ public class UserController {
      * @return {@link UserDto}
      */
     // region
-    @Operation(
-        summary = "Get User",
-        description = "Get specific user's information."
-    )
+    @Operation(summary = "Get User", description = "Get specific user's information.")
     @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            content = @Content(
-                schema = @Schema(implementation = UserDto.class),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "403",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-    })
+        @ApiResponse(responseCode = "200",
+            content = @Content(schema = @Schema(implementation = UserDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "403",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "404",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority(@DbSetup.USER_READ)")
@@ -319,44 +217,19 @@ public class UserController {
      * @return {@link UserDto}
      */
     // region
-    @Operation(
-        summary = "Update User",
-        description = "Update specific user's information.<br>"
-            + "<ul>"
-                + "<li>Ignores <em>id</em> and <em>password</em> from request body.</li>"
-                + "<li>Any field missing or null from request body will be left unchanged in user information.</li>"
-            + "</ul>"
-    )
+    @Operation(summary = "Update User", description = "Update specific user's information.<br>" + "<ul>"
+        + "<li>Ignores <em>id</em> and <em>password</em> from request body.</li>"
+        + "<li>Any field missing or null from request body will be left unchanged in user information.</li>" + "</ul>")
     @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            content = @Content(
-                array = @ArraySchema(schema = @Schema(implementation = Integer.class)),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "403",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "409",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-    })
+        @ApiResponse(responseCode = "200",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = Integer.class)),
+                mediaType = "application/json")),
+        @ApiResponse(responseCode = "403",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "404",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "409",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority(@DbSetup.USER_READ) and hasAuthority(@DbSetup.USER_WRITE)")
@@ -370,36 +243,14 @@ public class UserController {
      * @param id User id
      */
     // region
-    @Operation(
-        summary = "Delete User",
-        description = "Deletes specific user."
-    )
-    @ApiResponses({
-        @ApiResponse(
-            responseCode = "200"
-        ),
-        @ApiResponse(
-            responseCode = "403",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "409",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-    })
+    @Operation(summary = "Delete User", description = "Deletes specific user.")
+    @ApiResponses({@ApiResponse(responseCode = "200"),
+        @ApiResponse(responseCode = "403",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "404",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "409",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority(@DbSetup.USER_WRITE)")

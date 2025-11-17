@@ -16,23 +16,19 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import com.navercorp.fixturemonkey.FixtureMonkey;
-
 import api.dtos.AuthenticationDto;
 import api.services.FixtureService;
 import api.services.TokenService;
+import com.navercorp.fixturemonkey.FixtureMonkey;
 import jakarta.annotation.PostConstruct;
 
 /**
  * Baseline configurations for all controller tests.
  */
-@SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = """
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = """
         api.s3.max=2048
         api.s3.avatar.max=1024
-    """
-)
+    """)
 public abstract class BasicContext {
     @Autowired
     private TokenService tokenService;
@@ -77,8 +73,7 @@ public abstract class BasicContext {
         when(clock.getZone()).thenAnswer(inv -> zone);
         when(clock.instant()).thenAnswer(inv -> instant);
 
-        adminAuth = tokenService.generateToken(
-            new UsernamePasswordAuthenticationToken(adminUsername, null, Collections.emptyList())
-        );
+        adminAuth = tokenService
+            .generateToken(new UsernamePasswordAuthenticationToken(adminUsername, null, Collections.emptyList()));
     }
 }

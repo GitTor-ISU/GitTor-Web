@@ -24,19 +24,9 @@ public class HeartbeatController {
      * @return true
      */
     // region
-    @Operation(
-        summary = "Heartbeat",
-        description = "Always returns <em>true</em>."
-    )
-    @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            content = @Content(
-                schema = @Schema(implementation = Boolean.class),
-                mediaType = "application/json"
-            )
-        ),
-    })
+    @Operation(summary = "Heartbeat", description = "Always returns <em>true</em>.")
+    @ApiResponses({@ApiResponse(responseCode = "200",
+        content = @Content(schema = @Schema(implementation = Boolean.class), mediaType = "application/json"))})
     // endregion
     @GetMapping("")
     public boolean heartbeat() {

@@ -36,20 +36,14 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())
-            .sessionManagement(httpSecuritySessionManagementConfigurer ->
-                httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-            .authorizeHttpRequests(requests -> requests
-                .requestMatchers("/").permitAll()
-                .requestMatchers("/v3/**").permitAll()
-                .requestMatchers("/actuator/**").permitAll()
-                .requestMatchers("/authenticate/**").permitAll()
-                .anyRequest().authenticated()
-            )
-            .httpBasic(basic -> basic.authenticationEntryPoint((request, response, authException) ->
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage())))
+        http.csrf(csrf -> csrf.disable())
+            .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(requests -> requests.requestMatchers("/").permitAll().requestMatchers("/v3/**")
+                .permitAll().requestMatchers("/actuator/**").permitAll().requestMatchers("/authenticate/**").permitAll()
+                .anyRequest().authenticated())
+            .httpBasic(basic -> basic.authenticationEntryPoint((request, response, authException) -> response
+                .sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage())))
             .addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

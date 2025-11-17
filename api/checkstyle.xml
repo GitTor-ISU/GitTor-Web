@@ -375,7 +375,8 @@
                value="^@return the *|^This method returns |^A [{]@code [a-zA-Z0-9]+[}]( is a )"/>
     </module>
     <module name="JavadocParagraph">
-      <property name="allowNewlineParagraph" value="false"/>
+      <property name="allowNewlineParagraph" value="true"/>
+      <property name="violateExecutionOnNonTightHtml" value="true"/>
     </module>
     <module name="RequireEmptyLineBeforeBlockTagGroup"/>
     <module name="AtclauseOrder">

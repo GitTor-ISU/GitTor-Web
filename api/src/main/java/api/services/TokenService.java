@@ -41,10 +41,8 @@ public class TokenService {
      */
     @PostConstruct
     public void init() {
-        parser = Jwts.parser()
-            .clock(() -> Date.from(Instant.now(clock)))
-            .verifyWith(Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret)))
-            .build();
+        parser = Jwts.parser().clock(() -> Date.from(Instant.now(clock)))
+            .verifyWith(Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret))).build();
     }
 
     /**
@@ -59,12 +57,8 @@ public class TokenService {
         Date issuedAt = Date.from(now);
         Date expireDate = Date.from(now.plus(expiresMinutes, ChronoUnit.MINUTES));
 
-        String token = Jwts.builder()
-            .subject(username)
-            .issuedAt(issuedAt)
-            .expiration(expireDate)
-            .signWith(Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret)))
-            .compact();
+        String token = Jwts.builder().subject(username).issuedAt(issuedAt).expiration(expireDate)
+            .signWith(Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret))).compact();
 
         return new AuthenticationDto(token, "Bearer", expireDate);
     }

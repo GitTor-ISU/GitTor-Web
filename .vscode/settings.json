@@ -1,11 +1,22 @@
 {
     "java.compile.nullAnalysis.mode": "automatic",
     "java.configuration.updateBuildConfiguration": "automatic",
-    "java.format.settings.url": "file:///api/src/main/resources/checkstyle.xml",
+    "java.format.settings.url": "file://${workspaceFolder}/api/eclipse-formatter.xml",
+    "java.completion.importOrder": [
+        "#",
+        "java",
+        "javax",
+        "org",
+        ""
+    ],
+    "[java]": {
+        "editor.defaultFormatter": "redhat.java"
+    },
     "editor.codeActionsOnSave": {
         "source.organizeImports": "always",
         "source.fixAll.eslint": "always"
     },
+    "editor.formatOnSave": true,
     "editor.insertSpaces": true,
     "editor.rulers": [120],
     "scss.lint.unknownAtRules": "ignore",

@@ -72,8 +72,7 @@ public class AuthorityService {
      */
     @Transactional(readOnly = true)
     public Authority get(int id) {
-        return find(id)
-            .orElseThrow(() -> EntityNotFoundException.fromAuthority(id));
+        return find(id).orElseThrow(() -> EntityNotFoundException.fromAuthority(id));
     }
 
     /**
@@ -84,8 +83,7 @@ public class AuthorityService {
      */
     @Transactional(readOnly = true)
     public Authority get(String authority) {
-        return find(authority)
-            .orElseThrow(() -> EntityNotFoundException.fromAuthority(authority));
+        return find(authority).orElseThrow(() -> EntityNotFoundException.fromAuthority(authority));
     }
 
     /**

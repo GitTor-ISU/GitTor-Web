@@ -58,15 +58,12 @@ public class User implements UserDetails {
 
     @Default
     @ManyToMany
-    @JoinTable(name = "userRole",
-        joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+    @JoinTable(name = "userRole", joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Set<Role> roles = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles.stream()
-            .flatMap(role -> role.getAuthorities().stream())
-            .collect(Collectors.toSet());
+        return roles.stream().flatMap(role -> role.getAuthorities().stream()).collect(Collectors.toSet());
     }
 }

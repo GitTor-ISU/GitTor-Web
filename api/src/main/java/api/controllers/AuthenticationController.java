@@ -51,30 +51,18 @@ public class AuthenticationController {
      * @return {@link AuthenticationDto}
      */
     // region
-    @Operation(
-        summary = "Login",
-        description = "Login to an existing user."
-    )
-    @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            content = @Content(
-                schema = @Schema(implementation = AuthenticationDto.class),
-                mediaType = "application/json"
-            )
-        ),
-    })
+    @Operation(summary = "Login", description = "Login to an existing user.")
+    @ApiResponses({@ApiResponse(responseCode = "200",
+        content = @Content(schema = @Schema(implementation = AuthenticationDto.class),
+            mediaType = "application/json"))})
     // endregion
     @PostMapping("/login")
     public AuthenticationDto login(@Valid @RequestBody LoginDto login) {
-        Optional<User> user = userService.find(
-            StringUtil.isNullOrEmpty(login.getUsername())
-            ? login.getEmail()
-            : login.getUsername()
-        );
+        Optional<User> user =
+            userService.find(StringUtil.isNullOrEmpty(login.getUsername()) ? login.getEmail() : login.getUsername());
 
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(user.orElse(null), login.getPassword()));
+        Authentication authentication = authenticationManager
+            .authenticate(new UsernamePasswordAuthenticationToken(user.orElse(null), login.getPassword()));
 
         return tokenService.generateToken(authentication);
     }
@@ -86,40 +74,22 @@ public class AuthenticationController {
      * @return {@link AuthenticationDto}
      */
     // region
-    @Operation(
-        summary = "Register",
-        description = "Register a new user."
-    )
+    @Operation(summary = "Register", description = "Register a new user.")
     @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            content = @Content(
-                schema = @Schema(implementation = AuthenticationDto.class),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "409",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-    })
+        @ApiResponse(responseCode = "200",
+            content = @Content(schema = @Schema(implementation = AuthenticationDto.class),
+                mediaType = "application/json")),
+        @ApiResponse(responseCode = "400",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "409",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @PostMapping("/register")
     public AuthenticationDto register(@Valid @RequestBody RegisterDto registerDto) {
         User user = authenticationService.register(registerDto);
 
-        Authentication authentication = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(user, registerDto.getPassword()));
+        Authentication authentication = authenticationManager
+            .authenticate(new UsernamePasswordAuthenticationToken(user, registerDto.getPassword()));
 
         return tokenService.generateToken(authentication);
     }
