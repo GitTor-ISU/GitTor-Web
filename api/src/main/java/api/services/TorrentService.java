@@ -1,15 +1,10 @@
 package api.services;
 
-import api.entities.MimeType;
-import api.entities.S3Object;
-import api.entities.Torrent;
-import api.entities.User;
-import api.exceptions.EntityNotFoundException;
-import api.repositories.TorrentRepository;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 import java.util.UUID;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +13,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import api.entities.MimeType;
+import api.entities.S3Object;
+import api.entities.Torrent;
+import api.entities.User;
+import api.exceptions.EntityNotFoundException;
+import api.repositories.TorrentRepository;
 
 /**
  * {@link TorrentService}.
@@ -83,9 +85,7 @@ public class TorrentService {
      */
     @Transactional(readOnly = true)
     public Torrent get(Long id) {
-        return find(id).orElseThrow(() ->
-            EntityNotFoundException.fromTorrent(id)
-        );
+        return find(id).orElseThrow(() -> EntityNotFoundException.fromTorrent(id));
     }
 
     /**
@@ -97,9 +97,7 @@ public class TorrentService {
      */
     @Transactional(readOnly = true)
     public Torrent getWithFile(Long id) {
-        return findWithFile(id).orElseThrow(() ->
-            EntityNotFoundException.fromTorrent(id)
-        );
+        return findWithFile(id).orElseThrow(() -> EntityNotFoundException.fromTorrent(id));
     }
 
     /**
@@ -111,9 +109,7 @@ public class TorrentService {
      */
     @Transactional(readOnly = true)
     public Torrent get(String name) {
-        return find(name).orElseThrow(() ->
-            EntityNotFoundException.fromTorrent(name)
-        );
+        return find(name).orElseThrow(() -> EntityNotFoundException.fromTorrent(name));
     }
 
     /**
@@ -174,31 +170,17 @@ public class TorrentService {
      * @throws IOException if file cannot be read
      */
     @Transactional
-    public Torrent create(
-        String name,
-        String description,
-        User uploader,
-        MultipartFile file
-    ) throws IOException {
+    public Torrent create(String name, String description, User uploader, MultipartFile file) throws IOException {
         validateTorrentFile(file);
 
-        MimeType mimeType = mimeTypeService.getOrCreateByName(
-            TORRENT_MIME_TYPE
-        );
-        S3Object s3Object = S3Object.builder()
-            .key(TORRENT_DIR + UUID.randomUUID())
-            .size(file.getSize())
-            .mimeType(mimeType)
-            .build();
+        MimeType mimeType = mimeTypeService.getOrCreateByName(TORRENT_MIME_TYPE);
+        S3Object s3Object =
+            S3Object.builder().key(TORRENT_DIR + UUID.randomUUID()).size(file.getSize()).mimeType(mimeType).build();
 
         s3ObjectService.save(s3Object, file.getInputStream());
 
-        Torrent torrent = Torrent.builder()
-            .name(name)
-            .description(description)
-            .file(s3Object)
-            .uploader(uploader)
-            .build();
+        Torrent torrent =
+            Torrent.builder().name(name).description(description).file(s3Object).uploader(uploader).build();
 
         return save(torrent);
     }
@@ -233,21 +215,15 @@ public class TorrentService {
      * @throws IOException if file cannot be read
      */
     @Transactional
-    public void updateTorrentFile(Long id, MultipartFile file)
-        throws IOException {
+    public void updateTorrentFile(Long id, MultipartFile file) throws IOException {
         Torrent torrent = get(id);
         validateTorrentFile(file);
 
         S3Object oldFile = torrent.getFile();
 
-        MimeType mimeType = mimeTypeService.getOrCreateByName(
-            TORRENT_MIME_TYPE
-        );
-        S3Object newFile = S3Object.builder()
-            .key(TORRENT_DIR + UUID.randomUUID())
-            .size(file.getSize())
-            .mimeType(mimeType)
-            .build();
+        MimeType mimeType = mimeTypeService.getOrCreateByName(TORRENT_MIME_TYPE);
+        S3Object newFile =
+            S3Object.builder().key(TORRENT_DIR + UUID.randomUUID()).size(file.getSize()).mimeType(mimeType).build();
 
         s3ObjectService.save(newFile, file.getInputStream());
         torrent.setFile(newFile);
@@ -299,15 +275,11 @@ public class TorrentService {
             throw new IllegalArgumentException("File must not be empty.");
         }
         if (file.getSize() > maxTorrentSize) {
-            throw new IllegalArgumentException(
-                "File size exceeds limit (" + maxTorrentSize + " bytes)."
-            );
+            throw new IllegalArgumentException("File size exceeds limit (" + maxTorrentSize + " bytes).");
         }
         String contentType = file.getContentType();
         if (!TORRENT_MIME_TYPE.equals(contentType)) {
-            throw new IllegalArgumentException(
-                "Only torrent files (application/x-bittorrent) are allowed."
-            );
+            throw new IllegalArgumentException("Only torrent files (application/x-bittorrent) are allowed.");
         }
     }
 }

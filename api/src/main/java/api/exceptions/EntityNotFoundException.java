@@ -21,9 +21,7 @@ public class EntityNotFoundException extends RuntimeException {
      * @return {@link EntityNotFoundException}
      */
     public static EntityNotFoundException fromUser(String username) {
-        return new EntityNotFoundException(
-            "User '" + username + "' not found."
-        );
+        return new EntityNotFoundException("User '" + username + "' not found.");
     }
 
     /**
@@ -44,9 +42,7 @@ public class EntityNotFoundException extends RuntimeException {
      * @return {@link EntityNotFoundException}
      */
     public static EntityNotFoundException fromUserAvatar(String username) {
-        return new EntityNotFoundException(
-            "User '" + username + "' avatar not found."
-        );
+        return new EntityNotFoundException("User '" + username + "' avatar not found.");
     }
 
     /**
@@ -88,9 +84,7 @@ public class EntityNotFoundException extends RuntimeException {
      * @return {@link EntityNotFoundException}
      */
     public static EntityNotFoundException fromAuthority(String authority) {
-        return new EntityNotFoundException(
-            "Authority '" + authority + "' not found."
-        );
+        return new EntityNotFoundException("Authority '" + authority + "' not found.");
     }
 
     /**
