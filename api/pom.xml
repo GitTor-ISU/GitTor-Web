@@ -281,6 +281,8 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
+          <maxAttempts>200</maxAttempts>
+          <wait>500</wait>
           <jvmArguments>
             -Dspring.application.admin.enabled=true
           </jvmArguments>

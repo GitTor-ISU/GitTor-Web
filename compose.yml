@@ -27,7 +27,6 @@ services:
       timeout: 5s
       retries: 5
 
-
   api:
     build:
       context: ./
@@ -68,7 +67,7 @@ services:
     restart: always
     ports:
       - "80:80"
-      - "443:443"
+      - "62554:443"
     links:
       - api
     depends_on:
