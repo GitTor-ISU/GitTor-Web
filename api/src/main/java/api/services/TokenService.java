@@ -1,5 +1,8 @@
 package api.services;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -88,10 +91,22 @@ public class TokenService {
      * @return {@link AuthenticationDto}
      */
     @Transactional
-    public RefreshToken getOrGenerateRefreshToken(User user) {
+    public RefreshToken generateRefreshToken(User user) {
         return refreshTokenRepository.findByUser(user)
             .map(this::regenerateRefreshToken)
-            .orElseGet(() -> generateRefreshToken(user));
+            .orElseGet(() -> {
+                String rawToken = UUID.randomUUID().toString();
+                String hashed = hash(rawToken);
+
+                RefreshToken newToken = RefreshToken.builder()
+                    .user(user)
+                    .expires(Instant.now(clock).plus(refreshTokenExpiresDays, ChronoUnit.DAYS))
+                    .token(hashed)
+                    .rawToken(rawToken)
+                    .build();
+
+                return refreshTokenRepository.save(newToken);
+            });
     }
 
     /**
@@ -101,8 +116,8 @@ public class TokenService {
      * @return {@link String} username
      */
     @Transactional
-    public String validate(String refreshToken) {
-        RefreshToken token = refreshTokenRepository.findByToken(refreshToken)
+    public RefreshToken validateAndRegenerate(String refreshToken) {
+        RefreshToken token = refreshTokenRepository.findByToken(hash(refreshToken))
             .orElseThrow(() -> new RefreshTokenException());
 
         if (token.getExpires().isBefore(Instant.now(clock))) {
@@ -110,7 +125,10 @@ public class TokenService {
             throw new RefreshTokenException();
         }
 
-        return token.getUser().getUsername();
+        RefreshToken regen = regenerateRefreshToken(token);
+        regen.getUser().getUsername();
+
+        return regen;
     }
 
     /**
@@ -120,7 +138,7 @@ public class TokenService {
      */
     @Transactional
     public void invalidate(String refreshToken) {
-        refreshTokenRepository.findByToken(refreshToken)
+        refreshTokenRepository.findByToken(hash(refreshToken))
             .ifPresent(refreshTokenRepository::delete);
     }
 
@@ -141,25 +159,24 @@ public class TokenService {
     }
 
     @Transactional
-    private RefreshToken generateRefreshToken(User user) {
-        if (user == null) {
-            return null;
-        }
-
-        RefreshToken newToken = RefreshToken.builder()
-            .user(user)
-            .expires(Instant.now(clock).plus(refreshTokenExpiresDays, ChronoUnit.DAYS))
-            .token(UUID.randomUUID().toString())
-            .build();
-
-        return refreshTokenRepository.save(newToken);
-    }
-
-    @Transactional
     private RefreshToken regenerateRefreshToken(RefreshToken token) {
+        String rawToken = UUID.randomUUID().toString();
+        String hashedToken = hash(rawToken);
+
         token.setExpires(Instant.now(clock).plus(refreshTokenExpiresDays, ChronoUnit.DAYS));
-        token.setToken(UUID.randomUUID().toString());
+        token.setToken(hashedToken);
+        token.setRawToken(rawToken);
 
         return refreshTokenRepository.save(token);
+    }
+
+    private String hash(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(hashBytes);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 algorithm not available", e);
+        }
     }
 }

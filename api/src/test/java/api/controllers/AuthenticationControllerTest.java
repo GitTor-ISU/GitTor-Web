@@ -409,13 +409,10 @@ public class AuthenticationControllerTest extends BasicContext {
 
             // THEN: Require token
             assertAll(
-                () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
+                () -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals(
-                    "Required cookie 'refresh_token' for method parameter type String is not present",
-                    responseEntity.getBody().getMessage()
-                )
+                () -> assertEquals("Login has expired.", responseEntity.getBody().getMessage())
             );
         }
 
@@ -592,13 +589,10 @@ public class AuthenticationControllerTest extends BasicContext {
 
             // THEN: No Content and clears cookie
             assertAll(
-                () -> assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode()),
+                () -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals(
-                    "Required cookie 'refresh_token' for method parameter type String is not present",
-                    responseEntity.getBody().getMessage()
-                )
+                () -> assertEquals("Login has expired.", responseEntity.getBody().getMessage())
             );
         }
     }

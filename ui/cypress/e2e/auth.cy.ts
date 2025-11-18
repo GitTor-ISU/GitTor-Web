@@ -36,7 +36,7 @@ describe('Login', function () {
     });
   });
 
-  it('should error after invalid credentials login', () => {
+  it('should error after invalid credentials', () => {
     const username = '!';
     const password = '123';
 
@@ -152,16 +152,19 @@ describe('Session', function () {
 
   it('should be logged out after logout', () => {
     cy.login(adminUsername, adminPassword);
+    cy.verifyLogin().should('be.true');
 
     // Logout
+    cy.visit('/');
     cy.getBySel('navbar-user-button').click();
     cy.getBySel('navbar-logout-button').click();
 
     cy.verifyLogin().should('be.false');
   });
 
-  it('should be logged in after access token expires', () => {
+  it('should be logged in after access token expires and refresh token valid', () => {
     cy.login(adminUsername, adminPassword);
+    cy.verifyLogin().should('be.true');
 
     // Expire access token
     cy.window().then((win) => {
@@ -174,7 +177,20 @@ describe('Session', function () {
     cy.verifyLogin().should('be.true');
   });
 
-  it('should be logged out after refresh token expires', () => {
+  it('should be logged in after access token valid and refresh token expires', () => {
+    cy.login(adminUsername, adminPassword);
+    cy.verifyLogin().should('be.true');
+
+    cy.intercept('GET', '/api/authenticate/refresh', {
+      statusCode: 401,
+    }).as('refresh');
+
+    cy.reload();
+    cy.get('@refresh.all').should('have.length', 0);
+    cy.verifyLogin().should('be.true');
+  });
+
+  it('should be logged out after access token expires and refresh token expires', () => {
     cy.login(adminUsername, adminPassword);
     cy.verifyLogin().should('be.true');
 

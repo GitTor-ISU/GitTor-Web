@@ -20,6 +20,7 @@ import api.dtos.LoginDto;
 import api.dtos.RegisterDto;
 import api.entities.RefreshToken;
 import api.entities.User;
+import api.exceptions.RefreshTokenException;
 import api.services.AuthenticationService;
 import api.services.TokenService;
 import api.services.UserService;
@@ -81,7 +82,7 @@ public class AuthenticationController {
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(user, login.getPassword()));
 
-        RefreshToken refreshToken = tokenService.getOrGenerateRefreshToken(user);
+        RefreshToken refreshToken = tokenService.generateRefreshToken(user);
         AuthenticationDto authDto = tokenService.generateAccessToken(authentication.getName());
 
         return ResponseEntity.ok()
@@ -131,7 +132,7 @@ public class AuthenticationController {
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(user, registerDto.getPassword()));
 
-        RefreshToken refreshToken = tokenService.getOrGenerateRefreshToken(user);
+        RefreshToken refreshToken = tokenService.generateRefreshToken(user);
         AuthenticationDto authDto = tokenService.generateAccessToken(authentication.getName());
 
         return ResponseEntity.ok()
@@ -168,9 +169,19 @@ public class AuthenticationController {
     })
     // endregion
     @GetMapping("/refresh")
-    public AuthenticationDto refresh(@CookieValue(CookieUtils.REFRESH_COOKIE_NAME) String refreshToken) {
-        String username = tokenService.validate(refreshToken);
-        return tokenService.generateAccessToken(username);
+    public ResponseEntity<AuthenticationDto> refresh(
+        @CookieValue(value = CookieUtils.REFRESH_COOKIE_NAME, required = false)
+        String refreshToken
+    ) {
+        if (refreshToken == null) {
+            throw new RefreshTokenException();
+        }
+
+        RefreshToken regenToken = tokenService.validateAndRegenerate(refreshToken);
+        AuthenticationDto authDto = tokenService.generateAccessToken(regenToken.getUser().getUsername());
+        return ResponseEntity.ok()
+            .header(HttpHeaders.SET_COOKIE, CookieUtils.generateRefreshTokenCookie(regenToken).toString())
+            .body(authDto);
     }
 
     /**
@@ -198,7 +209,14 @@ public class AuthenticationController {
     })
     // endregion
     @DeleteMapping("/logout")
-    public ResponseEntity<Void> logout(@CookieValue(CookieUtils.REFRESH_COOKIE_NAME) String refreshToken) {
+    public ResponseEntity<Void> logout(
+        @CookieValue(value = CookieUtils.REFRESH_COOKIE_NAME, required = false)
+        String refreshToken
+        ) {
+        if (refreshToken == null) {
+            throw new RefreshTokenException();
+        }
+
         tokenService.invalidate(refreshToken);
         return ResponseEntity.noContent()
             .header(HttpHeaders.SET_COOKIE, CookieUtils.generateEmptyCookie().toString())

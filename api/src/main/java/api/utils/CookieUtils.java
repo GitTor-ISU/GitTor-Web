@@ -35,7 +35,7 @@ public class CookieUtils {
      */
     public static ResponseCookie generateRefreshTokenCookie(RefreshToken refreshToken) {
         long maxAge = Duration.between(Instant.now(), refreshToken.getExpires()).getSeconds();
-        return ResponseCookie.from(REFRESH_COOKIE_NAME, refreshToken.getToken())
+        return ResponseCookie.from(REFRESH_COOKIE_NAME, refreshToken.getRawToken())
             .httpOnly(true)
             .secure(true)
             .path("/")

@@ -17,9 +17,8 @@ export class GlobalErrorHandler implements ErrorHandler {
   public handleError(err: any): void {
     const message: string = 'An unexpected error occurred';
 
-    if (err instanceof HttpErrorResponse && err.error.message) {
+    if (err instanceof HttpErrorResponse && err.error?.message) {
       toast.error(err.error.message);
-      console.error('HTTP Error:', err);
       return;
     }
 

@@ -23,7 +23,7 @@ export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
         switchMap(() => {
           return next(addAuthHeader(req, sessionService.accessToken()?.accessToken));
         }),
-        catchError(() => {
+        catchError((error: HttpErrorResponse) => {
           return throwError(() => error);
         })
       );

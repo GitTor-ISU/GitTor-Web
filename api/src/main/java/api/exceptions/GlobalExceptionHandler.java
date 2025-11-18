@@ -8,7 +8,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.MissingRequestCookieException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -90,17 +89,6 @@ public class GlobalExceptionHandler {
         String field = StringUtils.capitalize(ex.getFieldError().getField());
         String errorMessage = String.format("%s %s.", field, ex.getFieldError().getDefaultMessage());
         return new ResponseEntity<>(errorService.error(errorMessage), HttpStatus.BAD_REQUEST);
-    }
-
-    /**
-     * Handle {@link MissingRequestCookieException}.
-     *
-     * @param ex Exception
-     * @return {@link ResponseEntity}
-     */
-    @ExceptionHandler(MissingRequestCookieException.class)
-    public ResponseEntity<ErrorDto> handleMissingRequestCookieException(MissingRequestCookieException ex) {
-        return new ResponseEntity<>(errorService.error(ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 
     /**
