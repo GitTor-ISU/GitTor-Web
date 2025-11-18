@@ -52,7 +52,7 @@ public class UserControllerTest extends BasicContext {
     @Autowired
     private AuthenticationController authenticationController;
 
-    @Value("${jwt.token.expires-minutes:30}")
+    @Value("${jwt.access-token.expires-minutes:30}")
     private int expires;
     @Value("${pagination.default-page-size:10}")
     private int defaultPageSize;

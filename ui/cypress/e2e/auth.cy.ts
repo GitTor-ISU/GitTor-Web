@@ -11,7 +11,7 @@ describe('Login', function () {
     cy.verifyLogin().should('be.true');
   });
 
-  it('should redirect to home after login', () => {
+  it('should redirect off of login page if logged in', () => {
     cy.login(adminUsername, adminPassword);
     cy.visit('/login');
     cy.location('pathname').should('equal', '/');
@@ -57,7 +57,7 @@ describe('Register', function () {
     cy.verifyLogin().should('be.true');
   });
 
-  it('should redirect to home after register', () => {
+  it('should redirect off of register page if registered', () => {
     const username = faker.string.alphanumeric({ length: { min: 3, max: 20 } });
     const email = faker.internet.email();
     const password = faker.string.alphanumeric(8);
@@ -130,7 +130,7 @@ describe('Register', function () {
     {
       description: 'should error with duplicate email',
       username: faker.string.alphanumeric({ length: { min: 3, max: 20 } }),
-      email: 'admin@gittor',
+      email: adminEmail,
       password: faker.string.alphanumeric(8),
       expect: `Email '${adminEmail}' already in use.`,
     },

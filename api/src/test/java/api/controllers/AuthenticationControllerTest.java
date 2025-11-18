@@ -33,7 +33,7 @@ public class AuthenticationControllerTest extends BasicContext {
     @Autowired
     private AuthenticationController authenticationController;
 
-    @Value("${jwt.access-token.expires-days:7}")
+    @Value("${jwt.refresh-token.expires-days:7}")
     private int refreshTokenExpiresDays;
 
     /**

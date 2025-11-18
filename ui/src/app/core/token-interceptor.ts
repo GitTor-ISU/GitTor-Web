@@ -12,6 +12,10 @@ const addAuthHeader = (req: HttpRequest<unknown>, token: string | undefined): Ht
 export const tokenInterceptor: HttpInterceptorFn = (req, next) => {
   const sessionService: SessionService = inject(SessionService);
 
+  if (!req.url.startsWith('/api')) {
+    return next(req);
+  }
+
   if (req.url.startsWith('/api/authenticate')) {
     return next(req);
   }

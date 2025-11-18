@@ -93,7 +93,7 @@ public class AuthenticationController {
         @ApiResponse(responseCode = "400",
             content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
         @ApiResponse(responseCode = "409",
-            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),})
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @PostMapping("/register")
     public ResponseEntity<AuthenticationDto> register(@Valid @RequestBody RegisterDto registerDto) {
@@ -149,7 +149,7 @@ public class AuthenticationController {
     @Operation(summary = "Logout", description = "Logout a user.")
     @ApiResponses({@ApiResponse(responseCode = "204"),
         @ApiResponse(responseCode = "401",
-            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),})
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @DeleteMapping("/logout")
     public ResponseEntity<Void> logout(

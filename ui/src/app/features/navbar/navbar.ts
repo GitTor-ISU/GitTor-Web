@@ -127,11 +127,9 @@ export class Navbar {
   }
 
   private deleteUser(username: string | undefined): void {
-    firstValueFrom(this.usersService.deleteMe())
-      .then(() => {
-        toast.success(`'${username}' was deleted`);
-        this.sessionService.logout();
-      })
-      .catch((err) => toast.error(err));
+    firstValueFrom(this.usersService.deleteMe()).then(() => {
+      toast.success(`'${username}' was deleted`);
+      this.sessionService.logout();
+    });
   }
 }

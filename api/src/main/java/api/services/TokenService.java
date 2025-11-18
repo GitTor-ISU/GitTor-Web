@@ -17,6 +17,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -44,10 +45,10 @@ public class TokenService {
     @Value("${jwt.token.secret:XrLHWXPiznJfz3jvJF9ZJkIzvgC0RAF64dOO8bqSxJ2LStAOUAIO85gWg7tcFlfLL9c6q40UCRKMlwnyM5OQOg==}")
     private String secret;
 
-    @Value("${jwt.token.expires-minutes:30}")
+    @Value("${jwt.access-token.expires-minutes:30}")
     private int accessTokenExpiresMinutes;
 
-    @Value("${jwt.access-token.expires-days:7}")
+    @Value("${jwt.refresh-token.expires-days:7}")
     private int refreshTokenExpiresDays;
 
     private JwtParser parser;
@@ -115,7 +116,7 @@ public class TokenService {
         }
 
         RefreshToken regen = regenerateRefreshToken(token);
-        regen.getUser().getUsername();
+        Hibernate.initialize(regen.getUser());
 
         return regen;
     }
