@@ -5,7 +5,6 @@ import static org.mockito.Mockito.when;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
-import java.util.Collections;
 
 import com.navercorp.fixturemonkey.FixtureMonkey;
 import jakarta.annotation.PostConstruct;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import api.dtos.AuthenticationDto;
@@ -73,7 +71,6 @@ public abstract class BasicContext {
         when(clock.getZone()).thenAnswer(inv -> zone);
         when(clock.instant()).thenAnswer(inv -> instant);
 
-        adminAuth = tokenService
-            .generateToken(new UsernamePasswordAuthenticationToken(adminUsername, null, Collections.emptyList()));
+        adminAuth = tokenService.generateAccessToken(adminUsername);
     }
 }

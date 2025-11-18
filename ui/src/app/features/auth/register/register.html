@@ -11,19 +11,40 @@
       <z-form-field>
         <label z-form-label zRequired>Username</label>
         <z-form-control [helpText]="usernameErrorMessage()">
-          <input z-input zSize="sm" type="text" placeholder="Choose your username" formControlName="username" />
+          <input
+            z-input
+            zSize="sm"
+            type="text"
+            placeholder="Choose your username"
+            formControlName="username"
+            data-test="register-username"
+          />
         </z-form-control>
       </z-form-field>
       <z-form-field>
         <label z-form-label zRequired>Email</label>
         <z-form-control [helpText]="emailErrorMessage()">
-          <input z-input zSize="sm" type="email" placeholder="Enter your email" formControlName="email" />
+          <input
+            z-input
+            zSize="sm"
+            type="email"
+            placeholder="Enter your email"
+            formControlName="email"
+            data-test="register-email"
+          />
         </z-form-control>
       </z-form-field>
       <z-form-field>
         <label z-form-label zRequired>Password</label>
         <z-form-control [helpText]="passwordErrorMessage()">
-          <input z-input zSize="sm" type="password" placeholder="Create your password" formControlName="password" />
+          <input
+            z-input
+            zSize="sm"
+            type="password"
+            placeholder="Create your password"
+            formControlName="password"
+            data-test="register-password"
+          />
         </z-form-control>
       </z-form-field>
       <z-form-field>
@@ -35,12 +56,20 @@
             type="password"
             placeholder="Confirm your password"
             formControlName="confirmPassword"
+            data-test="register-confirm-password"
           />
         </z-form-control>
       </z-form-field>
       <div class="flex gap-3">
         <a z-button zType="secondary" routerLink="/login" class="flex-1 text-center">Log in</a>
-        <button z-button zType="default" type="submit" class="flex-1" [disabled]="registerForm.invalid">
+        <button
+          z-button
+          zType="default"
+          type="submit"
+          class="flex-1"
+          data-test="register-submit"
+          [disabled]="registerForm.invalid"
+        >
           Create Account
         </button>
       </div>

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ThemeService } from '@core/theme';
+import ThemeService from '@core/theme-service';
 import { NgxGridpatternComponent } from '@omnedia/ngx-gridpattern';
 import { NgxTypewriterComponent } from '@omnedia/ngx-typewriter';
 import { ThemeToggle } from '@shared/components/theme-toggle/theme-toggle';

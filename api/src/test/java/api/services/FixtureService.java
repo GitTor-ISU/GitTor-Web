@@ -37,7 +37,7 @@ public class FixtureService {
 
     private final Function<FixtureMonkey, ? extends ArbitraryBuilder<?>> userBuilderFunc =
         fm -> fm.giveMeBuilder(User.class).setNull(javaGetter(User::getAvatar)).setNull(javaGetter(User::getId))
-            .set(javaGetter(User::getEmail), DEFAULT_STRING_ARBITRARY)
+            .setNull(javaGetter(User::getRefreshToken)).set(javaGetter(User::getEmail), DEFAULT_STRING_ARBITRARY)
             .set(javaGetter(User::getUsername), DEFAULT_STRING_ARBITRARY);
 
     @Getter

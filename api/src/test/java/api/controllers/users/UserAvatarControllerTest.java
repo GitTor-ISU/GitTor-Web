@@ -70,7 +70,7 @@ public class UserAvatarControllerTest extends BasicContext {
         public void shouldGetMyAvatar(String extension, String expectedMediaType) {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
-            AuthenticationDto auth = authenticationController.register(register);
+            AuthenticationDto auth = authenticationController.register(register).getBody();
 
             // GIVEN: JWT authentication
             HttpHeaders putHeaders = new HttpHeaders();
@@ -116,7 +116,7 @@ public class UserAvatarControllerTest extends BasicContext {
         public void shouldGetMyAvatar_whenAvatarChanged(String extension, String expectedMediaType) {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
-            AuthenticationDto auth = authenticationController.register(register);
+            AuthenticationDto auth = authenticationController.register(register).getBody();
 
             // GIVEN: JWT authentication
             HttpHeaders putHeaders = new HttpHeaders();
@@ -177,7 +177,7 @@ public class UserAvatarControllerTest extends BasicContext {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
             String username = register.getUsername();
-            AuthenticationDto auth = authenticationController.register(register);
+            AuthenticationDto auth = authenticationController.register(register).getBody();
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -208,7 +208,7 @@ public class UserAvatarControllerTest extends BasicContext {
         public void shouldUpdateMyAvatar(String extension) {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
-            AuthenticationDto auth = authenticationController.register(register);
+            AuthenticationDto auth = authenticationController.register(register).getBody();
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -245,7 +245,7 @@ public class UserAvatarControllerTest extends BasicContext {
         public void should400_whenMediaTypeInvalid(String extension) {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
-            AuthenticationDto auth = authenticationController.register(register);
+            AuthenticationDto auth = authenticationController.register(register).getBody();
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -281,7 +281,7 @@ public class UserAvatarControllerTest extends BasicContext {
         public void should400_whenFileNull(String extension) {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
-            AuthenticationDto auth = authenticationController.register(register);
+            AuthenticationDto auth = authenticationController.register(register).getBody();
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -316,7 +316,7 @@ public class UserAvatarControllerTest extends BasicContext {
         public void should400_whenTooLarge(String extension) {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
-            AuthenticationDto auth = authenticationController.register(register);
+            AuthenticationDto auth = authenticationController.register(register).getBody();
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -361,7 +361,7 @@ public class UserAvatarControllerTest extends BasicContext {
         public void shouldDeleteMyAvatar(String extension) {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
-            AuthenticationDto auth = authenticationController.register(register);
+            AuthenticationDto auth = authenticationController.register(register).getBody();
 
             // GIVEN: JWT authentication
             HttpHeaders putHeaders = new HttpHeaders();
@@ -406,7 +406,7 @@ public class UserAvatarControllerTest extends BasicContext {
         public void shouldDeleteAvatar_whenUserDeleted() {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
-            AuthenticationDto auth = authenticationController.register(register);
+            AuthenticationDto auth = authenticationController.register(register).getBody();
 
             // GIVEN: JWT authentication
             HttpHeaders putHeaders = new HttpHeaders();
@@ -450,7 +450,7 @@ public class UserAvatarControllerTest extends BasicContext {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
             String username = register.getUsername();
-            AuthenticationDto auth = authenticationController.register(register);
+            AuthenticationDto auth = authenticationController.register(register).getBody();
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -482,7 +482,7 @@ public class UserAvatarControllerTest extends BasicContext {
         public void shouldGetUserAvatar(String extension, String expectedMediaType) {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
-            AuthenticationDto auth = authenticationController.register(register);
+            AuthenticationDto auth = authenticationController.register(register).getBody();
 
             // GIVEN: JWT authentication
             HttpHeaders putHeaders = new HttpHeaders();
@@ -532,7 +532,7 @@ public class UserAvatarControllerTest extends BasicContext {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
             String username = register.getUsername();
-            AuthenticationDto auth = authenticationController.register(register);
+            AuthenticationDto auth = authenticationController.register(register).getBody();
 
             // GIVEN: User authentication
             HttpHeaders headers = new HttpHeaders();
@@ -559,7 +559,7 @@ public class UserAvatarControllerTest extends BasicContext {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
             String username = register.getUsername();
-            authenticationController.register(register);
+            authenticationController.register(register).getBody();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -586,7 +586,7 @@ public class UserAvatarControllerTest extends BasicContext {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
             String username = register.getUsername();
-            authenticationController.register(register);
+            authenticationController.register(register).getBody();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -622,7 +622,7 @@ public class UserAvatarControllerTest extends BasicContext {
         public void shouldUpdateUserAvatar(String extension) {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
-            authenticationController.register(register);
+            authenticationController.register(register).getBody();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -663,7 +663,7 @@ public class UserAvatarControllerTest extends BasicContext {
         public void shouldReplaceOldAvatar(String extension) {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
-            authenticationController.register(register);
+            authenticationController.register(register).getBody();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -722,7 +722,7 @@ public class UserAvatarControllerTest extends BasicContext {
         public void should400_whenMediaTypeInvalid(String extension) {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
-            authenticationController.register(register);
+            authenticationController.register(register).getBody();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -763,7 +763,7 @@ public class UserAvatarControllerTest extends BasicContext {
         public void should400_whenFileNull(String extension) {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
-            authenticationController.register(register);
+            authenticationController.register(register).getBody();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -803,7 +803,7 @@ public class UserAvatarControllerTest extends BasicContext {
         public void should400_whenTooLarge(String extension) {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
-            authenticationController.register(register);
+            authenticationController.register(register).getBody();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -845,7 +845,7 @@ public class UserAvatarControllerTest extends BasicContext {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
             String username = register.getUsername();
-            AuthenticationDto auth = authenticationController.register(register);
+            AuthenticationDto auth = authenticationController.register(register).getBody();
 
             // GIVEN: User authentication
             HttpHeaders headers = new HttpHeaders();
@@ -882,7 +882,7 @@ public class UserAvatarControllerTest extends BasicContext {
         public void should404_whenUserNonexistent() {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
-            authenticationController.register(register);
+            authenticationController.register(register).getBody();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -930,7 +930,7 @@ public class UserAvatarControllerTest extends BasicContext {
         public void shouldDeleteUserAvatar(String extension) {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
-            AuthenticationDto auth = authenticationController.register(register);
+            AuthenticationDto auth = authenticationController.register(register).getBody();
 
             // GIVEN: JWT authentication
             HttpHeaders putHeaders = new HttpHeaders();
@@ -979,7 +979,7 @@ public class UserAvatarControllerTest extends BasicContext {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeBuilder(RegisterDto.class).sample();
             String username = register.getUsername();
-            AuthenticationDto auth = authenticationController.register(register);
+            AuthenticationDto auth = authenticationController.register(register).getBody();
 
             // GIVEN: User authentication
             HttpHeaders headers = new HttpHeaders();
@@ -1006,7 +1006,7 @@ public class UserAvatarControllerTest extends BasicContext {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
             String username = register.getUsername();
-            authenticationController.register(register);
+            authenticationController.register(register).getBody();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
@@ -1033,7 +1033,7 @@ public class UserAvatarControllerTest extends BasicContext {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
             String username = register.getUsername();
-            authenticationController.register(register);
+            authenticationController.register(register).getBody();
 
             // GIVEN: Admin authentication header
             HttpHeaders headers = new HttpHeaders();
