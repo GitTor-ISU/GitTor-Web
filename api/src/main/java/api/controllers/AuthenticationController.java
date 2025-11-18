@@ -212,7 +212,7 @@ public class AuthenticationController {
     public ResponseEntity<Void> logout(
         @CookieValue(value = CookieUtils.REFRESH_COOKIE_NAME, required = false)
         String refreshToken
-        ) {
+    ) {
         if (refreshToken == null) {
             throw new RefreshTokenException();
         }
