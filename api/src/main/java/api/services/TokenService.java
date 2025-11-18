@@ -6,6 +6,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Date;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -13,11 +18,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import api.dtos.AuthenticationDto;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
 
 /**
  * {@link TokenService}.
@@ -41,10 +41,8 @@ public class TokenService {
      */
     @PostConstruct
     public void init() {
-        parser = Jwts.parser()
-            .clock(() -> Date.from(Instant.now(clock)))
-            .verifyWith(Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret)))
-            .build();
+        parser = Jwts.parser().clock(() -> Date.from(Instant.now(clock)))
+            .verifyWith(Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret))).build();
     }
 
     /**
@@ -59,12 +57,8 @@ public class TokenService {
         Date issuedAt = Date.from(now);
         Date expireDate = Date.from(now.plus(expiresMinutes, ChronoUnit.MINUTES));
 
-        String token = Jwts.builder()
-            .subject(username)
-            .issuedAt(issuedAt)
-            .expiration(expireDate)
-            .signWith(Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret)))
-            .compact();
+        String token = Jwts.builder().subject(username).issuedAt(issuedAt).expiration(expireDate)
+            .signWith(Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret))).compact();
 
         return new AuthenticationDto(token, "Bearer", expireDate);
     }

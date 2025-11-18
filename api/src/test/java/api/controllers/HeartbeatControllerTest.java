@@ -22,14 +22,11 @@ public class HeartbeatControllerTest extends BasicContext {
     public void shouldReturnTrue_whenHeartbeat() {
         // GIVEN:
         // WHEN: Call endpoint
-        ResponseEntity<Boolean> responseEntity = testRestTemplate.exchange(
-            url + "/", HttpMethod.GET, null, new ParameterizedTypeReference<Boolean>() {}
-        );
+        ResponseEntity<Boolean> responseEntity =
+            testRestTemplate.exchange(url + "/", HttpMethod.GET, null, new ParameterizedTypeReference<Boolean>() {});
 
         // THEN: Returns OK and true
-        assertAll(
-            () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
-            () -> assertEquals(true, responseEntity.getBody())
-        );
+        assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+            () -> assertEquals(true, responseEntity.getBody()));
     }
 }

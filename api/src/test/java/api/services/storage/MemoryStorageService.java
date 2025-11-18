@@ -6,11 +6,11 @@ import java.io.InputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import api.exceptions.StorageException;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link MemoryStorageService}.

@@ -43,12 +43,12 @@ public class SimpleStorageServiceTest extends BasicContext {
             for (byte[] data : streams) {
                 // Correct size
                 if (data != null) {
-                    permutations.add(new Object[]{key, data, data.length});
+                    permutations.add(new Object[] {key, data, data.length});
                 }
 
                 // Other sizes
                 for (long size : sizes) {
-                    permutations.add(new Object[]{key, data, size});
+                    permutations.add(new Object[] {key, data, size});
                 }
             }
         }
@@ -105,21 +105,16 @@ public class SimpleStorageServiceTest extends BasicContext {
 
         assertAll(
             // Downloads match
-            IntStream.range(0, downloads[0].length)
-                .boxed()
-                .flatMap(j ->
-                    IntStream.range(1, storages.size())
-                        .mapToObj(i -> (Executable) () -> {
-                            if (downloads[0][j] != null) {
-                                assertEquals(downloads[0][j], downloads[i][j],
-                                    "Download " + j + " mismatch between storage 0 and " + i);
-                            } else {
-                                assertNull(downloads[i][j],
-                                    "Download " + j + " failed for storage 0, but succeeded for storage " + i);
-                            }
-                        })
-                )
-        );
+            IntStream.range(0, downloads[0].length).boxed()
+                .flatMap(j -> IntStream.range(1, storages.size()).mapToObj(i -> (Executable) () -> {
+                    if (downloads[0][j] != null) {
+                        assertEquals(downloads[0][j], downloads[i][j],
+                            "Download " + j + " mismatch between storage 0 and " + i);
+                    } else {
+                        assertNull(downloads[i][j],
+                            "Download " + j + " failed for storage 0, but succeeded for storage " + i);
+                    }
+                })));
     }
 
     @ParameterizedTest
@@ -186,37 +181,29 @@ public class SimpleStorageServiceTest extends BasicContext {
 
         List<Executable> all = Stream.concat(
             // Downloads match
-            IntStream.range(0, downloads[0].length)
-                .boxed()
-                .flatMap(j ->
-                    IntStream.range(1, storages.size())
-                        .mapToObj(i -> (Executable) () -> {
-                            if (downloads[0][j] != null) {
-                                assertEquals(downloads[0][j], downloads[i][j],
-                                    "Download " + j + " mismatch between storage 0 and " + i);
-                            } else {
-                                assertNull(downloads[i][j],
-                                    "Download " + j + " failed for storage 0, but succeeded for storage " + i);
-                            }
-                        })
-                ),
+            IntStream.range(0, downloads[0].length).boxed()
+                .flatMap(j -> IntStream.range(1, storages.size()).mapToObj(i -> (Executable) () -> {
+                    if (downloads[0][j] != null) {
+                        assertEquals(downloads[0][j], downloads[i][j],
+                            "Download " + j + " mismatch between storage 0 and " + i);
+                    } else {
+                        assertNull(downloads[i][j],
+                            "Download " + j + " failed for storage 0, but succeeded for storage " + i);
+                    }
+                })),
 
             // Exceptions match
-            IntStream.range(0, exceptions[0].length)
-                .boxed()
-                .flatMap(j ->
-                    IntStream.range(1, storages.size())
-                        .mapToObj(i -> (Executable) () -> {
-                            if (exceptions[0][j] != null) {
-                                assertEquals(exceptions[0][j].getClass(), exceptions[i][j].getClass(),
-                                    "Step " + j + " exception mismatch between storage 0 and " + i);
-                            } else {
-                                assertNull(exceptions[i][j],
-                                    "Step " + j + " no exception for storage 0, but exception for storage " + i);
-                            }
-                        })
-                )
-        ).toList();
+            IntStream.range(0, exceptions[0].length).boxed()
+                .flatMap(j -> IntStream.range(1, storages.size()).mapToObj(i -> (Executable) () -> {
+                    if (exceptions[0][j] != null) {
+                        assertEquals(exceptions[0][j].getClass(), exceptions[i][j].getClass(),
+                            "Step " + j + " exception mismatch between storage 0 and " + i);
+                    } else {
+                        assertNull(exceptions[i][j],
+                            "Step " + j + " no exception for storage 0, but exception for storage " + i);
+                    }
+                })))
+            .toList();
 
         assertAll(all);
     }
