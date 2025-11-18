@@ -10,6 +10,13 @@ import java.util.Base64;
 import java.util.Date;
 import java.util.UUID;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -20,13 +27,6 @@ import api.entities.RefreshToken;
 import api.entities.User;
 import api.exceptions.RefreshTokenException;
 import api.repositories.RefreshTokenRepository;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtParser;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
-import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link TokenService}.
@@ -57,10 +57,8 @@ public class TokenService {
      */
     @PostConstruct
     public void init() {
-        parser = Jwts.parser()
-            .clock(() -> Date.from(Instant.now(clock)))
-            .verifyWith(Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret)))
-            .build();
+        parser = Jwts.parser().clock(() -> Date.from(Instant.now(clock)))
+            .verifyWith(Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret))).build();
     }
 
     /**
@@ -75,12 +73,8 @@ public class TokenService {
         Date issuedAt = Date.from(now);
         Date expireDate = Date.from(now.plus(accessTokenExpiresMinutes, ChronoUnit.MINUTES));
 
-        String accessToken = Jwts.builder()
-            .subject(username)
-            .issuedAt(issuedAt)
-            .expiration(expireDate)
-            .signWith(Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret)))
-            .compact();
+        String accessToken = Jwts.builder().subject(username).issuedAt(issuedAt).expiration(expireDate)
+            .signWith(Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret))).compact();
         return new AuthenticationDto(accessToken, "Bearer", expireDate);
     }
 
@@ -92,21 +86,16 @@ public class TokenService {
      */
     @Transactional
     public RefreshToken generateRefreshToken(User user) {
-        return refreshTokenRepository.findByUser(user)
-            .map(this::regenerateRefreshToken)
-            .orElseGet(() -> {
-                String rawToken = UUID.randomUUID().toString();
-                String hashed = hash(rawToken);
+        return refreshTokenRepository.findByUser(user).map(this::regenerateRefreshToken).orElseGet(() -> {
+            String rawToken = UUID.randomUUID().toString();
+            String hashed = hash(rawToken);
 
-                RefreshToken newToken = RefreshToken.builder()
-                    .user(user)
-                    .expires(Instant.now(clock).plus(refreshTokenExpiresDays, ChronoUnit.DAYS))
-                    .token(hashed)
-                    .rawToken(rawToken)
-                    .build();
+            RefreshToken newToken = RefreshToken.builder().user(user)
+                .expires(Instant.now(clock).plus(refreshTokenExpiresDays, ChronoUnit.DAYS)).token(hashed)
+                .rawToken(rawToken).build();
 
-                return refreshTokenRepository.save(newToken);
-            });
+            return refreshTokenRepository.save(newToken);
+        });
     }
 
     /**
@@ -117,8 +106,8 @@ public class TokenService {
      */
     @Transactional
     public RefreshToken validateAndRegenerate(String refreshToken) {
-        RefreshToken token = refreshTokenRepository.findByToken(hash(refreshToken))
-            .orElseThrow(() -> new RefreshTokenException());
+        RefreshToken token =
+            refreshTokenRepository.findByToken(hash(refreshToken)).orElseThrow(() -> new RefreshTokenException());
 
         if (token.getExpires().isBefore(Instant.now(clock))) {
             refreshTokenRepository.delete(token);
@@ -138,8 +127,7 @@ public class TokenService {
      */
     @Transactional
     public void invalidate(String refreshToken) {
-        refreshTokenRepository.findByToken(hash(refreshToken))
-            .ifPresent(refreshTokenRepository::delete);
+        refreshTokenRepository.findByToken(hash(refreshToken)).ifPresent(refreshTokenRepository::delete);
     }
 
     /**

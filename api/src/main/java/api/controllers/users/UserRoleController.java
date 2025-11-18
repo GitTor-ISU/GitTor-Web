@@ -5,6 +5,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,13 +30,6 @@ import api.entities.User;
 import api.mapper.RoleMapper;
 import api.services.RoleService;
 import api.services.UserService;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * {@link UserRoleController}.
@@ -52,41 +52,21 @@ public class UserRoleController {
      * @return {@link List} of {@link RoleDto}
      */
     // region
-    @Operation(
-        summary = "Get User's Roles",
-        description = "Get list of roles applied to a user."
-    )
+    @Operation(summary = "Get User's Roles", description = "Get list of roles applied to a user.")
     @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            content = @Content(
-                array = @ArraySchema(schema = @Schema(implementation = RoleDto.class)),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "403",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-    })
+        @ApiResponse(responseCode = "200",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = RoleDto.class)),
+                mediaType = "application/json")),
+        @ApiResponse(responseCode = "403",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "404",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @GetMapping("")
     @PreAuthorize("hasAuthority(@DbSetup.USER_READ) and hasAuthority(@DbSetup.ROLE_READ)")
     public List<RoleDto> getUserRoles(@PathVariable int userId) {
         Set<Role> roles = userService.getRoles(userId);
-        return roles.stream()
-            .map(roleMapper::toDto)
-            .collect(Collectors.toList());
+        return roles.stream().map(roleMapper::toDto).collect(Collectors.toList());
     }
 
     /**
@@ -98,43 +78,19 @@ public class UserRoleController {
      * @apiNote Does not throw error if roles not found
      */
     // region
-    @Operation(
-        summary = "Set User's Roles",
-        description = "Set list of roles applied to a user."
-            + "<ul>"
-                + "<li>If a role ID is not found in the system, it will not be applied to the user.</li>"
-            + "</ul>"
-    )
+    @Operation(summary = "Set User's Roles",
+        description = "Set list of roles applied to a user." + "<ul>"
+            + "<li>If a role ID is not found in the system, it will not be applied to the user.</li>" + "</ul>")
     @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            content = @Content(
-                array = @ArraySchema(schema = @Schema(implementation = RoleDto.class)),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "403",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "409",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-    })
+        @ApiResponse(responseCode = "200",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = RoleDto.class)),
+                mediaType = "application/json")),
+        @ApiResponse(responseCode = "403",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "404",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "409",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @PostMapping("")
     @PreAuthorize("hasAuthority(@DbSetup.USER_WRITE) and hasAuthority(@DbSetup.ROLE_READ)")
@@ -145,9 +101,7 @@ public class UserRoleController {
         user.setRoles(roles);
         userService.save(user);
 
-        return userService.getRoles(userId).stream()
-            .map(roleMapper::toDto)
-            .collect(Collectors.toList());
+        return userService.getRoles(userId).stream().map(roleMapper::toDto).collect(Collectors.toList());
     }
 
     /**
@@ -160,37 +114,18 @@ public class UserRoleController {
      * @apiNote Does not throw error if roles not found
      */
     // region
-    @Operation(
-        summary = "Add User's Roles",
-        description = "Add list of roles applied to a user."
-            + "<ul>"
-                + "<li>If a role ID is not found in the system, it will not be applied to the user.</li>"
-                + "<li>If a role ID is already applied to the user, it will remain applied.</li>"
-            + "</ul>"
-    )
+    @Operation(summary = "Add User's Roles",
+        description = "Add list of roles applied to a user." + "<ul>"
+            + "<li>If a role ID is not found in the system, it will not be applied to the user.</li>"
+            + "<li>If a role ID is already applied to the user, it will remain applied.</li>" + "</ul>")
     @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            content = @Content(
-                array = @ArraySchema(schema = @Schema(implementation = RoleDto.class)),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "403",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-    })
+        @ApiResponse(responseCode = "200",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = RoleDto.class)),
+                mediaType = "application/json")),
+        @ApiResponse(responseCode = "403",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "404",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @PutMapping("")
     @PreAuthorize("""
@@ -206,9 +141,7 @@ public class UserRoleController {
         user.setRoles(roles);
         userService.save(user);
 
-        return userService.getRoles(userId).stream()
-            .map(roleMapper::toDto)
-            .collect(Collectors.toList());
+        return userService.getRoles(userId).stream().map(roleMapper::toDto).collect(Collectors.toList());
     }
 
     /**
@@ -220,50 +153,21 @@ public class UserRoleController {
      * @apiNote Does not throw error if user does not have specified role
      */
     // region
-    @Operation(
-        summary = "Remove User's Roles",
-        description = "Remove list of roles applied to a user."
-            + "<ul>"
-                + "<li>If a role ID is not applied to the user, it will remain not applied.</li>"
-            + "</ul>"
-    )
+    @Operation(summary = "Remove User's Roles",
+        description = "Remove list of roles applied to a user." + "<ul>"
+            + "<li>If a role ID is not applied to the user, it will remain not applied.</li>" + "</ul>")
     @ApiResponses({
-        @ApiResponse(
-            responseCode = "200",
-            content = @Content(
-                array = @ArraySchema(schema = @Schema(implementation = RoleDto.class)),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "400",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "403",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "404",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-        @ApiResponse(
-            responseCode = "409",
-            content = @Content(
-                schema = @Schema(implementation = ErrorDto.class),
-                mediaType = "application/json"
-            )
-        ),
-    })
+        @ApiResponse(responseCode = "200",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = RoleDto.class)),
+                mediaType = "application/json")),
+        @ApiResponse(responseCode = "400",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "403",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "404",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "409",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @DeleteMapping("")
     @PreAuthorize("""
@@ -276,15 +180,13 @@ public class UserRoleController {
         roles.removeAll(roleService.get(roleIds));
         if (!roles.contains(roleService.get(RoleService.USER_ROLE_NAME))) {
             throw new IllegalArgumentException(
-                    "Role '" + RoleService.USER_ROLE_NAME + "' cannot be removed from users.");
+                "Role '" + RoleService.USER_ROLE_NAME + "' cannot be removed from users.");
         }
 
         User user = userService.get(userId);
         user.setRoles(roles);
         userService.save(user);
 
-        return userService.getRoles(userId).stream()
-            .map(roleMapper::toDto)
-            .collect(Collectors.toList());
+        return userService.getRoles(userId).stream().map(roleMapper::toDto).collect(Collectors.toList());
     }
 }

@@ -2,6 +2,10 @@ package api.components;
 
 import java.io.IOException;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -15,10 +19,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import api.services.TokenService;
 import api.services.UserService;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * {@link TokenFilter}.
@@ -32,11 +32,8 @@ public class TokenFilter extends OncePerRequestFilter {
     private UserService userService;
 
     @Override
-    protected void doFilterInternal(
-        @NonNull HttpServletRequest request,
-        @NonNull HttpServletResponse response,
-        @NonNull FilterChain filterChain
-    ) throws ServletException, IOException {
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+        @NonNull FilterChain filterChain) throws ServletException, IOException {
         try {
             String token = getTokenFromRequest(request);
 
@@ -60,8 +57,6 @@ public class TokenFilter extends OncePerRequestFilter {
     private String getTokenFromRequest(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
 
-        return StringUtils.hasText(token) && token.startsWith("Bearer ")
-            ? token.substring(7, token.length())
-            : null;
+        return StringUtils.hasText(token) && token.startsWith("Bearer ") ? token.substring(7, token.length()) : null;
     }
 }

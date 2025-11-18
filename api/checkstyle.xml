@@ -326,6 +326,13 @@
     <module name="OverloadMethodsDeclarationOrder"/>
     <module name="ConstructorsDeclarationGrouping"/>
     <module name="VariableDeclarationUsageDistance"/>
+    <module name="CustomImportOrder">
+      <property name="sortImportsInGroupAlphabetically" value="true"/>
+      <property name="separateLineBetweenGroups" value="true"/>
+      <property name="customImportOrderRules"
+        value="STATIC, STANDARD_JAVA_PACKAGE, THIRD_PARTY_PACKAGE"/>
+      <property name="thirdPartyPackageRegExp" value="^(?!api\.).+"/>
+    </module>
     <module name="MethodParamPad">
       <property name="tokens"
                value="CTOR_DEF, LITERAL_NEW, METHOD_CALL, METHOD_DEF, CTOR_CALL,
@@ -375,7 +382,8 @@
                value="^@return the *|^This method returns |^A [{]@code [a-zA-Z0-9]+[}]( is a )"/>
     </module>
     <module name="JavadocParagraph">
-      <property name="allowNewlineParagraph" value="false"/>
+      <property name="allowNewlineParagraph" value="true"/>
+      <property name="violateExecutionOnNonTightHtml" value="true"/>
     </module>
     <module name="RequireEmptyLineBeforeBlockTagGroup"/>
     <module name="AtclauseOrder">

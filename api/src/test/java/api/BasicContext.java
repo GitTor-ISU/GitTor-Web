@@ -6,6 +6,8 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 
+import com.navercorp.fixturemonkey.FixtureMonkey;
+import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,23 +16,17 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import com.navercorp.fixturemonkey.FixtureMonkey;
-
 import api.dtos.AuthenticationDto;
 import api.services.FixtureService;
 import api.services.TokenService;
-import jakarta.annotation.PostConstruct;
 
 /**
  * Baseline configurations for all controller tests.
  */
-@SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = """
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = """
         api.s3.max=2048
         api.s3.avatar.max=1024
-    """
-)
+    """)
 public abstract class BasicContext {
     @Autowired
     private TokenService tokenService;
