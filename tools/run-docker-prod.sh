@@ -9,20 +9,8 @@ export API_ADMIN_USERNAME=admin
 export API_ADMIN_EMAIL=admin@gittor
 export API_ADMIN_PASSWORD=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c16)
 
-# Building containers (mostly generating Open API code for the frontend)
 docker compose -f "$ROOT_DIR/compose.yml" -f "$ROOT_DIR/compose.dev.yml" down
-docker compose -f "$ROOT_DIR/compose.yml" -f "$ROOT_DIR/compose.dev.yml" up --build -d api
-echo "Waiting for API to be healthy..."
-until [ "$(docker inspect -f '{{.State.Health.Status}}' "$(docker compose ps -q api)")" = "healthy" ]; do
-    sleep 1
-done
-docker compose -f "$ROOT_DIR/compose.yml" build --build-arg CACHEBUST=$(date +%s) ui
-
-# Remove extra containers and extra exposed ports
-docker compose -f "$ROOT_DIR/compose.yml" down
-
-# Start up production application
-docker compose -f "$ROOT_DIR/compose.yml" up -d
+docker compose -f "$ROOT_DIR/compose.yml" up --build -d
 
 echo "API_ADMIN_USERNAME: $API_ADMIN_USERNAME"
 echo "API_ADMIN_EMAIL: $API_ADMIN_EMAIL"
