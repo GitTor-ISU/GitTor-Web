@@ -99,7 +99,7 @@ export class Repository implements OnInit {
   protected readonly lastCommitAuthor = signal<string>('john-doe');
   protected readonly lastCommitMessage = signal<string>('Initial commit');
   protected readonly lastCommitTime = signal<string>('2 days ago');
-  protected readonly cloneUrl = signal<string>('https://git.gittor.com/john-doe/awesol');
+  protected readonly cloneUrl = signal<string>(window.location.href);
 
   protected readonly activeTab = signal<string>('code');
 
