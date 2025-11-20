@@ -5,7 +5,6 @@ import { Home } from '@features/home/home';
 import { NotFound } from '@features/not-found/not-found';
 import { RepositoryList } from '@features/repository-list/repository-list';
 import { Repository } from '@features/repository/repository';
-import { AuthLayout } from './layouts/auth-layout/auth-layout';
 import { MainLayout } from './layouts/main-layout/main-layout';
 
 export const routes: Routes = [
