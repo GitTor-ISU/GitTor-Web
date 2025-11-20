@@ -113,30 +113,6 @@ public class TorrentController {
     }
 
     /**
-     * Get my uploaded torrents.
-     *
-     * @param user Current user
-     * @param page Page number (0-indexed)
-     * @param size Page size
-     * @return List of {@link TorrentDto}
-     */
-    // region
-    @Operation(summary = "List My Torrents", description = "Get torrents uploaded by current user.")
-    @ApiResponses({@ApiResponse(responseCode = "200",
-        content = @Content(schema = @Schema(implementation = TorrentDto.class), mediaType = "application/json"))})
-    // endregion
-    @GetMapping("/me")
-    public List<TorrentDto> getMyTorrents(@AuthenticationPrincipal User user,
-        @RequestParam(defaultValue = "0") int page, @RequestParam(required = false) Integer size) {
-        int requestedSize = size != null ? size : defaultPageSize;
-        int safeSize = Math.min(requestedSize, maxPageSize);
-
-        Pageable pageable = PageRequest.of(page, safeSize, Sort.by("createdAt").descending());
-
-        return torrentService.getAllByUploader(user, pageable).map(torrentMapper::toDto).getContent();
-    }
-
-    /**
      * Get torrent by id.
      *
      * @param id Torrent id
@@ -153,6 +129,27 @@ public class TorrentController {
     @GetMapping("/{id}")
     public TorrentDto getTorrent(@PathVariable Long id) {
         Torrent torrent = torrentService.get(id);
+        return torrentMapper.toDto(torrent);
+    }
+
+    /**
+     * Update torrent metadata.
+     *
+     * @param id Torrent id
+     * @param updateDto Update data
+     * @return {@link TorrentDto}
+     */
+    // region
+    @Operation(summary = "Update Torrent Metadata", description = "Update torrent name and/or description.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200",
+            content = @Content(schema = @Schema(implementation = TorrentDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "404",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
+    // endregion
+    @PutMapping("/{id}")
+    public TorrentDto updateTorrent(@PathVariable Long id, @RequestPart("metadata") UpdateTorrentDto updateDto) {
+        Torrent torrent = torrentService.updateMetadata(id, updateDto.getName(), updateDto.getDescription());
         return torrentMapper.toDto(torrent);
     }
 
@@ -188,7 +185,7 @@ public class TorrentController {
             content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @GetMapping("/{id}/file")
-    public ResponseEntity<Resource> downloadTorrentFile(@PathVariable Long id) throws IOException {
+    public ResponseEntity<Resource> getTorrentFile(@PathVariable Long id) throws IOException {
         Torrent torrent = torrentService.getWithFile(id);
 
         InputStream in = torrentService.downloadTorrentFile(id);
@@ -223,27 +220,5 @@ public class TorrentController {
     @PutMapping("/{id}/file")
     public void updateTorrentFile(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
         torrentService.updateTorrentFile(id, file);
-    }
-
-    /**
-     * Update torrent metadata.
-     *
-     * @param id Torrent id
-     * @param updateDto Update data
-     * @return {@link TorrentDto}
-     */
-    // region
-    @Operation(summary = "Update Torrent Metadata", description = "Update torrent name and/or description.")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200",
-            content = @Content(schema = @Schema(implementation = TorrentDto.class), mediaType = "application/json")),
-        @ApiResponse(responseCode = "404",
-            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
-    // endregion
-    @PutMapping("/{id}/metadata")
-    public TorrentDto updateTorrentMetadata(@PathVariable Long id,
-        @RequestPart("metadata") UpdateTorrentDto updateDto) {
-        Torrent torrent = torrentService.updateMetadata(id, updateDto.getName(), updateDto.getDescription());
-        return torrentMapper.toDto(torrent);
     }
 }
