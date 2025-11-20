@@ -33,9 +33,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import api.dtos.CreateTorrentDto;
+import api.dtos.ErrorDto;
 import api.dtos.TorrentDto;
 import api.dtos.UpdateTorrentDto;
-import api.dtos.ErrorDto;
 import api.entities.Torrent;
 import api.entities.User;
 import api.mapper.TorrentMapper;
@@ -64,13 +64,8 @@ public class TorrentController {
     private static final String TORRENT_MIME_TYPE = "application/x-bittorrent";
 
     /**
-     * Upload new torrent.
-     *
-     * APPROACH 1: Using @RequestPart for JSON metadata + file (recommended) This keeps the API clean
-     * and properly typed.
-     *
-     * Client sends multipart/form-data with: - "metadata" part (application/json) - "file" part
-     * (application/x-bittorrent)
+     * Upload new torrent. Client sends multipart/form-data with: - "metadata" part (application/json) -
+     * "file" part (application/x-bittorrent)
      *
      * @param user Current user
      * @param metadata Torrent metadata
@@ -84,7 +79,7 @@ public class TorrentController {
         @ApiResponse(responseCode = "200",
             content = @Content(schema = @Schema(implementation = TorrentDto.class), mediaType = "application/json")),
         @ApiResponse(responseCode = "400",
-            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),})
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public TorrentDto uploadTorrent(@AuthenticationPrincipal User user,
@@ -93,34 +88,6 @@ public class TorrentController {
         Torrent torrent = torrentService.create(metadata.getName(), metadata.getDescription(), user, file);
         return torrentMapper.toDto(torrent);
     }
-
-    /**
-     * Upload new torrent (Alternative approach).
-     *
-     * APPROACH 2: Using @RequestParam for all fields (simpler, follows avatar pattern) This is simpler
-     * but less type-safe.
-     *
-     * Uncomment this and comment out the above method if you prefer this approach.
-     *
-     * @param user Current user
-     * @param name Torrent name
-     * @param description Torrent description
-     * @param file Torrent file
-     * @return {@link TorrentDto}
-     * @throws IOException if file cannot be read
-     */
-    /*
-     * @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE) public TorrentDto uploadTorrent(
-     *
-     * @AuthenticationPrincipal User user,
-     *
-     * @RequestParam("name") String name,
-     *
-     * @RequestParam(value = "description", required = false) String description,
-     *
-     * @RequestParam("file") MultipartFile file ) throws IOException { Torrent torrent =
-     * torrentService.create(name, description, user, file); return torrentMapper.toDto(torrent); }
-     */
 
     /**
      * Get all torrents with pagination.
@@ -132,7 +99,7 @@ public class TorrentController {
     // region
     @Operation(summary = "List Torrents", description = "Get all torrents with pagination.")
     @ApiResponses({@ApiResponse(responseCode = "200",
-        content = @Content(schema = @Schema(implementation = TorrentDto.class), mediaType = "application/json")),})
+        content = @Content(schema = @Schema(implementation = TorrentDto.class), mediaType = "application/json"))})
     // endregion
     @GetMapping("")
     public List<TorrentDto> getAllTorrents(@RequestParam(defaultValue = "0") int page,
@@ -156,7 +123,7 @@ public class TorrentController {
     // region
     @Operation(summary = "List My Torrents", description = "Get torrents uploaded by current user.")
     @ApiResponses({@ApiResponse(responseCode = "200",
-        content = @Content(schema = @Schema(implementation = TorrentDto.class), mediaType = "application/json")),})
+        content = @Content(schema = @Schema(implementation = TorrentDto.class), mediaType = "application/json"))})
     // endregion
     @GetMapping("/me")
     public List<TorrentDto> getMyTorrents(@AuthenticationPrincipal User user,
@@ -181,7 +148,7 @@ public class TorrentController {
         @ApiResponse(responseCode = "200",
             content = @Content(schema = @Schema(implementation = TorrentDto.class), mediaType = "application/json")),
         @ApiResponse(responseCode = "404",
-            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),})
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @GetMapping("/{id}")
     public TorrentDto getTorrent(@PathVariable Long id) {
@@ -200,7 +167,7 @@ public class TorrentController {
         @ApiResponse(responseCode = "200",
             content = @Content(schema = @Schema(implementation = Void.class), mediaType = "application/json")),
         @ApiResponse(responseCode = "404",
-            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),})
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @DeleteMapping("/{id}")
     public void deleteTorrent(@PathVariable Long id) {
@@ -218,7 +185,7 @@ public class TorrentController {
     @Operation(summary = "Download Torrent File", description = "Download the actual .torrent file.")
     @ApiResponses({@ApiResponse(responseCode = "200", content = @Content(mediaType = "application/x-bittorrent")),
         @ApiResponse(responseCode = "404",
-            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),})
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @GetMapping("/{id}/file")
     public ResponseEntity<Resource> downloadTorrentFile(@PathVariable Long id) throws IOException {
@@ -251,7 +218,7 @@ public class TorrentController {
         @ApiResponse(responseCode = "400",
             content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
         @ApiResponse(responseCode = "404",
-            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),})
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @PutMapping("/{id}/file")
     public void updateTorrentFile(@PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
@@ -271,7 +238,7 @@ public class TorrentController {
         @ApiResponse(responseCode = "200",
             content = @Content(schema = @Schema(implementation = TorrentDto.class), mediaType = "application/json")),
         @ApiResponse(responseCode = "404",
-            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),})
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @PutMapping("/{id}/metadata")
     public TorrentDto updateTorrentMetadata(@PathVariable Long id,

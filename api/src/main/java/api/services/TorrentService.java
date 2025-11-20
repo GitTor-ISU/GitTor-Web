@@ -55,17 +55,6 @@ public class TorrentService {
     }
 
     /**
-     * Find torrent by id with file eager loaded.
-     *
-     * @param id Torrent id
-     * @return {@link Optional} {@link Torrent}
-     */
-    @Transactional(readOnly = true)
-    public Optional<Torrent> findWithFile(Long id) {
-        return torrentRepository.findByIdWithFile(id);
-    }
-
-    /**
      * Find torrent by name.
      *
      * @param name Torrent name
@@ -74,6 +63,17 @@ public class TorrentService {
     @Transactional(readOnly = true)
     public Optional<Torrent> find(String name) {
         return torrentRepository.findByName(name);
+    }
+
+    /**
+     * Find torrent by id with file eager loaded.
+     *
+     * @param id Torrent id
+     * @return {@link Optional} {@link Torrent}
+     */
+    @Transactional(readOnly = true)
+    public Optional<Torrent> findWithFile(Long id) {
+        return torrentRepository.findByIdWithFile(id);
     }
 
     /**
@@ -89,18 +89,6 @@ public class TorrentService {
     }
 
     /**
-     * Get torrent by id with file eager loaded.
-     *
-     * @param id Torrent id
-     * @return {@link Torrent}
-     * @throws EntityNotFoundException if torrent not found
-     */
-    @Transactional(readOnly = true)
-    public Torrent getWithFile(Long id) {
-        return findWithFile(id).orElseThrow(() -> EntityNotFoundException.fromTorrent(id));
-    }
-
-    /**
      * Get torrent by name.
      *
      * @param name Torrent name
@@ -110,6 +98,18 @@ public class TorrentService {
     @Transactional(readOnly = true)
     public Torrent get(String name) {
         return find(name).orElseThrow(() -> EntityNotFoundException.fromTorrent(name));
+    }
+
+    /**
+     * Get torrent by id with file eager loaded.
+     *
+     * @param id Torrent id
+     * @return {@link Torrent}
+     * @throws EntityNotFoundException if torrent not found
+     */
+    @Transactional(readOnly = true)
+    public Torrent getWithFile(Long id) {
+        return findWithFile(id).orElseThrow(() -> EntityNotFoundException.fromTorrent(id));
     }
 
     /**
@@ -219,7 +219,7 @@ public class TorrentService {
         Torrent torrent = get(id);
         validateTorrentFile(file);
 
-        S3Object oldFile = torrent.getFile();
+        final S3Object oldFile = torrent.getFile();
 
         MimeType mimeType = mimeTypeService.getOrCreateByName(TORRENT_MIME_TYPE);
         S3Object newFile =
