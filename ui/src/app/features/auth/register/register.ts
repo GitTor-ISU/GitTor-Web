@@ -1,14 +1,16 @@
-import { Component, inject, OnDestroy, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { Auth } from '@core/auth';
+import SessionService from '@core/session-service';
+import { RegisterDto } from '@generated/openapi/models/register-dto';
+import { Logo } from '@shared/components/logo/logo';
 import { ZardButtonComponent } from '@shared/components/z-button/button.component';
 import { ZardCardComponent } from '@shared/components/z-card/card.component';
 import { ZardFormModule } from '@shared/components/z-form/form.module';
 import { ZardInputDirective } from '@shared/components/z-input/input.directive';
 import { passwordMatchValidator } from '@shared/password-match-validator';
 import { GitBranchIcon, LucideAngularModule } from 'lucide-angular';
-import { Subscription } from 'rxjs';
 
 /**
  * Register component.
@@ -23,23 +25,36 @@ import { Subscription } from 'rxjs';
     ZardButtonComponent,
     ZardInputDirective,
     RouterLink,
+    Logo,
   ],
   templateUrl: './register.html',
 })
-export class Register implements OnDestroy {
+export class Register {
   protected readonly logoIcon = GitBranchIcon;
 
   protected registerForm = new FormGroup(
     {
-      username: new FormControl('', [
-        Validators.required,
-        Validators.minLength(3),
-        Validators.maxLength(20),
-        Validators.pattern(/^[a-zA-Z0-9_-]*$/),
-      ]),
-      email: new FormControl('', [Validators.required, Validators.email]),
-      password: new FormControl('', [Validators.required, Validators.minLength(8)]),
-      confirmPassword: new FormControl('', [Validators.required]),
+      username: new FormControl<string>('', {
+        validators: [
+          Validators.required,
+          Validators.minLength(3),
+          Validators.maxLength(20),
+          Validators.pattern(/^[a-zA-Z0-9_-]*$/),
+        ],
+        nonNullable: true,
+      }),
+      email: new FormControl<string>('', {
+        validators: [Validators.required, Validators.maxLength(255), Validators.email],
+        nonNullable: true,
+      }),
+      password: new FormControl<string>('', {
+        validators: [Validators.required, Validators.minLength(8), Validators.maxLength(72)],
+        nonNullable: true,
+      }),
+      confirmPassword: new FormControl<string>('', {
+        validators: [Validators.required],
+        nonNullable: true,
+      }),
     },
     { validators: passwordMatchValidator }
   );
@@ -50,22 +65,15 @@ export class Register implements OnDestroy {
   protected readonly confirmPasswordErrorMessage = signal('');
 
   private readonly router: Router = inject(Router);
-  private readonly auth: Auth = inject(Auth);
-  private subscriptions: Subscription[] = [];
+  private readonly sessionService: SessionService = inject(SessionService);
 
   public constructor() {
-    const formErrorSubscription = this.registerForm.valueChanges.subscribe(() => {
-      this.usernameErrorMessage.set(this._getErrorMessage('username'));
-      this.emailErrorMessage.set(this._getErrorMessage('email'));
-      this.passwordErrorMessage.set(this._getErrorMessage('password'));
-      this.confirmPasswordErrorMessage.set(this._getErrorMessage('confirmPassword'));
+    this.registerForm.valueChanges.pipe(takeUntilDestroyed()).subscribe(() => {
+      this.usernameErrorMessage.set(this.getErrorMessage('username'));
+      this.emailErrorMessage.set(this.getErrorMessage('email'));
+      this.passwordErrorMessage.set(this.getErrorMessage('password'));
+      this.confirmPasswordErrorMessage.set(this.getErrorMessage('confirmPassword'));
     });
-
-    this.subscriptions.push(formErrorSubscription);
-  }
-
-  public ngOnDestroy(): void {
-    this.subscriptions.forEach((sub) => sub.unsubscribe());
   }
 
   protected onSubmit(): void {
@@ -73,12 +81,15 @@ export class Register implements OnDestroy {
       return;
     }
 
-    console.log('Form submitted:', this.registerForm.value);
-    this.auth.setToken('token');
-    this.router.navigate(['']);
+    const { username, password, email } = this.registerForm.getRawValue();
+    const register: RegisterDto = { username, password, email };
+
+    this.sessionService.register(register).then(() => {
+      this.router.navigate(['/']);
+    });
   }
 
-  private _getErrorMessage(controlName: string): string {
+  private getErrorMessage(controlName: string): string {
     if (controlName === 'confirmPassword' && this.registerForm.hasError('passwordMismatch')) {
       return 'Passwords do not match.';
     }

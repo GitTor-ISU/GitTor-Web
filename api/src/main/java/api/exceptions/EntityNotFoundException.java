@@ -15,13 +15,13 @@ public class EntityNotFoundException extends RuntimeException {
     }
 
     /**
-     * Generate exception from user.
+     * Generate exception from username or email.
      *
-     * @param username username
+     * @param identifier Identifier
      * @return {@link EntityNotFoundException}
      */
-    public static EntityNotFoundException fromUser(String username) {
-        return new EntityNotFoundException("User '" + username + "' not found.");
+    public static EntityNotFoundException fromUser(String identifier) {
+        return new EntityNotFoundException("User '" + identifier + "' not found.");
     }
 
     /**

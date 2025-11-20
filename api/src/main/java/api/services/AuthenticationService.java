@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import api.dtos.RegisterDto;
 import api.entities.Role;
@@ -33,23 +32,17 @@ public class AuthenticationService {
      */
     @Transactional
     public User register(RegisterDto registerDto) {
-        if (!StringUtils.hasText(registerDto.getUsername())) {
-            throw new IllegalArgumentException("Username must not be empty.");
-        }
-        if (!StringUtils.hasText(registerDto.getPassword())) {
-            throw new IllegalArgumentException("Password must not be empty.");
+        if (userService.exists(registerDto.getEmail())) {
+            throw DuplicateEntityException.fromEmail(registerDto.getEmail());
         }
         if (userService.exists(registerDto.getUsername())) {
-            throw DuplicateEntityException.fromUser(registerDto.getUsername());
+            throw DuplicateEntityException.fromUsername(registerDto.getUsername());
         }
 
         Role userRole = roleService.get(RoleService.USER_ROLE_NAME);
 
-        User user = User.builder()
-            .username(registerDto.getUsername())
-            .password(encoder.encode(registerDto.getPassword()))
-            .roles(Set.of(userRole))
-            .build();
+        User user = User.builder().email(registerDto.getEmail()).username(registerDto.getUsername())
+            .password(encoder.encode(registerDto.getPassword())).roles(Set.of(userRole)).build();
 
         return userService.save(user);
     }

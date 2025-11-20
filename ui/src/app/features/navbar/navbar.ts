@@ -1,12 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, inject, OnInit, signal } from '@angular/core';
-import { Auth } from '@core/auth';
+import { Component, effect, inject, signal } from '@angular/core';
+import SessionService from '@core/session-service';
 import { ZardButtonComponent } from '@shared/components/z-button/button.component';
 import { MenuItem } from '@shared/components/z-menu/menu-item.directive';
 import { ZardMenuModule } from '@shared/components/z-menu/menu.module';
 
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
+import { UserDto } from '@generated/openapi/models/user-dto';
+import { UsersService } from '@generated/openapi/services/users';
 import { ThemeToggle } from '@shared/components/theme-toggle/theme-toggle';
+import { ZardAlertDialogService } from '@shared/components/z-alert-dialog/alert-dialog.service';
 import { ZardDividerComponent } from '@shared/components/z-divider/divider.component';
 import {
   BookAIcon,
@@ -17,6 +20,8 @@ import {
   MenuIcon,
   UserCogIcon,
 } from 'lucide-angular';
+import { toast } from 'ngx-sonner';
+import { firstValueFrom } from 'rxjs';
 
 /**
  * Navbar component
@@ -34,8 +39,9 @@ import {
   ],
   templateUrl: './navbar.html',
 })
-export class Navbar implements OnInit {
-  protected readonly isLoggedIn = signal(false);
+export class Navbar {
+  private static readonly DEBOUNCE_MARGIN: number = 10;
+  protected readonly sessionService: SessionService = inject(SessionService);
   protected readonly isVisible = signal(true);
 
   protected userIcon = UserCogIcon;
@@ -63,8 +69,8 @@ export class Navbar implements OnInit {
     },
   ];
 
-  private readonly auth: Auth = inject(Auth);
-  private readonly router: Router = inject(Router);
+  private readonly usersService: UsersService = inject(UsersService);
+  private readonly alertDialogService: ZardAlertDialogService = inject(ZardAlertDialogService);
 
   public constructor() {
     effect((onCleanup) => {
@@ -82,7 +88,16 @@ export class Navbar implements OnInit {
           return;
         }
 
-        this.isVisible.set(currentScrollY < lastScrollY);
+        if (currentScrollY < Navbar.DEBOUNCE_MARGIN) {
+          // Top (show)
+          this.isVisible.set(true);
+        } else if (window.innerHeight + currentScrollY >= document.body.offsetHeight - Navbar.DEBOUNCE_MARGIN) {
+          // Bottom (hide)
+          this.isVisible.set(false);
+        } else {
+          // Scroll down (hide)
+          this.isVisible.set(currentScrollY < lastScrollY);
+        }
 
         lastScrollY = currentScrollY;
       };
@@ -95,19 +110,26 @@ export class Navbar implements OnInit {
     });
   }
 
-  public ngOnInit(): void {
-    this.refresh();
-  }
-
   /**
-   * Refresh the sub-components.
+   * Temporary to demonstrate auth.
    */
-  public refresh(): void {
-    this.isLoggedIn.set(this.auth.isLoggedIn());
+  protected async showUser(): Promise<void> {
+    const user: UserDto = await firstValueFrom(this.usersService.getMe());
+
+    this.alertDialogService.confirm({
+      zTitle: `Hello ${user.username}!`,
+      zDescription: `Id: ${user.id}, Email: ${user.email}`,
+      zOkText: 'Delete',
+      zCancelText: 'Back',
+      zOkDestructive: true,
+      zOnOk: () => this.deleteUser(user.username),
+    });
   }
 
-  protected logout(): void {
-    this.auth.removeToken();
-    this.router.navigate(['/login']);
+  private deleteUser(username: string | undefined): void {
+    firstValueFrom(this.usersService.deleteMe()).then(() => {
+      toast.success(`'${username}' was deleted`);
+      this.sessionService.logout();
+    });
   }
 }
