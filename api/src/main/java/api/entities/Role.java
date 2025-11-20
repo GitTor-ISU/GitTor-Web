@@ -40,8 +40,7 @@ public class Role {
 
     @Default
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "roleAuthorities",
-        joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
+    @JoinTable(name = "roleAuthorities", joinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
     private Set<Authority> authorities = new HashSet<>();
 }

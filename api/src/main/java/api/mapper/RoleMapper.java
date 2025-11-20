@@ -52,12 +52,8 @@ public abstract class RoleMapper {
      * @param roleDto Update information
      */
     @Mapping(target = "id", ignore = true)
-    @Mapping(
-        target = "authorities",
-        source = "authorityIds",
-        qualifiedByName = "AuthorityIdstoAuthorities",
-        conditionQualifiedByName = "notNull"
-    )
+    @Mapping(target = "authorities", source = "authorityIds", qualifiedByName = "AuthorityIdstoAuthorities",
+        conditionQualifiedByName = "notNull")
     public abstract void update(@MappingTarget Role role, RoleDto roleDto);
 
     /**
@@ -83,9 +79,7 @@ public abstract class RoleMapper {
         if (authorities == null) {
             return new ArrayList<>();
         }
-        return authorities.stream()
-            .map(Authority::getId)
-            .collect(Collectors.toList());
+        return authorities.stream().map(Authority::getId).collect(Collectors.toList());
     }
 
     /**

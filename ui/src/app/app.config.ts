@@ -1,8 +1,14 @@
-import { provideHttpClient } from '@angular/common/http';
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import {
+  ApplicationConfig,
+  ErrorHandler,
+  provideBrowserGlobalErrorListeners,
+  provideZoneChangeDetection,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 
+import { GlobalErrorHandler } from '@core/global-error-handler';
+import { tokenInterceptor } from '@core/token-interceptor';
 import { Configuration } from '@generated/openapi/configuration';
 import { routes } from './app.routes';
 
@@ -14,6 +20,7 @@ import { routes } from './app.routes';
 export function apiConfigFactory(): Configuration {
   return new Configuration({
     basePath: '/api',
+    withCredentials: true,
   });
 }
 
@@ -22,11 +29,11 @@ export const appConfig: ApplicationConfig = {
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(),
-    provideAnimationsAsync(),
+    provideHttpClient(withInterceptors([tokenInterceptor])),
     {
       provide: Configuration,
       useFactory: apiConfigFactory,
     },
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
   ],
 };

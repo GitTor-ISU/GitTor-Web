@@ -3,6 +3,7 @@ package api.services;
 import java.util.List;
 import java.util.Optional;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -10,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import api.entities.Authority;
 import api.exceptions.EntityNotFoundException;
 import api.repositories.AuthorityRepository;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * {@link AuthorityService}.
@@ -72,8 +72,7 @@ public class AuthorityService {
      */
     @Transactional(readOnly = true)
     public Authority get(int id) {
-        return find(id)
-            .orElseThrow(() -> EntityNotFoundException.fromAuthority(id));
+        return find(id).orElseThrow(() -> EntityNotFoundException.fromAuthority(id));
     }
 
     /**
@@ -84,8 +83,7 @@ public class AuthorityService {
      */
     @Transactional(readOnly = true)
     public Authority get(String authority) {
-        return find(authority)
-            .orElseThrow(() -> EntityNotFoundException.fromAuthority(authority));
+        return find(authority).orElseThrow(() -> EntityNotFoundException.fromAuthority(authority));
     }
 
     /**

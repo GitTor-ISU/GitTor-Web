@@ -28,8 +28,10 @@ public interface UserMapper {
      * @param userDto Update information
      */
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "email", ignore = true)
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "refreshToken", ignore = true)
     @Mapping(target = "authorities", ignore = true)
     @Mapping(target = "avatar", ignore = true)
     public void update(@MappingTarget User user, UserDto userDto);

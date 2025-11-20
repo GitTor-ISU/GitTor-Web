@@ -41,12 +41,8 @@ public class AuthenticationService {
 
         Role userRole = roleService.get(RoleService.USER_ROLE_NAME);
 
-        User user = User.builder()
-            .email(registerDto.getEmail())
-            .username(registerDto.getUsername())
-            .password(encoder.encode(registerDto.getPassword()))
-            .roles(Set.of(userRole))
-            .build();
+        User user = User.builder().email(registerDto.getEmail()).username(registerDto.getUsername())
+            .password(encoder.encode(registerDto.getPassword())).roles(Set.of(userRole)).build();
 
         return userService.save(user);
     }
