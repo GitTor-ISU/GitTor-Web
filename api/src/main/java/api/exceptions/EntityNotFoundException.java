@@ -4,6 +4,7 @@ package api.exceptions;
  * {@link EntityNotFoundException}.
  */
 public class EntityNotFoundException extends RuntimeException {
+
     /**
      * EntityNotFoundException.
      *
@@ -95,5 +96,25 @@ public class EntityNotFoundException extends RuntimeException {
      */
     public static EntityNotFoundException fromAuthority(int id) {
         return new EntityNotFoundException("Authority " + id + " not found.");
+    }
+
+    /**
+     * Generate exception from torrent.
+     *
+     * @param id torrent id
+     * @return {@link EntityNotFoundException}
+     */
+    public static EntityNotFoundException fromTorrent(Long id) {
+        return new EntityNotFoundException("Torrent " + id + " not found.");
+    }
+
+    /**
+     * Generate exception from torrent.
+     *
+     * @param name torrent name
+     * @return {@link EntityNotFoundException}
+     */
+    public static EntityNotFoundException fromTorrent(String name) {
+        return new EntityNotFoundException("Torrent '" + name + "' not found.");
     }
 }
