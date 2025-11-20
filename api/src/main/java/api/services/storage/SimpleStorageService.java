@@ -16,9 +16,7 @@ public interface SimpleStorageService {
      */
     default void validateKey(String key) {
         if (key == null || !VALID_KEY.matcher(key).matches()) {
-            throw new IllegalArgumentException(
-                "Invalid key: '" + key + "'. " + VALID_KEY.pattern()
-            );
+            throw new IllegalArgumentException("Invalid key: '" + key + "'. " + VALID_KEY.pattern());
         }
     }
 

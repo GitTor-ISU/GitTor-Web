@@ -59,41 +59,36 @@ public class AuthorityControllerTest extends BasicContext {
             HttpEntity<Void> request = new HttpEntity<>(null, headers);
 
             // WHEN: Get authorities
-            ResponseEntity<List<AuthorityDto>> responseEntity = testRestTemplate.exchange(
-                url + ENDPOINT, HttpMethod.GET, request, new ParameterizedTypeReference<List<AuthorityDto>>() {}
-            );
+            ResponseEntity<List<AuthorityDto>> responseEntity = testRestTemplate.exchange(url + ENDPOINT,
+                HttpMethod.GET, request, new ParameterizedTypeReference<List<AuthorityDto>>() {});
 
             // THEN: New authority should be in list
-            assertAll(
-                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertTrue(
                     responseEntity.getBody().stream().anyMatch(a -> newAuthorityName.equals(a.getAuthority())),
-                    "Expected authority '" + newAuthorityName + "' not found"
-                )
-            );
+                    "Expected authority '" + newAuthorityName + "' not found"));
         }
 
         @Test
         public void should403_whenUnauthorized() {
             // GIVEN: User authentication header
-            AuthenticationDto auth = authenticationController.register(fixtureMonkey.giveMeOne(RegisterDto.class));
+            AuthenticationDto auth = authenticationController
+                .register(fixtureMonkey.giveMeOne(RegisterDto.class))
+                .getBody();
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(auth.getAccessToken());
             HttpEntity<Void> request = new HttpEntity<>(null, headers);
 
             // WHEN: Get authorities
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                url + ENDPOINT, HttpMethod.GET, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET, request,
+                new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds forbidden
-            assertAll(
-                () -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage())
-            );
+                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage()));
         }
     }
 
@@ -114,22 +109,17 @@ public class AuthorityControllerTest extends BasicContext {
             headers.setBearerAuth(adminAuth.getAccessToken());
             HttpEntity<Void> request = new HttpEntity<>(null, headers);
 
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(newAuthority.getId())
-                .toUri();
+            URI uri =
+                UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(newAuthority.getId()).toUri();
 
             // WHEN: Get new authority
-            ResponseEntity<AuthorityDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.GET, request, new ParameterizedTypeReference<AuthorityDto>() {}
-            );
+            ResponseEntity<AuthorityDto> responseEntity = testRestTemplate.exchange(uri, HttpMethod.GET, request,
+                new ParameterizedTypeReference<AuthorityDto>() {});
 
             // THEN: New authority should be returned
-            assertAll(
-                () -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
-                () -> assertEquals(authorityMapper.toDto(newAuthority), responseEntity.getBody())
-            );
+                () -> assertEquals(authorityMapper.toDto(newAuthority), responseEntity.getBody()));
         }
 
         @Test
@@ -138,29 +128,26 @@ public class AuthorityControllerTest extends BasicContext {
             Authority newAuthority = authorityService.save(fixtureMonkey.giveMeOne(Authority.class));
 
             // GIVEN: User authentication header
-            AuthenticationDto auth = authenticationController.register(fixtureMonkey.giveMeOne(RegisterDto.class));
+            AuthenticationDto auth = authenticationController
+                .register(fixtureMonkey.giveMeOne(RegisterDto.class))
+                .getBody();
 
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(auth.getAccessToken());
             HttpEntity<Void> request = new HttpEntity<>(null, headers);
 
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(newAuthority.getId())
-                .toUri();
+            URI uri =
+                UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(newAuthority.getId()).toUri();
 
             // WHEN: Get new authority
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.GET, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity =
+                testRestTemplate.exchange(uri, HttpMethod.GET, request, new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds forbidden
-            assertAll(
-                () -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage())
-            );
+                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage()));
         }
 
         @Test
@@ -175,23 +162,17 @@ public class AuthorityControllerTest extends BasicContext {
 
             // GIVEN: Wrong authority id
             int wrongId = newAuthority.getId() + 1;
-            URI uri = UriComponentsBuilder.fromUriString(url)
-                .path(ENDPOINT)
-                .buildAndExpand(wrongId)
-                .toUri();
+            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(wrongId).toUri();
 
             // WHEN: Get new authority at id plus 1
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(
-                uri, HttpMethod.GET, request, new ParameterizedTypeReference<ErrorDto>() {}
-            );
+            ResponseEntity<ErrorDto> responseEntity =
+                testRestTemplate.exchange(uri, HttpMethod.GET, request, new ParameterizedTypeReference<ErrorDto>() {});
 
             // THEN: Responds not found
-            assertAll(
-                () -> assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode()),
+            assertAll(() -> assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Authority " + wrongId + " not found.", responseEntity.getBody().getMessage())
-            );
+                () -> assertEquals("Authority " + wrongId + " not found.", responseEntity.getBody().getMessage()));
         }
     }
 }

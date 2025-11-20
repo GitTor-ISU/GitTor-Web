@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 import { About } from '@features/about/about';
-import { Login } from '@features/auth/login/login';
-import { Register } from '@features/auth/register/register';
+import { AuthRoutes } from '@features/auth/auth-routes';
 import { Home } from '@features/home/home';
 import { NotFound } from '@features/not-found/not-found';
 import { RepositoryList } from '@features/repository-list/repository-list';
@@ -20,13 +19,6 @@ export const routes: Routes = [
       { path: ':owner/:name', component: Repository },
     ],
   },
-  {
-    path: '',
-    component: AuthLayout,
-    children: [
-      { path: 'register', component: Register },
-      { path: 'login', component: Login },
-    ],
-  },
+  ...AuthRoutes,
   { path: '**', component: NotFound },
 ];

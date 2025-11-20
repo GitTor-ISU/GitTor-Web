@@ -17,18 +17,35 @@
             type="text"
             placeholder="Enter your username or email"
             formControlName="usernameOrEmail"
+            data-test="login-username"
           />
         </z-form-control>
       </z-form-field>
       <z-form-field>
         <label z-form-label zRequired>Password</label>
         <z-form-control>
-          <input z-input zSize="sm" type="password" placeholder="Enter your password" formControlName="password" />
+          <input
+            z-input
+            zSize="sm"
+            type="password"
+            placeholder="Enter your password"
+            formControlName="password"
+            data-test="login-password"
+          />
         </z-form-control>
       </z-form-field>
       <div class="flex gap-3">
         <a z-button zType="secondary" routerLink="/register" class="flex-1 text-center">Register</a>
-        <button z-button zType="default" type="submit" class="flex-1" [disabled]="loginForm.invalid">Log in</button>
+        <button
+          z-button
+          zType="default"
+          type="submit"
+          class="flex-1"
+          data-test="login-submit"
+          [disabled]="loginForm.invalid"
+        >
+          Log in
+        </button>
       </div>
     </form>
   </z-card>

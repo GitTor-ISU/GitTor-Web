@@ -28,9 +28,7 @@ public class S3ObjectServiceTest extends BasicContext {
         int size = (int) (maxObjectSize + 1);
         byte[] content = new byte[size];
 
-        S3Object object = S3Object.builder()
-            .size(size)
-            .build();
+        S3Object object = S3Object.builder().size(size).build();
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
             () -> s3ObjectService.save(object, new ByteArrayInputStream(content)));
