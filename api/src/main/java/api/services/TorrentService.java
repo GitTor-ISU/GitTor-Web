@@ -172,6 +172,9 @@ public class TorrentService {
     @Transactional
     public Torrent create(String name, String description, User uploader, MultipartFile file) throws IOException {
         validateTorrentFile(file);
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Name must not be empty.");
+        }
 
         MimeType mimeType = mimeTypeService.getOrCreateByName(TORRENT_MIME_TYPE);
         S3Object s3Object =

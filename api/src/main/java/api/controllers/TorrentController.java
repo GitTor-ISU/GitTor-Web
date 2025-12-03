@@ -188,8 +188,10 @@ public class TorrentController {
     public ResponseEntity<Resource> getTorrentFile(@PathVariable Long id) throws IOException {
         Torrent torrent = torrentService.getWithFile(id);
 
-        InputStream in = torrentService.downloadTorrentFile(id);
-        byte[] bytes = in.readAllBytes();
+        byte[] bytes;
+        try (InputStream in = torrentService.downloadTorrentFile(id)) {
+            bytes = in.readAllBytes();
+        }
         ByteArrayResource resource = new ByteArrayResource(bytes);
 
         // Suggest filename for download
