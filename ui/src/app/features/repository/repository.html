@@ -1,7 +1,7 @@
 <div class="min-h-screen">
-  <div class="border-border bg-background px-6 py-4">
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-2">
+  <div class="border-border bg-background px-4 py-4 md:px-6">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex flex-wrap items-center gap-2">
         <lucide-angular class="text-muted-foreground size-4" [img]="bookIcon" />
         <a class="text-blue-500 hover:underline" [href]="`/${owner()}`">{{ owner() }}</a>
         <span class="text-muted-foreground">/</span>
@@ -27,8 +27,8 @@
     </div>
   </div>
 
-  <div class="border-border bg-background border-b px-6">
-    <div class="flex gap-1">
+  <div class="border-border bg-background border-b px-4 md:px-6">
+    <div class="flex gap-1 overflow-x-auto">
       <button
         z-button
         zType="ghost"
@@ -94,20 +94,15 @@
     </div>
   </div>
 
-  <div class="flex gap-6 p-6">
+  <div class="flex flex-col gap-6 p-4 md:flex-row md:p-6">
     <div class="flex-1">
-      <div class="mb-4 flex items-center gap-3">
+      <div class="mb-4 flex flex-wrap items-center gap-3">
         <button z-button zType="outline" zSize="sm" class="gap-1">
           <lucide-angular class="size-4" [img]="branchIcon" />
           {{ currentBranch() }}
           <lucide-angular class="size-4" [img]="chevronDownIcon" />
         </button>
-        <button z-button zType="outline" zSize="sm" class="gap-1">
-          <lucide-angular class="size-4" [img]="branchIcon" />
-          main branches
-          <lucide-angular class="size-4" [img]="chevronDownIcon" />
-        </button>
-        <div class="flex-1">
+        <div class="w-full flex-1 sm:w-auto">
           <input
             type="text"
             placeholder="Go to file"
@@ -121,7 +116,9 @@
       </div>
 
       <z-card class="mb-6 p-0">
-        <div class="border-border flex items-center justify-between border-b px-4 py-3">
+        <div
+          class="border-border flex flex-col gap-2 border-b px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+        >
           <div class="flex items-center gap-2">
             <div class="flex size-6 items-center justify-center rounded-full bg-blue-500 text-xs text-white">
               {{ lastCommitAuthor().charAt(0).toUpperCase() }}{{ lastCommitAuthor().charAt(1) }}
@@ -137,7 +134,7 @@
 
         <div class="divide-border divide-y">
           @for (file of files(); track file.name) {
-            <div class="hover:bg-muted/50 flex items-center justify-between px-4 py-2">
+            <div class="hover:bg-muted/50 flex flex-col gap-2 px-4 py-2 sm:flex-row sm:items-center sm:justify-between">
               <div class="flex items-center gap-3">
                 @if (file.type === 'folder') {
                   <lucide-angular class="size-4 text-blue-500" [img]="folderIcon" />
@@ -164,9 +161,8 @@
       </z-card>
     </div>
 
-    <div class="w-80 shrink-0 space-y-4">
-      <z-card>
-        <h3 class="mb-3 font-semibold">Clone</h3>
+    <div class="w-full shrink-0 space-y-4 md:w-80">
+      <z-card zTitle="Clone">
         <div class="mb-3 flex items-center gap-2">
           <input
             type="text"
@@ -178,7 +174,7 @@
             <lucide-angular class="size-4" [img]="copyIcon" />
           </button>
         </div>
-        <div class="flex gap-2">
+        <div class="grid grid-cols-3 gap-2">
           <button z-button zType="outline" zSize="sm" class="flex-1 gap-1">
             <lucide-angular class="size-4" [img]="linkIcon" />
             Link
@@ -194,8 +190,7 @@
         </div>
       </z-card>
 
-      <z-card>
-        <h3 class="mb-3 font-semibold">About</h3>
+      <z-card zTitle="About">
         <p class="text-muted-foreground mb-4 text-sm">{{ description() }}</p>
         <div class="space-y-2 text-sm">
           <div class="flex items-center gap-2">
@@ -213,11 +208,7 @@
         </div>
       </z-card>
 
-      <z-card>
-        <div class="mb-3 flex items-center gap-2">
-          <lucide-angular class="size-4" [img]="usersIcon" />
-          <h3 class="font-semibold">Contributors</h3>
-        </div>
+      <z-card zTitle="Contributors">
         <div class="space-y-3">
           @for (contributor of contributors(); track contributor.name) {
             <div class="flex items-center justify-between">
@@ -236,8 +227,7 @@
         </div>
       </z-card>
 
-      <z-card>
-        <h3 class="mb-3 font-semibold">Languages</h3>
+      <z-card zTitle="Languages">
         <div class="mb-3 flex h-2 overflow-hidden rounded-full">
           @for (lang of languages(); track lang.name) {
             <div [class]="lang.color" [style.width.%]="lang.percentage"></div>
