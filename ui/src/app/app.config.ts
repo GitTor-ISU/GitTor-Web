@@ -5,12 +5,13 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, TitleStrategy } from '@angular/router';
 
 import { GlobalErrorHandler } from '@core/global-error-handler';
 import { tokenInterceptor } from '@core/token-interceptor';
 import { Configuration } from '@generated/openapi/configuration';
 import { routes } from './app.routes';
+import { AppTitleStrategy } from '@core/title-strategy';
 
 /**
  * Factory function to create API configuration.
@@ -35,5 +36,6 @@ export const appConfig: ApplicationConfig = {
       useFactory: apiConfigFactory,
     },
     { provide: ErrorHandler, useClass: GlobalErrorHandler },
+    { provide: TitleStrategy, useClass: AppTitleStrategy },
   ],
 };
