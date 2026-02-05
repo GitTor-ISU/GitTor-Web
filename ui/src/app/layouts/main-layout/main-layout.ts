@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import SessionService from '@core/session-service';
 import { Logo } from '@shared/components/logo/logo';
+import { ThemeToggle } from '@shared/components/theme-toggle/theme-toggle';
 import { ZardAvatarComponent } from '@shared/components/z-avatar';
 import {
   ZardBreadcrumbComponent,
@@ -45,6 +46,7 @@ import { FolderIcon, HouseIcon, InfoIcon, LogInIcon, SearchIcon } from 'lucide-a
     ContentComponent,
     ZardTooltipImports,
     Logo,
+    ThemeToggle,
   ],
   templateUrl: './main-layout.html',
 })

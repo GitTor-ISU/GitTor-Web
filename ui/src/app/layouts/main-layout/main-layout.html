@@ -36,51 +36,12 @@
         }
       </z-sidebar-group>
 
-      <z-sidebar-group>
-        @if (!sidebarCollapsed()) {
-          <z-sidebar-group-label>Workspace</z-sidebar-group-label>
-        }
-        @for (item of workspaceMenuItems; track item.label) {
-          @if (item.submenu) {
-            @if (sidebarCollapsed()) {
-              <button
-                type="button"
-                z-button
-                zType="ghost"
-                z-menu
-                zPlacement="rightTop"
-                zPosition="right"
-                class="w-full justify-center"
-                [zMenuTriggerFor]="submenu"
-                [zTooltip]="item.label"
-              >
-                <z-icon [zType]="item.icon!" />
-              </button>
-            } @else {
-              <button
-                type="button"
-                z-button
-                zType="ghost"
-                z-menu
-                zPlacement="rightTop"
-                zPosition="right"
-                class="w-full justify-start"
-                [zMenuTriggerFor]="submenu"
-              >
-                <z-icon class="mr-1" [zType]="item.icon!" />
-                <span class="flex-1 text-left">{{ item.label }}</span>
-                <z-icon zType="chevron-right" />
-              </button>
-            }
-
-            <ng-template #submenu>
-              <div z-menu-content class="w-48">
-                @for (subitem of item.submenu; track subitem.label) {
-                  <button type="button" z-menu-item>{{ subitem.label }}</button>
-                }
-              </div>
-            </ng-template>
-          } @else {
+      @if (sessionService.isLoggedIn()) {
+        <z-sidebar-group>
+          @if (!sidebarCollapsed()) {
+            <z-sidebar-group-label>Workspace</z-sidebar-group-label>
+          }
+          @for (item of workspaceMenuItems; track item.label) {
             @if (sidebarCollapsed()) {
               <button
                 type="button"
@@ -99,10 +60,32 @@
               </button>
             }
           }
-        }
-      </z-sidebar-group>
+        </z-sidebar-group>
+      }
 
       <div class="mt-auto">
+        <div [class]="sidebarCollapsed() ? 'mb-2 justify-center' : 'flex items-center gap-2'">
+          @if (sidebarCollapsed()) {
+            <button
+              type="button"
+              z-button
+              zType="ghost"
+              zPosition="right"
+              class="mb-2 justify-center"
+              [zTooltip]="sessionService.isLoggedIn() ? 'Logout' : 'Login'"
+            >
+              <z-icon [zType]="sessionService.isLoggedIn() ? 'log-out' : logInIcon" />
+            </button>
+          } @else {
+            <button type="button" z-button zType="ghost" zPosition="right">
+              <z-icon class="mr-1" [zType]="sessionService.isLoggedIn() ? 'log-out' : logInIcon" />
+              <span>{{ sessionService.isLoggedIn() ? 'Logout' : 'Login' }}</span>
+            </button>
+          }
+
+          <app-theme-toggle />
+        </div>
+
         @if (sessionService.isLoggedIn()) {
           <div
             z-menu
@@ -132,27 +115,25 @@
               [class]="sidebarCollapsed() ? 'opacity-0' : 'opacity-100'"
             />
           </div>
-        } @else {
-          <z-icon [zType]="logInIcon" />
-        }
 
-        <ng-template #userMenu>
-          <div z-menu-content class="w-48">
-            <button type="button" z-menu-item>
-              <z-icon zType="user" class="mr-2" />
-              Profile
-            </button>
-            <button type="button" z-menu-item>
-              <z-icon zType="settings" class="mr-2" />
-              Settings
-            </button>
-            <z-divider zSpacing="sm" />
-            <button type="button" z-menu-item>
-              <z-icon zType="log-out" class="mr-2" />
-              Logout
-            </button>
-          </div>
-        </ng-template>
+          <ng-template #userMenu>
+            <div z-menu-content class="w-48">
+              <button type="button" z-menu-item>
+                <z-icon zType="user" class="mr-2" />
+                Profile
+              </button>
+              <button type="button" z-menu-item>
+                <z-icon zType="settings" class="mr-2" />
+                Settings
+              </button>
+              <z-divider zSpacing="sm" />
+              <button type="button" z-menu-item>
+                <z-icon zType="log-out" class="mr-2" />
+                Logout
+              </button>
+            </div>
+          </ng-template>
+        }
       </div>
     </nav>
   </z-sidebar>
