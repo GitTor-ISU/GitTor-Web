@@ -5,7 +5,7 @@ import ThemeService from '@core/theme-service';
 import { NgxGridpatternComponent } from '@omnedia/ngx-gridpattern';
 import { NgxTypewriterComponent } from '@omnedia/ngx-typewriter';
 import { ThemeToggle } from '@shared/components/theme-toggle/theme-toggle';
-import { LayoutModule } from '@shared/components/z-layout/layout.module';
+import { LayoutComponent } from '@shared/components/z-layout';
 import { ZardResizableHandleComponent } from '@shared/components/z-resizable/resizable-handle.component';
 import { ZardResizablePanelComponent } from '@shared/components/z-resizable/resizable-panel.component';
 import { ZardResizableComponent } from '@shared/components/z-resizable/resizable.component';
@@ -20,10 +20,10 @@ import { ZardResizableComponent } from '@shared/components/z-resizable/resizable
     ZardResizableComponent,
     ZardResizablePanelComponent,
     ZardResizableHandleComponent,
-    LayoutModule,
     ThemeToggle,
     NgxTypewriterComponent,
     NgxGridpatternComponent,
+    LayoutComponent,
   ],
   templateUrl: './auth-layout.html',
 })

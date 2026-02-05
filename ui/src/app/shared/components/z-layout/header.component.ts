@@ -1,21 +1,20 @@
-import type { ClassValue } from 'clsx';
-
 import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 
+import type { ClassValue } from 'clsx';
+
+import { headerVariants } from '@shared/components/z-layout/layout.variants';
 import { mergeClasses } from '@shared/utils/merge-classes';
-import { headerVariants } from './layout.variants';
 
 @Component({
   selector: 'z-header',
-  exportAs: 'zHeader',
-  standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None,
   template: `
     <header [class]="classes()" [style.height.px]="zHeight()">
-      <ng-content></ng-content>
+      <ng-content />
     </header>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
+  exportAs: 'zHeader',
 })
 export class HeaderComponent {
   readonly class = input<ClassValue>('');
