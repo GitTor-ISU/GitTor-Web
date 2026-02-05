@@ -5,6 +5,7 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
 } from '@angular/core';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter } from '@angular/router';
 
 import { GlobalErrorHandler } from '@core/global-error-handler';
@@ -28,6 +29,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
+    provideAnimations(),
     provideRouter(routes),
     provideHttpClient(withInterceptors([tokenInterceptor])),
     {
