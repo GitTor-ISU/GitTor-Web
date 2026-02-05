@@ -1,42 +1,38 @@
-<!-- <z-layout class="border">
-  <app-navbar />
-  <z-layout>
-    <z-content class="min-h-screen pt-16">
-      <router-outlet />
-    </z-content>
-    <z-footer>
-      <div class="text-muted-foreground flex w-full items-center justify-center text-sm">GitTor</div>
-    </z-footer>
-  </z-layout>
-</z-layout> -->
-
 <z-layout class="min-h-dvh overflow-hidden">
   <z-sidebar
     class="p-0!"
-    [zWidth]="250"
+    [zWidth]="225"
     [zCollapsible]="true"
     [zCollapsed]="sidebarCollapsed()"
-    [zCollapsedWidth]="70"
+    [zCollapsedWidth]="65"
     (zCollapsedChange)="onCollapsedChange($event)"
   >
     <nav [class]="`flex h-full flex-col overflow-hidden ${sidebarCollapsed() ? 'gap-1 p-1 pt-4' : 'gap-4 p-4'}`">
       <z-sidebar-group>
         @if (!sidebarCollapsed()) {
-          <z-sidebar-group-label>Main</z-sidebar-group-label>
+          <app-logo class="mb-4 h-8 w-max" mode="full" />
+        } @else {
+          <app-logo class="mb-4 h-8 w-8" />
         }
+
         @for (item of mainMenuItems; track item.label) {
-          <button
-            type="button"
-            z-button
-            zType="ghost"
-            zPosition="right"
-            [class]="sidebarCollapsed() ? 'justify-center' : 'justify-start'"
-          >
-            <z-icon [zType]="item.icon!" [class]="sidebarCollapsed() ? '' : 'mr-2'" />
-            @if (!sidebarCollapsed()) {
+          @if (sidebarCollapsed()) {
+            <button
+              type="button"
+              z-button
+              zType="ghost"
+              zPosition="right"
+              class="justify-center"
+              [zTooltip]="item.label"
+            >
+              <z-icon [zType]="item.icon!" />
+            </button>
+          } @else {
+            <button type="button" z-button zType="ghost" zPosition="right" class="justify-start">
+              <z-icon class="mr-1" [zType]="item.icon!" />
               <span>{{ item.label }}</span>
-            }
-          </button>
+            </button>
+          }
         }
       </z-sidebar-group>
 
@@ -46,22 +42,36 @@
         }
         @for (item of workspaceMenuItems; track item.label) {
           @if (item.submenu) {
-            <button
-              type="button"
-              z-button
-              zType="ghost"
-              z-menu
-              zPlacement="rightTop"
-              zPosition="right"
-              [zMenuTriggerFor]="submenu"
-              [class]="sidebarCollapsed() ? 'justify-center' : 'justify-start'"
-            >
-              <z-icon [zType]="item.icon!" [class]="sidebarCollapsed() ? '' : 'mr-2'" />
-              @if (!sidebarCollapsed()) {
+            @if (sidebarCollapsed()) {
+              <button
+                type="button"
+                z-button
+                zType="ghost"
+                z-menu
+                zPlacement="rightTop"
+                zPosition="right"
+                class="w-full justify-center"
+                [zMenuTriggerFor]="submenu"
+                [zTooltip]="item.label"
+              >
+                <z-icon [zType]="item.icon!" />
+              </button>
+            } @else {
+              <button
+                type="button"
+                z-button
+                zType="ghost"
+                z-menu
+                zPlacement="rightTop"
+                zPosition="right"
+                class="w-full justify-start"
+                [zMenuTriggerFor]="submenu"
+              >
+                <z-icon class="mr-1" [zType]="item.icon!" />
                 <span class="flex-1 text-left">{{ item.label }}</span>
                 <z-icon zType="chevron-right" />
-              }
-            </button>
+              </button>
+            }
 
             <ng-template #submenu>
               <div z-menu-content class="w-48">
@@ -71,42 +81,60 @@
               </div>
             </ng-template>
           } @else {
-            <button
-              type="button"
-              z-button
-              zType="ghost"
-              zPosition="right"
-              [class]="sidebarCollapsed() ? 'justify-center' : 'justify-start'"
-            >
-              <z-icon [zType]="item.icon!" [class]="sidebarCollapsed() ? '' : 'mr-2'" />
-              @if (!sidebarCollapsed()) {
+            @if (sidebarCollapsed()) {
+              <button
+                type="button"
+                z-button
+                zType="ghost"
+                zPosition="right"
+                class="w-full justify-center"
+                [zTooltip]="item.label"
+              >
+                <z-icon [zType]="item.icon!" />
+              </button>
+            } @else {
+              <button type="button" z-button zType="ghost" zPosition="right" class="w-full justify-start">
+                <z-icon class="mr-1" [zType]="item.icon!" />
                 <span>{{ item.label }}</span>
-              }
-            </button>
+              </button>
+            }
           }
         }
       </z-sidebar-group>
 
       <div class="mt-auto">
-        <div
-          z-menu
-          zPlacement="rightBottom"
-          [zMenuTriggerFor]="userMenu"
-          [class]="
-            `hover:bg-accent flex cursor-pointer items-center justify-center gap-2 rounded-md ${sidebarCollapsed() ? 'm-2 p-0' : 'p-2'}`
-          "
-        >
-          <!-- <z-avatar zSrc="https://zardui.com/images/avatar/imgs/avatar_image.jpg" zAlt="Zard UI" /> -->
+        @if (sessionService.isLoggedIn()) {
+          <div
+            z-menu
+            zPlacement="rightBottom"
+            [zMenuTriggerFor]="userMenu"
+            [class]="
+              `hover:bg-accent flex w-full cursor-pointer items-center gap-2 rounded-md ${sidebarCollapsed() ? 'm-2 justify-center p-0' : 'justify-start p-2'}`
+            "
+          >
+            <z-avatar
+              zSrc="https://zardui.com/images/avatar/imgs/avatar_image.jpg"
+              zAlt="User Avatar"
+              class="h-10 w-10 shrink-0"
+            />
 
-          @if (!sidebarCollapsed()) {
-            <div>
+            <div
+              class="min-w-0 overflow-hidden"
+              [class]="sidebarCollapsed() ? 'max-w-0 opacity-0' : 'max-w-[200px] opacity-100'"
+            >
               <span class="font-medium">zardui</span>
               <div class="text-xs">test&#64;zardui.com</div>
             </div>
 
-            <z-icon zType="chevrons-up-down" class="ml-auto" />
-          }
-        </div>
+            <z-icon
+              zType="chevrons-up-down"
+              class="ml-auto h-4 w-4 shrink-0"
+              [class]="sidebarCollapsed() ? 'opacity-0' : 'opacity-100'"
+            />
+          </div>
+        } @else {
+          <z-icon [zType]="logInIcon" />
+        }
 
         <ng-template #userMenu>
           <div z-menu-content class="w-48">
@@ -138,7 +166,7 @@
       <z-divider zOrientation="vertical" class="ml-2 h-4" />
 
       <z-breadcrumb zWrap="wrap" zAlign="start">
-        <z-breadcrumb-item [routerLink]="['/docs/components/layout']">Home</z-breadcrumb-item>
+        <z-breadcrumb-item [routerLink]="['/']">Home</z-breadcrumb-item>
         <z-breadcrumb-item>
           <span aria-current="page">Components</span>
         </z-breadcrumb-item>
@@ -146,9 +174,11 @@
     </div>
 
     <div class="space-y-4 py-4">
-      <!-- <router-outlet /> -->
-      <z-skeleton class="h-80 w-full" />
-      <z-skeleton class="h-16 w-full" />
+      <router-outlet (activate)="onOutletActivate()" (deactivate)="onOutletDeactivate()" />
+      @if (!outletActivated()) {
+        <z-skeleton class="h-80 w-full" />
+        <z-skeleton class="h-16 w-full" />
+      }
     </div>
   </z-content>
 </z-layout>

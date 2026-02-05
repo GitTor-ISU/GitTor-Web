@@ -1,13 +1,15 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { Navbar } from '@features/navbar/navbar';
+import SessionService from '@core/session-service';
+import { Logo } from '@shared/components/logo/logo';
+import { ZardAvatarComponent } from '@shared/components/z-avatar';
 import {
   ZardBreadcrumbComponent,
   ZardBreadcrumbItemComponent,
 } from '@shared/components/z-breadcrumb/breadcrumb.component';
 import { ZardButtonComponent } from '@shared/components/z-button';
 import { ZardDividerComponent } from '@shared/components/z-divider/divider.component';
-import { ZardIcon, ZardIconComponent } from '@shared/components/z-icon';
+import { ZardIconComponent } from '@shared/components/z-icon';
 import {
   ContentComponent,
   LayoutComponent,
@@ -15,14 +17,11 @@ import {
   SidebarGroupComponent,
   SidebarGroupLabelComponent,
 } from '@shared/components/z-layout';
+import { MenuItem } from '@shared/components/z-menu/menu-item.directive';
 import { ZardMenuModule } from '@shared/components/z-menu/menu.module';
 import { ZardSkeletonComponent } from '@shared/components/z-skeleton';
-
-interface MenuItem {
-  icon: ZardIcon;
-  label: string;
-  submenu?: { label: string }[];
-}
+import { ZardTooltipImports } from '@shared/components/z-tooltip';
+import { FolderIcon, HouseIcon, InfoIcon, LogInIcon, SearchIcon } from 'lucide-angular';
 
 /**
  * Main layout component.
@@ -37,43 +36,49 @@ interface MenuItem {
     ZardMenuModule,
     ZardSkeletonComponent,
     ZardButtonComponent,
+    ZardAvatarComponent,
     RouterOutlet,
-    Navbar,
     SidebarGroupLabelComponent,
     SidebarGroupComponent,
     SidebarComponent,
     LayoutComponent,
     ContentComponent,
+    ZardTooltipImports,
+    Logo,
   ],
   templateUrl: './main-layout.html',
 })
 export class MainLayout {
-  protected readonly sidebarCollapsed = signal(false);
+  protected readonly sessionService = inject(SessionService);
+  protected readonly sidebarCollapsed = signal(true);
+  protected readonly outletActivated = signal(false);
+  protected logInIcon = LogInIcon;
 
   protected mainMenuItems: MenuItem[] = [
-    { icon: 'house', label: 'Home' },
-    { icon: 'inbox', label: 'Inbox' },
+    { icon: HouseIcon, label: 'Home', route: '/' },
+    { icon: InfoIcon, label: 'About', route: '/about' },
+    { icon: SearchIcon, label: 'Search' },
   ];
 
   protected workspaceMenuItems: MenuItem[] = [
     {
-      icon: 'folder',
-      label: 'Projects',
-      submenu: [{ label: 'Design System' }, { label: 'Mobile App' }, { label: 'Website' }],
+      icon: FolderIcon,
+      label: 'Repositories',
     },
-    { icon: 'calendar', label: 'Calendar' },
-    { icon: 'search', label: 'Search' },
   ];
 
   protected toggleSidebar(): void {
     this.sidebarCollapsed.update((collapsed) => !collapsed);
   }
 
-  /**
-   * Updates collapsed state when sidebar emits change.
-   *
-   * @param collapsed New collapsed state.
-   */
+  protected onOutletActivate(): void {
+    this.outletActivated.set(true);
+  }
+
+  protected onOutletDeactivate(): void {
+    this.outletActivated.set(false);
+  }
+
   protected onCollapsedChange(collapsed: boolean): void {
     this.sidebarCollapsed.set(collapsed);
   }

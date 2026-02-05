@@ -27,10 +27,6 @@ import { mergeClasses, transform } from '@shared/utils/merge-classes';
   imports: [ZardStringTemplateOutletDirective, ZardIconComponent],
   template: `
     <aside [class]="classes()" [style.width.px]="currentWidth()" [attr.data-collapsed]="zCollapsed()">
-      <div class="flex-1 overflow-auto">
-        <ng-content />
-      </div>
-
       @if (zCollapsible() && !zTrigger()) {
         <div
           [class]="triggerClasses()"
@@ -44,6 +40,10 @@ import { mergeClasses, transform } from '@shared/utils/merge-classes';
           <z-icon [zType]="chevronIcon()" />
         </div>
       }
+
+      <div class="flex-1 overflow-auto">
+        <ng-content />
+      </div>
 
       @if (zCollapsible() && zTrigger()) {
         <ng-container *zStringTemplateOutlet="zTrigger()" />
