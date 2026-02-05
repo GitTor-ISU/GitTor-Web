@@ -6,28 +6,28 @@
 
 :root {
   --radius: 0.75rem;
-  --background: oklch(0.94 0 0);
+  --background: oklch(0.94 0.007 248);
   --foreground: oklch(0.141 0 0);
-  --card: oklch(0.98 0.001 286.375);
+  --card: oklch(0.98 0.005 248);
   --card-foreground: oklch(0.141 0 0);
-  --popover: oklch(0.98 0.001 286.375);
+  --popover: oklch(0.98 0.005 248);
   --popover-foreground: oklch(0.141 0 0);
-  --primary: oklch(0.21 0.006 285.885);
-  --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.98 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.98 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.98 0.001 286.375);
+  --primary: oklch(0.3 0.08 248);
+  --primary-foreground: oklch(0.98 0.01 248);
+  --secondary: oklch(0.95 0.02 248);
+  --secondary-foreground: oklch(0.3 0.04 262);
+  --muted: oklch(0.98 0.005 248);
+  --muted-foreground: oklch(0.552 0.016 262);
+  --accent: oklch(0.98 0.005 248);
   --accent-foreground: oklch(0.21 0.006 285.885);
-  --destructive: oklch(0.577 0.245 27.325);
+  --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(0.92 0.004 286.32);
   --highlight: var(--background);
   --input: oklch(0.92 0.004 286.32);
   --ring: oklch(0.705 0.015 286.067);
-  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-1: oklch(0.704 0.191 22.216);
   --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-3: oklch(0.3 0.08 248);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
   --sidebar: oklch(0.985 0 0);
@@ -47,7 +47,7 @@
   --card-foreground: oklch(0.95 0 0);
   --popover: oklch(0.2 0.01 256);
   --popover-foreground: oklch(0.95 0 0);
-  --primary: oklch(0.95 0 0);
+  --primary: oklch(0.70 0.08 256);
   --primary-foreground: oklch(0.2 0.01 256);
   --secondary: oklch(0.225 0.01 256);
   --secondary-foreground: oklch(0.95 0 0);
@@ -64,7 +64,7 @@
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
+  --chart-5: oklch(0.704 0.191 22.216);
   --sidebar: oklch(0.2 0.01 256);
   --sidebar-foreground: oklch(0.95 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
@@ -79,7 +79,7 @@
 @theme {
   --color-background-mid: var(--primary-foreground);
   --color-highlight: var(--highlight);
-  --color-background-light: var(--secondary);
+  --color-background-light: var(--card);
   --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif,
   "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
 }
