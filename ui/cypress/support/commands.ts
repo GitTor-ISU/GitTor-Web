@@ -6,6 +6,7 @@ Cypress.Commands.add('login', (username, password) => {
   const loginPath = '/login';
 
   cy.intercept('POST', '/api/authenticate/login').as('login');
+  cy.intercept('GET', '/api/users/me').as('me');
   cy.visit(loginPath);
 
   if (username) cy.getBySel('login-username').type(username);
@@ -15,6 +16,7 @@ Cypress.Commands.add('login', (username, password) => {
     if ($btn.is(':disabled')) return;
     cy.wrap($btn).click();
     cy.wait('@login');
+    cy.wait('@me');
   });
 });
 
@@ -22,6 +24,7 @@ Cypress.Commands.add('register', (username, email, password, confirmPassword?) =
   const registerPath = '/register';
 
   cy.intercept('POST', '/api/authenticate/register').as('register');
+  cy.intercept('GET', '/api/users/me').as('me');
   cy.visit(registerPath);
 
   if (username) cy.getBySel('register-username').type(username);
@@ -33,14 +36,14 @@ Cypress.Commands.add('register', (username, email, password, confirmPassword?) =
     if ($btn.is(':disabled')) return;
     cy.wrap($btn).click();
     cy.wait('@register');
+    cy.wait('@me');
   });
 });
 
 Cypress.Commands.add('verifyLogin', () => {
   cy.visit('');
-  cy.getBySel('navbar-user-button').click();
 
   return cy.get('body').then(($body) => {
-    return $body.find('[data-test="navbar-logout-button"]').length > 0;
+    return $body.find('[data-test="sidebar-logout-button"]').length > 0;
   });
 });

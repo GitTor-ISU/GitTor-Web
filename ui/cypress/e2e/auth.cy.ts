@@ -156,8 +156,7 @@ describe('Session', function () {
 
     // Logout
     cy.visit('/');
-    cy.getBySel('navbar-user-button').click();
-    cy.getBySel('navbar-logout-button').click();
+    cy.getBySel('sidebar-logout-button').click();
 
     cy.verifyLogin().should('be.false');
   });
