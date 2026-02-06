@@ -170,9 +170,11 @@ describe('Session', function () {
       win.localStorage.removeItem('accessToken');
     });
     cy.intercept('GET', '/api/authenticate/refresh').as('refresh');
+    cy.intercept('GET', '/api/users/me').as('me');
 
     cy.reload();
     cy.wait('@refresh');
+    cy.wait('@me');
     cy.verifyLogin().should('be.true');
   });
 

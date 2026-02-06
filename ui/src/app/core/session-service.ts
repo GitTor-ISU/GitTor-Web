@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AuthenticationDto } from '@generated/openapi/models/authentication-dto';
 import { LoginDto } from '@generated/openapi/models/login-dto';
 import { RegisterDto } from '@generated/openapi/models/register-dto';
+import { UserDto } from '@generated/openapi/models/user-dto';
 import { AuthenticationService } from '@generated/openapi/services/authentication';
 import { firstValueFrom } from 'rxjs';
 
@@ -15,6 +16,7 @@ import { firstValueFrom } from 'rxjs';
 export default class SessionService {
   public readonly accessToken: WritableSignal<AuthenticationDto | undefined> = signal(undefined);
   public readonly isLoggedIn: Signal<boolean> = computed(() => !!this.accessToken());
+  public readonly user: WritableSignal<UserDto | null> = signal(null);
 
   private readonly TOKEN_KEY = 'accessToken';
   private readonly authService: AuthenticationService = inject(AuthenticationService);

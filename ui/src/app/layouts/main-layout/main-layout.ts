@@ -1,4 +1,4 @@
-import { Component, effect, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import SessionService from '@core/session-service';
 import { UserDto } from '@generated/openapi/models/user-dto';
@@ -52,7 +52,6 @@ export class MainLayout {
   protected readonly sessionService = inject(SessionService);
   protected readonly usersService = inject(UsersService);
   protected readonly sidebarCollapsed = signal(true);
-  protected readonly user = signal<UserDto | null>(null);
   protected logInIcon = LogInIcon;
 
   protected mainMenuItems: MenuItem[] = [
@@ -70,12 +69,6 @@ export class MainLayout {
 
   private readonly alertDialogService: ZardAlertDialogService = inject(ZardAlertDialogService);
 
-  public constructor() {
-    effect(async () => {
-      this.user.set(await firstValueFrom(this.usersService.getMe()));
-    });
-  }
-
   protected toggleSidebar(): void {
     this.sidebarCollapsed.update((collapsed) => !collapsed);
   }
@@ -88,17 +81,19 @@ export class MainLayout {
    * Temporary to demonstrate auth.
    */
   protected async showUser(): Promise<void> {
-    if (!this.user()) {
+    if (!this.sessionService.user()) {
       return;
     }
 
+    const user: UserDto = this.sessionService.user()!;
+
     this.alertDialogService.confirm({
-      zTitle: `Hello ${this.user()?.username}!`,
-      zDescription: `Id: ${this.user()?.id}, Email: ${this.user()?.email}`,
+      zTitle: `Hello ${user.username}!`,
+      zDescription: `Id: ${user.id}, Email: ${user.email}`,
       zOkText: 'Delete',
       zCancelText: 'Back',
       zOkDestructive: true,
-      zOnOk: () => this.deleteUser(this.user()?.username ?? ''),
+      zOnOk: () => this.deleteUser(user.username ?? ''),
     });
   }
 

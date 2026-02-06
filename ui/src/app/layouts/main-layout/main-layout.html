@@ -117,7 +117,7 @@
           <app-theme-toggle />
         </div>
 
-        @if (sessionService.isLoggedIn() && user()) {
+        @if (sessionService.isLoggedIn() && sessionService.user()) {
           <div
             z-menu
             zPlacement="rightBottom"
@@ -139,7 +139,7 @@
                 class="min-w-0 overflow-hidden"
                 [class]="sidebarCollapsed() ? 'max-w-0 opacity-0' : 'max-w-[200px] opacity-100'"
               >
-                <span class="font-medium">{{ user()?.username }}</span>
+                <span class="font-medium">{{ sessionService.user()?.username }}</span>
               </div>
               <z-icon
                 zType="chevrons-up-down"
