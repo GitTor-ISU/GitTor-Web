@@ -1,10 +1,10 @@
 <div>
   @if (themeService.getCurrentTheme() === 'dark') {
-    <button z-button zType="ghost" zTooltip="Light Theme" zPosition="right" (click)="themeService.toggleTheme()">
+    <button z-button zType="ghost" zTooltip="Light" zPosition="right" (click)="themeService.toggleTheme()">
       <z-icon zType="sun" />
     </button>
   } @else {
-    <button z-button zType="ghost" zTooltip="Dark Theme" zPosition="right" (click)="themeService.toggleTheme()">
+    <button z-button zType="ghost" zTooltip="Dark" zPosition="right" (click)="themeService.toggleTheme()">
       <z-icon zType="moon" />
     </button>
   }

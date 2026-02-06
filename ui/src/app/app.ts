@@ -29,9 +29,9 @@ export class App implements OnInit {
       .then(() => toast.success('API: Connected'))
       .catch(() => toast.error('API: Failed to connect'));
 
-    firstValueFrom(this.usersService.getMe()).then((user) => {
-      this.sessionService.user.set(user);
-      toast.success('Authorized');
-    });
+    this.sessionService
+      .setMe()
+      .then(() => toast.success('Authorized'))
+      .catch(() => toast.error('Unauthorized'));
   }
 }

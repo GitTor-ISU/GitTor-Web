@@ -5,6 +5,7 @@ import { LoginDto } from '@generated/openapi/models/login-dto';
 import { RegisterDto } from '@generated/openapi/models/register-dto';
 import { UserDto } from '@generated/openapi/models/user-dto';
 import { AuthenticationService } from '@generated/openapi/services/authentication';
+import { UsersService } from '@generated/openapi/services/users';
 import { firstValueFrom } from 'rxjs';
 
 /**
@@ -20,6 +21,7 @@ export default class SessionService {
 
   private readonly TOKEN_KEY = 'accessToken';
   private readonly authService: AuthenticationService = inject(AuthenticationService);
+  private readonly usersService: UsersService = inject(UsersService);
   private readonly router: Router = inject(Router);
 
   public constructor() {
@@ -58,6 +60,8 @@ export default class SessionService {
     } catch (error) {
       this.accessToken.set(undefined);
       throw error;
+    } finally {
+      this.setMe();
     }
   }
 
@@ -73,6 +77,8 @@ export default class SessionService {
     } catch (error) {
       this.accessToken.set(undefined);
       throw error;
+    } finally {
+      this.setMe();
     }
   }
 
@@ -88,6 +94,8 @@ export default class SessionService {
     } catch (error) {
       this.accessToken.set(undefined);
       throw error;
+    } finally {
+      this.setMe();
     }
   }
 
@@ -100,6 +108,26 @@ export default class SessionService {
       this.accessToken.set(undefined);
     } catch (error) {
       this.accessToken.set(undefined);
+      throw error;
+    } finally {
+      this.setMe();
+    }
+  }
+
+  /**
+   * Set user info.
+   */
+  public async setMe(): Promise<void> {
+    if (!this.accessToken()) {
+      this.user.set(null);
+      throw new Error('Not authenticated');
+    }
+
+    try {
+      const user = await firstValueFrom(this.usersService.getMe());
+      this.user.set(user!);
+    } catch (error) {
+      this.user.set(null);
       throw error;
     }
   }
