@@ -1,6 +1,6 @@
 <z-layout class="min-h-dvh overflow-hidden">
   <z-sidebar
-    class="p-0!"
+    class="fixed top-0 left-0 z-10 h-dvh p-0!"
     [zWidth]="190"
     [zCollapsible]="true"
     [zCollapsed]="sidebarCollapsed()"
@@ -180,23 +180,10 @@
     </nav>
   </z-sidebar>
 
-  <z-content class="min-h-50">
-    <div class="flex items-center">
-      <button type="button" z-button zType="ghost" zSize="sm" class="-ml-2" (click)="toggleSidebar()">
-        <z-icon zType="panel-left" />
-      </button>
-      <!-- Implement Breadcrumbs Later
-      <z-divider zOrientation="vertical" class="ml-2 h-4" />
-
-      <z-breadcrumb zWrap="wrap" zAlign="start">
-        <z-breadcrumb-item [routerLink]="['/']">Home</z-breadcrumb-item>
-        <z-breadcrumb-item>
-          <span aria-current="page">Components</span>
-        </z-breadcrumb-item>
-      </z-breadcrumb> -->
-    </div>
-    <div class="space-y-4 py-4">
-      <router-outlet />
-    </div>
+  <z-content
+    class="min-h-50 transition-[margin] duration-300 ease-in-out"
+    [style.marginLeft.px]="sidebarCollapsed() ? 70 : 190"
+  >
+    <router-outlet />
   </z-content>
 </z-layout>

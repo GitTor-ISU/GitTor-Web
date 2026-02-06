@@ -30,7 +30,7 @@ export const contentVariants = cva('flex-1 flex flex-col overflow-auto bg-backgr
 
 // Sidebar Variants
 export const sidebarVariants = cva(
-  'relative flex flex-col h-full transition-all duration-300 ease-in-out border-r shrink-0 p-6 bg-sidebar text-sidebar-foreground border-sidebar-border',
+  'relative flex flex-col h-full transition-[width] duration-300 ease-in-out border-r shrink-0 p-6 bg-sidebar text-sidebar-foreground border-sidebar-border will-change-[width]',
 );
 
 export const sidebarTriggerVariants = cva(
