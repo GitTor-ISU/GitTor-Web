@@ -1,5 +1,5 @@
 <div class="min-h-screen">
-  <div class="border-border bg-background border-b px-6 py-6">
+  <div class="bg-background px-6 pt-6">
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-bold">{{ owner() }}</h1>
@@ -12,7 +12,9 @@
     </div>
   </div>
 
-  <div class="border-border bg-background border-b px-6 py-4">
+  <z-divider />
+
+  <div class="bg-background px-6 py-4">
     <div class="flex items-center gap-3">
       <div class="relative mr-3 flex-1">
         <lucide-angular
@@ -20,9 +22,10 @@
           [img]="searchIcon"
         />
         <input
+          z-input
           type="text"
           placeholder="Find a repository..."
-          class="border-input bg-background placeholder:text-muted-foreground focus:ring-ring w-full rounded-md border py-1.5 pl-12 text-sm focus:ring-2 focus:outline-none"
+          class="bg-muted laceholder:text-muted-foreground focus:ring-ring w-full rounded-md border py-1.5 pl-12 text-sm shadow-sm focus:ring-2 focus:outline"
           [value]="searchQuery()"
           (input)="onSearchChange($event)"
         />
@@ -66,22 +69,31 @@
     </div>
   </div>
 
-  <div class="divide-border divide-y">
-    @for (repo of filteredRepositories(); track repo.name) {
-      <div class="hover:bg-muted/30 px-6 py-4">
-        <div class="flex items-start justify-between">
-          <div class="flex-1">
-            <div class="mb-1 flex items-center gap-2">
-              <lucide-angular class="text-muted-foreground size-4" [img]="bookIcon" />
-              <a
-                class="text-lg font-semibold text-blue-500 hover:underline"
-                [routerLink]="`/${owner()}/${repo.name}`"
-                >{{ repo.name }}</a
-              >
-              <span class="border-border text-muted-foreground rounded-full border px-2 py-0.5 text-xs">
-                {{ repo.visibility }}
-              </span>
+  <div class="bg-muted/30 p-6">
+    <div class="space-y-4">
+      @for (repo of filteredRepositories(); track repo.name) {
+        <z-card class="transition-shadow hover:shadow-lg">
+          <div class="flex items-start justify-between px-4">
+            <div class="flex-1">
+              <div class="mb-1 flex items-center gap-2">
+                <lucide-angular class="text-muted-foreground size-4" [img]="bookIcon" />
+                <a class="text-lg font-semibold text-blue-500 hover:underline" [routerLink]="`/${owner()}/${repo.name}`"
+                  >{{ repo.name }}
+                </a>
+                <span class="text-muted-foreground rounded-full border px-2 py-0.5 text-xs">
+                  {{ repo.visibility }}
+                </span>
+              </div>
             </div>
+            <button z-button zType="outline" zSize="sm" class="gap-1">
+              <lucide-angular class="size-4" [img]="starIcon" />
+              Star
+            </button>
+          </div>
+
+          <z-divider />
+
+          <div class="px-4 py-4">
             <p class="text-muted-foreground mb-3 text-sm">{{ repo.description }}</p>
             <div class="text-muted-foreground flex items-center gap-4 text-xs">
               @if (repo.language) {
@@ -105,24 +117,20 @@
               <span>Updated {{ repo.updatedAt }}</span>
             </div>
           </div>
-          <button z-button zType="outline" zSize="sm" class="gap-1">
-            <lucide-angular class="size-4" [img]="starIcon" />
-            Star
-          </button>
+        </z-card>
+      } @empty {
+        <div class="px-6 py-12 text-center">
+          <lucide-angular class="text-muted-foreground mx-auto mb-4 size-12" [img]="bookIcon" />
+          <h3 class="mb-2 text-lg font-semibold">No repositories found</h3>
+          <p class="text-muted-foreground text-sm">
+            @if (searchQuery()) {
+              No repositories match your search criteria.
+            } @else {
+              This user doesn't have any repositories yet.
+            }
+          </p>
         </div>
-      </div>
-    } @empty {
-      <div class="px-6 py-12 text-center">
-        <lucide-angular class="text-muted-foreground mx-auto mb-4 size-12" [img]="bookIcon" />
-        <h3 class="mb-2 text-lg font-semibold">No repositories found</h3>
-        <p class="text-muted-foreground text-sm">
-          @if (searchQuery()) {
-            No repositories match your search criteria.
-          } @else {
-            This user doesn't have any repositories yet.
-          }
-        </p>
-      </div>
-    }
+      }
+    </div>
   </div>
 </div>

@@ -3,6 +3,8 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { Title } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ZardButtonComponent } from '@shared/components/z-button/button.component';
+import { ZardCardComponent } from '@shared/components/z-card/card.component';
+import { ZardDividerComponent } from '@shared/components/z-divider/divider.component';
 import { ZardMenuModule } from '@shared/components/z-menu/menu.module';
 import {
   BookOpenIcon,
@@ -33,7 +35,15 @@ interface RepositorySummary {
  */
 @Component({
   selector: 'app-repository-list',
-  imports: [CommonModule, RouterLink, LucideAngularModule, ZardButtonComponent, ZardMenuModule],
+  imports: [
+    CommonModule,
+    RouterLink,
+    LucideAngularModule,
+    ZardButtonComponent,
+    ZardMenuModule,
+    ZardCardComponent,
+    ZardDividerComponent,
+  ],
   standalone: true,
   templateUrl: './repository-list.html',
 })
