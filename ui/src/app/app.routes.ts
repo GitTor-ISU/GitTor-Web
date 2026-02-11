@@ -14,7 +14,7 @@ export const routes: Routes = [
     children: [
       { path: '', component: Home },
       { path: 'about', component: About },
-      { path: ':owner/repositories', component: RepositoryList },
+      { path: ':owner', component: RepositoryList },
       { path: ':owner/:name', component: Repository },
     ],
   },
