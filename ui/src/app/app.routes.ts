@@ -11,9 +11,9 @@ export const routes: Routes = [
     component: MainLayout,
     children: [
       { path: '', component: Home },
-      { path: 'about', component: About },
+      { path: 'about', component: About, title: 'About' },
     ],
   },
   ...AuthRoutes,
-  { path: '**', component: NotFound },
+  { path: '**', component: NotFound, title: '404 Not Found' },
 ];
