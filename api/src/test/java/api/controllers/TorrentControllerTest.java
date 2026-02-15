@@ -29,11 +29,9 @@ import org.springframework.util.MultiValueMap;
 
 import api.BasicContext;
 import api.dtos.AuthenticationDto;
-import api.dtos.CreateTorrentDto;
 import api.dtos.ErrorDto;
 import api.dtos.RegisterDto;
 import api.dtos.TorrentDto;
-import api.dtos.UpdateTorrentDto;
 import api.entities.User;
 import api.services.AuthenticationService;
 
@@ -74,7 +72,7 @@ public class TorrentControllerTest extends BasicContext {
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
             // GIVEN: Torrent metadata
-            CreateTorrentDto metadata = fixtureMonkey.giveMeOne(CreateTorrentDto.class);
+            TorrentDto metadata = fixtureMonkey.giveMeOne(TorrentDto.class);
 
             // GIVEN: Torrent file
             byte[] torrentContent = "fake-torrent-content".getBytes(StandardCharsets.UTF_8);
@@ -116,7 +114,7 @@ public class TorrentControllerTest extends BasicContext {
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
             // GIVEN: Torrent metadata with empty file
-            CreateTorrentDto metadata = fixtureMonkey.giveMeOne(CreateTorrentDto.class);
+            TorrentDto metadata = fixtureMonkey.giveMeOne(TorrentDto.class);
             var file = new ByteArrayResource(new byte[0]) {
                 @Override
                 public String getFilename() {
@@ -150,7 +148,7 @@ public class TorrentControllerTest extends BasicContext {
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
             // GIVEN: Torrent file without metadata
-            var metadata = new CreateTorrentDto();
+            var metadata = new TorrentDto();
             byte[] torrentContent = "fake-torrent-content".getBytes(StandardCharsets.UTF_8);
             ByteArrayResource torrentFile = new ByteArrayResource(torrentContent) {
                 @Override
@@ -185,7 +183,7 @@ public class TorrentControllerTest extends BasicContext {
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
             // GIVEN: Torrent metadata with empty name
-            CreateTorrentDto metadata = CreateTorrentDto.builder().name("").description("Test description").build();
+            TorrentDto metadata = TorrentDto.builder().name("").description("Test description").build();
 
             // GIVEN: Torrent file
             byte[] torrentContent = "fake-torrent-content".getBytes(StandardCharsets.UTF_8);
@@ -353,8 +351,7 @@ public class TorrentControllerTest extends BasicContext {
             TorrentDto uploaded = uploadTestTorrent();
 
             // GIVEN: Update metadata with new name
-            UpdateTorrentDto updateDto =
-                UpdateTorrentDto.builder().name("New Name").description(uploaded.getDescription()).build();
+            TorrentDto updateDto = TorrentDto.builder().name("New Name").description(uploaded.getDescription()).build();
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -383,8 +380,7 @@ public class TorrentControllerTest extends BasicContext {
             TorrentDto uploaded = uploadTestTorrent();
 
             // GIVEN: Update metadata with new description
-            UpdateTorrentDto updateDto =
-                UpdateTorrentDto.builder().name(uploaded.getName()).description("New Description").build();
+            TorrentDto updateDto = TorrentDto.builder().name(uploaded.getName()).description("New Description").build();
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -413,8 +409,7 @@ public class TorrentControllerTest extends BasicContext {
             final TorrentDto uploaded = uploadTestTorrent();
 
             // GIVEN: Update metadata with new name and description
-            UpdateTorrentDto updateDto =
-                UpdateTorrentDto.builder().name("New Name").description("New Description").build();
+            TorrentDto updateDto = TorrentDto.builder().name("New Name").description("New Description").build();
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -443,8 +438,7 @@ public class TorrentControllerTest extends BasicContext {
             final Long nonexistentId = 999999L;
 
             // GIVEN: Update metadata
-            UpdateTorrentDto updateDto =
-                UpdateTorrentDto.builder().name("New Name").description("New Description").build();
+            TorrentDto updateDto = TorrentDto.builder().name("New Name").description("New Description").build();
 
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
@@ -732,7 +726,7 @@ public class TorrentControllerTest extends BasicContext {
         RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
         User user = authenticationService.register(register);
 
-        CreateTorrentDto metadata = fixtureMonkey.giveMeOne(CreateTorrentDto.class);
+        TorrentDto metadata = fixtureMonkey.giveMeOne(TorrentDto.class);
         MockMultipartFile file = new MockMultipartFile("file", "test.torrent", TORRENT_MIME_TYPE, content);
 
         try {

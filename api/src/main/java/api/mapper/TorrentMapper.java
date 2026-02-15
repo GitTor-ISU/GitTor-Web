@@ -5,9 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-import api.dtos.CreateTorrentDto;
 import api.dtos.TorrentDto;
-import api.dtos.UpdateTorrentDto;
 import api.entities.Torrent;
 
 /**
@@ -27,7 +25,7 @@ public interface TorrentMapper {
     TorrentDto toDto(Torrent torrent);
 
     /**
-     * Update {@link Torrent} metadata with {@link UpdateTorrentDto}.
+     * Update {@link Torrent} metadata with {@link TorrentDto}.
      *
      * @param torrent Torrent to update
      * @param updateDto Update information
@@ -37,11 +35,10 @@ public interface TorrentMapper {
     @Mapping(target = "uploader", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    void update(@MappingTarget Torrent torrent, UpdateTorrentDto updateDto);
+    void update(@MappingTarget Torrent torrent, TorrentDto updateDto);
 
     /**
-     * Convert {@link CreateTorrentDto} to {@link Torrent}. Note: file and uploader must be set
-     * separately.
+     * Convert {@link TorrentDto} to {@link Torrent}. Note: file and uploader must be set separately.
      *
      * @param createDto Create DTO
      * @return {@link Torrent}
@@ -51,5 +48,5 @@ public interface TorrentMapper {
     @Mapping(target = "uploader", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    Torrent toEntity(CreateTorrentDto createDto);
+    Torrent toEntity(TorrentDto createDto);
 }

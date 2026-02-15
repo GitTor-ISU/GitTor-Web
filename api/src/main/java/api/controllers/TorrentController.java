@@ -32,10 +32,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import api.dtos.CreateTorrentDto;
 import api.dtos.ErrorDto;
 import api.dtos.TorrentDto;
-import api.dtos.UpdateTorrentDto;
 import api.entities.Torrent;
 import api.entities.User;
 import api.mapper.TorrentMapper;
@@ -82,9 +80,8 @@ public class TorrentController {
             content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public TorrentDto uploadTorrent(@AuthenticationPrincipal User user,
-        @RequestPart("metadata") CreateTorrentDto metadata, @RequestPart("file") MultipartFile file)
-        throws IOException {
+    public TorrentDto uploadTorrent(@AuthenticationPrincipal User user, @RequestPart("metadata") TorrentDto metadata,
+        @RequestPart("file") MultipartFile file) throws IOException {
         Torrent torrent = torrentService.create(metadata.getName(), metadata.getDescription(), user, file);
         return torrentMapper.toDto(torrent);
     }
@@ -148,7 +145,7 @@ public class TorrentController {
             content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @PutMapping("/{id}")
-    public TorrentDto updateTorrent(@PathVariable Long id, @RequestPart("metadata") UpdateTorrentDto updateDto) {
+    public TorrentDto updateTorrent(@PathVariable Long id, @RequestPart("metadata") TorrentDto updateDto) {
         Torrent torrent = torrentService.updateMetadata(id, updateDto.getName(), updateDto.getDescription());
         return torrentMapper.toDto(torrent);
     }
