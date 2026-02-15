@@ -1,5 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { Title } from '@angular/platform-browser';
+import { Component } from '@angular/core';
 import { ZardAlertComponent } from '@shared/components/z-alert/alert.component';
 
 /**
@@ -11,10 +10,4 @@ import { ZardAlertComponent } from '@shared/components/z-alert/alert.component';
   templateUrl: './not-found.html',
   styleUrl: './not-found.scss',
 })
-export class NotFound implements OnInit {
-  private title = inject(Title);
-
-  public ngOnInit(): void {
-    this.title.setTitle('UI - 404 Not Found');
-  }
-}
+export class NotFound {}
