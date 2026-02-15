@@ -15,8 +15,11 @@ Cypress.Commands.add('login', (username, password) => {
   cy.getBySel('login-submit').then(($btn) => {
     if ($btn.is(':disabled')) return;
     cy.wrap($btn).click();
-    cy.wait('@login');
-    cy.wait('@me');
+    cy.wait('@login').then((interception) => {
+      if (interception.response?.statusCode === 200) {
+        cy.wait('@me');
+      }
+    });
   });
 });
 
@@ -35,8 +38,11 @@ Cypress.Commands.add('register', (username, email, password, confirmPassword?) =
   cy.getBySel('register-submit').then(($btn) => {
     if ($btn.is(':disabled')) return;
     cy.wrap($btn).click();
-    cy.wait('@register');
-    cy.wait('@me');
+    cy.wait('@register').then((interception) => {
+      if (interception.response?.statusCode === 200) {
+        cy.wait('@me');
+      }
+    });
   });
 });
 

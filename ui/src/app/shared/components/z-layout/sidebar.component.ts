@@ -41,7 +41,7 @@ import { mergeClasses, transform } from '@shared/utils/merge-classes';
         </div>
       }
 
-      <div class="flex-1 overflow-auto">
+      <div [class]="'flex-1 overflow-auto ' + ((zCollapsible() && !zTrigger()) ? 'pr-3' : '')">
         <ng-content />
       </div>
 

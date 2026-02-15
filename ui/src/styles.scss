@@ -124,7 +124,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-border font-normal;
   }
   body {
     @apply bg-background text-foreground;

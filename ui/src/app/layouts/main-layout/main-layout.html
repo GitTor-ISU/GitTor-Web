@@ -1,180 +1,124 @@
 <z-layout class="min-h-dvh overflow-hidden">
   <z-sidebar
     class="fixed top-0 left-0 z-10 h-dvh p-0!"
-    [zWidth]="190"
+    [zWidth]="205"
     [zCollapsible]="true"
     [zCollapsed]="sidebarCollapsed()"
     [zCollapsedWidth]="70"
     (zCollapsedChange)="onCollapsedChange($event)"
   >
-    <nav
-      [class]="
-        `flex h-full flex-col overflow-hidden [&_*]:text-xs ${sidebarCollapsed() ? 'gap-1 p-1 pt-4' : 'gap-4 p-4'}`
-      "
-    >
+    <nav [class]="`flex h-full flex-col overflow-hidden ${sidebarCollapsed() ? 'gap-1 px-3 py-4' : 'gap-4 p-4 pb-3'}`">
       <z-sidebar-group>
-        @if (!sidebarCollapsed()) {
-          <app-logo class="mb-3 h-8 w-max" mode="full" />
-        } @else {
-          <app-logo class="mb-3 h-8 w-8" />
-        }
+        <app-logo class="mb-3 w-8" mode="icon" [class.hidden]="!sidebarCollapsed()" />
+        <app-logo class="mb-3 h-8 w-max" mode="full" [class.hidden]="sidebarCollapsed()" />
 
         @for (item of mainMenuItems; track item.label) {
-          @if (sidebarCollapsed()) {
-            <button
-              type="button"
-              z-button
-              zType="ghost"
-              zPosition="right"
-              class="justify-center"
-              [zTooltip]="item.label"
-              [routerLink]="item.route"
-            >
-              <z-icon [zType]="item.icon!" />
-            </button>
-          } @else {
+          <button
+            type="button"
+            z-button
+            zType="ghost"
+            zPosition="right"
+            class="justify-start"
+            [zTooltip]="sidebarCollapsed() ? item.label : ''"
+            [routerLink]="item.route"
+          >
+            <z-icon class="mr-1 -ml-0.5" [zType]="item.icon!" />
+            <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{ item.label }}</span>
+          </button>
+        }
+      </z-sidebar-group>
+
+      @if (sessionService.isLoggedIn()) {
+        <z-sidebar-group>
+          <z-sidebar-group-label [class.hidden]="sidebarCollapsed()">Workspace</z-sidebar-group-label>
+          @for (item of workspaceMenuItems; track item.label) {
             <button
               type="button"
               z-button
               zType="ghost"
               zPosition="right"
               class="justify-start"
+              [zTooltip]="sidebarCollapsed() ? item.label : ''"
               [routerLink]="item.route"
             >
-              <z-icon class="mr-1" [zType]="item.icon!" />
-              <span>{{ item.label }}</span>
+              <z-icon class="mr-1 -ml-0.5" [zType]="item.icon!" />
+              <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{ item.label }}</span>
             </button>
-          }
-        }
-      </z-sidebar-group>
-
-      @if (sessionService.isLoggedIn()) {
-        <z-sidebar-group>
-          @if (!sidebarCollapsed()) {
-            <z-sidebar-group-label>Workspace</z-sidebar-group-label>
-          }
-          @for (item of workspaceMenuItems; track item.label) {
-            @if (sidebarCollapsed()) {
-              <button
-                type="button"
-                z-button
-                zType="ghost"
-                zPosition="right"
-                class="w-full justify-center"
-                [zTooltip]="item.label"
-                [routerLink]="item.route"
-              >
-                <z-icon [zType]="item.icon!" />
-              </button>
-            } @else {
-              <button
-                type="button"
-                z-button
-                zType="ghost"
-                zPosition="right"
-                class="w-full justify-start"
-                [routerLink]="item.route"
-              >
-                <z-icon class="mr-1" [zType]="item.icon!" />
-                <span>{{ item.label }}</span>
-              </button>
-            }
           }
         </z-sidebar-group>
       }
 
       <div class="mt-auto">
-        <div [class]="sidebarCollapsed() ? 'mb-4 justify-center' : 'mb-1 flex items-center gap-2'">
-          @if (sessionService.isLoggedIn()) {
-            <button
-              type="button"
-              z-button
-              zType="ghost"
-              zPosition="right"
-              data-test="sidebar-logout-button"
-              [zTooltip]="sidebarCollapsed() ? 'Log Out' : ''"
-              [class]="sidebarCollapsed() ? 'mb-2' : ''"
-              (click)="sessionService.logout()"
-            >
-              <z-icon zType="log-out" [class.mr-1]="!sidebarCollapsed()" />
-              @if (!sidebarCollapsed()) {
-                <span>Log Out</span>
-              }
-            </button>
-          } @else {
-            <button
-              type="button"
-              z-button
-              zType="ghost"
-              zPosition="right"
-              data-test="sidebar-login-button"
-              routerLink="/login"
-              [zTooltip]="sidebarCollapsed() ? 'Log In' : ''"
-              [class]="sidebarCollapsed() ? 'mb-2' : ''"
-            >
-              <z-icon [class.mr-1]="!sidebarCollapsed()" [zType]="logInIcon" />
-              @if (!sidebarCollapsed()) {
-                <span>Log In</span>
-              }
-            </button>
-          }
+        <div [class]="!sidebarCollapsed() ? 'mb-1 flex justify-between gap-2' : 'mb-3'">
+          <button
+            type="button"
+            z-button
+            zType="ghost"
+            zPosition="right"
+            class="mb-1 justify-start"
+            [attr.data-test]="sessionService.isLoggedIn() ? 'sidebar-logout-button' : 'sidebar-login-button'"
+            [class.w-full]="sidebarCollapsed()"
+            [zTooltip]="sidebarCollapsed() ? (sessionService.isLoggedIn() ? 'Log Out' : 'Log In') : ''"
+            [routerLink]="!sessionService.isLoggedIn() ? '/login' : ''"
+            (click)="sessionService.isLoggedIn() && sessionService.logout()"
+          >
+            <z-icon class="-ml-0.5" [zType]="sessionService.isLoggedIn() ? 'log-out' : logInIcon" />
+            <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{
+              sessionService.isLoggedIn() ? 'Log Out' : 'Log In'
+            }}</span>
+          </button>
           <app-theme-toggle />
         </div>
 
-        @if (sessionService.isLoggedIn()) {
-          @defer (when sessionService.user()) {
-            <div
-              z-menu
-              zPlacement="rightBottom"
-              data-test="sidebar-user-button"
-              [zMenuTriggerFor]="userMenu"
-              [class]="
-                `hover:bg-muted flex cursor-pointer items-center gap-2 rounded-md ${sidebarCollapsed() ? 'm-2 mr-4 p-0' : 'mr-1 p-2'}`
-              "
-            >
-              <!-- Update -->
-              <z-avatar
-                zSrc="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDKRD3JXx695EOaMjnRWvaIH0bifN8UqjmBQ&s"
-                zAlt="User Avatar"
-                class="h-10 w-10 shrink-0 cursor-pointer"
+        @if (sessionService.user()) {
+          <div
+            z-menu
+            zPlacement="rightBottom"
+            data-test="sidebar-user-button"
+            [zMenuTriggerFor]="userMenu"
+            [class]="
+              `cursor-pointer gap-2 rounded-md ${sidebarCollapsed() ? 'mt-2 -ml-1 w-max' : 'hover:bg-muted flex items-center p-1'}`
+            "
+          >
+            <z-avatar
+              zSrc="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDKRD3JXx695EOaMjnRWvaIH0bifN8UqjmBQ&s"
+              zAlt="User Avatar"
+              class="h-11 w-11 shrink-0 cursor-pointer"
+            />
+            @if (!sidebarCollapsed()) {
+              <div
+                class="min-w-0 overflow-hidden"
+                [class]="sidebarCollapsed() ? 'max-w-0 opacity-0' : 'max-w-[200px] opacity-100'"
+              >
+                <span class="block truncate font-medium">{{ sessionService.user()?.username }}</span>
+              </div>
+              <z-icon
+                zType="chevrons-up-down"
+                class="ml-auto h-4 w-4 shrink-0"
+                [class]="sidebarCollapsed() ? 'opacity-0' : 'opacity-100'"
               />
-
-              @if (!sidebarCollapsed()) {
-                <div
-                  class="min-w-0 overflow-hidden"
-                  [class]="sidebarCollapsed() ? 'max-w-0 opacity-0' : 'max-w-[200px] opacity-100'"
-                >
-                  <span class="font-medium">{{ sessionService.user()?.username }}</span>
-                </div>
-                <z-icon
-                  zType="chevrons-up-down"
-                  class="ml-auto h-4 w-4 shrink-0"
-                  [class]="sidebarCollapsed() ? 'opacity-0' : 'opacity-100'"
-                />
-              }
+            }
+          </div>
+          <ng-template #userMenu>
+            <div z-menu-content class="w-48">
+              <button type="button" z-menu-item data-test="sidebar-profile-button" (click)="showUser()">
+                <z-icon zType="user" class="mr-2" />
+                Profile
+              </button>
+              <button type="button" z-menu-item>
+                <z-icon zType="settings" class="mr-2" />
+                Settings
+              </button>
             </div>
-
-            <ng-template #userMenu>
-              <div z-menu-content class="w-48">
-                <button type="button" z-menu-item data-test="sidebar-profile-button" (click)="showUser()">
-                  <z-icon zType="user" class="mr-2" />
-                  Profile
-                </button>
-                <button type="button" z-menu-item>
-                  <z-icon zType="settings" class="mr-2" />
-                  Settings
-                </button>
-              </div>
-            </ng-template>
-          } @placeholder {
-            <div class="mb-2 flex items-center space-x-4">
-              <z-skeleton class="h-10 w-10 rounded-full" />
-              <div class="space-y-2">
-                <z-skeleton class="h-4 w-[125px]" />
-                <z-skeleton class="h-4 w-[100px]" />
-              </div>
+          </ng-template>
+        } @else if (sessionService.isLoggedIn()) {
+          <div class="-ml-1 flex items-center space-x-4">
+            <z-skeleton class="h-11 w-11 rounded-full" />
+            <div class="space-y-2">
+              <z-skeleton class="h-4 w-[100px]" />
+              <z-skeleton class="h-4 w-[75px]" />
             </div>
-          }
+          </div>
         }
       </div>
     </nav>
@@ -182,7 +126,7 @@
 
   <z-content
     class="min-h-50 transition-[margin] duration-300 ease-in-out"
-    [style.marginLeft.px]="sidebarCollapsed() ? 70 : 190"
+    [style.marginLeft.px]="sidebarCollapsed() ? 70 : 205"
   >
     <router-outlet />
   </z-content>

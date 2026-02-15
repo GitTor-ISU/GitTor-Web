@@ -57,11 +57,11 @@ export default class SessionService {
     try {
       const result = await firstValueFrom(this.authService.refresh(''));
       this.accessToken.set(result);
+      this.setMe();
     } catch (error) {
       this.accessToken.set(undefined);
+      this.user.set(null);
       throw error;
-    } finally {
-      this.setMe();
     }
   }
 
@@ -74,11 +74,11 @@ export default class SessionService {
     try {
       const result = await firstValueFrom(this.authService.login(data));
       this.accessToken.set(result);
+      this.setMe();
     } catch (error) {
       this.accessToken.set(undefined);
+      this.user.set(null);
       throw error;
-    } finally {
-      this.setMe();
     }
   }
 
@@ -91,11 +91,11 @@ export default class SessionService {
     try {
       const result = await firstValueFrom(this.authService.register(data));
       this.accessToken.set(result);
+      this.setMe();
     } catch (error) {
       this.accessToken.set(undefined);
+      this.user.set(null);
       throw error;
-    } finally {
-      this.setMe();
     }
   }
 
@@ -106,11 +106,11 @@ export default class SessionService {
     try {
       await firstValueFrom(this.authService.logout(''));
       this.accessToken.set(undefined);
+      this.user.set(null);
     } catch (error) {
       this.accessToken.set(undefined);
+      this.user.set(null);
       throw error;
-    } finally {
-      this.setMe();
     }
   }
 
@@ -118,11 +118,6 @@ export default class SessionService {
    * Set user info.
    */
   public async setMe(): Promise<void> {
-    if (!this.accessToken()) {
-      this.user.set(null);
-      throw new Error('Not authenticated');
-    }
-
     try {
       const user = await firstValueFrom(this.usersService.getMe());
       this.user.set(user!);
