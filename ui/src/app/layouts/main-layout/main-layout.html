@@ -22,7 +22,7 @@
             [zTooltip]="sidebarCollapsed() ? item.label : ''"
             [routerLink]="item.route"
           >
-            <z-icon class="mr-1 -ml-0.5" [zType]="item.icon!" />
+            <z-icon class="mr-1 -ml-[3px]" [zType]="item.icon!" />
             <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{ item.label }}</span>
           </button>
         }
@@ -41,7 +41,7 @@
               [zTooltip]="sidebarCollapsed() ? item.label : ''"
               [routerLink]="item.route"
             >
-              <z-icon class="mr-1 -ml-0.5" [zType]="item.icon!" />
+              <z-icon class="mr-1 -ml-[3px]" [zType]="item.icon!" />
               <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{ item.label }}</span>
             </button>
           }
@@ -62,7 +62,7 @@
             [routerLink]="!sessionService.isLoggedIn() ? '/login' : ''"
             (click)="sessionService.isLoggedIn() && sessionService.logout()"
           >
-            <z-icon class="-ml-0.5" [zType]="sessionService.isLoggedIn() ? 'log-out' : logInIcon" />
+            <z-icon class="-ml-[3px]" [zType]="sessionService.isLoggedIn() ? 'log-out' : logInIcon" />
             <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{
               sessionService.isLoggedIn() ? 'Log Out' : 'Log In'
             }}</span>
