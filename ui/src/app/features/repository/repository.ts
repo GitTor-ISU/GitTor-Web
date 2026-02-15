@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { Title } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { ZardButtonComponent } from '@shared/components/z-button/button.component';
 import { ZardCardComponent } from '@shared/components/z-card/card.component';
@@ -144,7 +143,6 @@ export class Repository implements OnInit {
 npm run dev</code></pre>
   `);
 
-  private readonly title = inject(Title);
   private readonly route = inject(ActivatedRoute);
 
   public ngOnInit(): void {
@@ -157,8 +155,6 @@ npm run dev</code></pre>
     if (name) {
       this.repoName.set(name);
     }
-
-    this.title.setTitle(`${this.owner()}/${this.repoName()} - GitTor`);
   }
 
   /**
