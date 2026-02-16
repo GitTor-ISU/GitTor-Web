@@ -13,14 +13,14 @@ Welcome to GitTor-Web wiki!
 
 Given a username and password, must return JWT token.
 
-### Upload Repository ❌
+### [Upload Repository](https://gittor-isu.github.io/GitTor-Web/openapi.html#tag/Torrents/operation/uploadTorrent) ✅
 
-Given a repository torrent file, must create a new repository.
+Given a repository torrent file and metadata (name required, description optional), must create a new repository.
 
-### Update Repository ❌
-
-Given a repository torrent file and repository unique identifier, must update the existing repository with the new torrent file.
-
-### Get Repository ❌
+### [Get Repository](https://gittor-isu.github.io/GitTor-Web/openapi.html#tag/Torrents/operation/getTorrentFile) ✅
 
 Given repository unique identifier, must must return repository torrent file.
+
+### [Update Repository](https://gittor-isu.github.io/GitTor-Web/openapi.html#tag/Torrents/operation/updateTorrentFile) ✅
+
+Given a repository torrent file and repository unique identifier, must update the existing repository with the new torrent file.
