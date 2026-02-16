@@ -9,8 +9,8 @@
   >
     <nav [class]="`flex h-full flex-col overflow-hidden ${sidebarCollapsed() ? 'gap-1 px-3 py-4' : 'gap-4 p-4 pb-3'}`">
       <z-sidebar-group>
-        <app-logo class="mb-3 w-8" mode="icon" [class.hidden]="!sidebarCollapsed()" />
-        <app-logo class="mb-3 h-8 w-max" mode="full" [class.hidden]="sidebarCollapsed()" />
+        <app-logo class="mb-3 w-8" mode="icon" [link]="true" [class.hidden]="!sidebarCollapsed()" />
+        <app-logo class="mb-3 h-8 w-max" mode="full" [link]="true" [class.hidden]="sidebarCollapsed()" />
 
         @for (item of mainMenuItems; track item.label) {
           <button
