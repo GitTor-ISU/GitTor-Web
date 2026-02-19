@@ -54,7 +54,7 @@ public class User implements UserDetails {
     private String firstname;
     private String lastname;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne
     @JoinColumn(name = "avatar_id")
     private S3Object avatar;
 
