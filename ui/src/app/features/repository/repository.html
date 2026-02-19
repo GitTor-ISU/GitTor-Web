@@ -190,8 +190,7 @@
         </div>
       </z-card>
 
-      <z-card zTitle="About">
-        <p class="text-muted-foreground mb-4 text-sm">{{ description() }}</p>
+      <z-card zTitle="About" [zDescription]="description()">
         <div class="space-y-2 text-sm">
           <div class="flex items-center gap-2">
             <lucide-angular class="size-4" [img]="starIcon" />
