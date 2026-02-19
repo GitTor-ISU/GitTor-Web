@@ -2,23 +2,15 @@ name: Deploy
 
 on:
   workflow_call:
+  workflow_dispatch:
 
 jobs:
-  pi:
-    runs-on: pi
+  web:
+    runs-on: tux
     continue-on-error: true
-    if: github.ref == 'refs/heads/main'
 
     steps:
     - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Fetch
-      run: git fetch origin pi-deploy-config
-
-    - name: Update Configuration
-      run: git merge origin/pi-deploy-config
 
     - name: Deploy
       working-directory: ./tools
