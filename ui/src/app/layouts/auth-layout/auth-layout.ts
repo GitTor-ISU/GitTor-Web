@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import ThemeService from '@core/theme-service';
@@ -16,7 +15,6 @@ import { ZardResizableComponent } from '@shared/components/z-resizable/resizable
   selector: 'app-auth-layout',
   imports: [
     RouterOutlet,
-    CommonModule,
     ZardResizableComponent,
     ZardResizablePanelComponent,
     ZardResizableHandleComponent,
