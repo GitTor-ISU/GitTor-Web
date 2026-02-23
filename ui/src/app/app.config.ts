@@ -8,9 +8,9 @@ import {
 import { provideRouter, TitleStrategy } from '@angular/router';
 
 import { GlobalErrorHandler } from '@core/global-error-handler';
+import { AppTitleStrategy } from '@core/title-strategy';
 import { tokenInterceptor } from '@core/token-interceptor';
 import { Configuration } from '@generated/openapi/configuration';
-import { AppTitleStrategy } from '@core/title-strategy';
 import { routes } from './app.routes';
 
 /**
