@@ -1,5 +1,5 @@
 <div class="min-h-screen">
-  <div class="border-border bg-background px-4 py-4 md:px-6">
+  <div class="border-border bg-background px-4 pb-4 md:px-6">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div class="flex flex-wrap items-center gap-2">
         <lucide-angular class="text-muted-foreground size-4" [img]="bookIcon" />
@@ -170,7 +170,7 @@
             class="border-input bg-muted flex-1 rounded-md border px-3 py-1.5 text-sm"
             [value]="cloneUrl()"
           />
-          <button z-button zType="outline" zSize="icon" (click)="copyCloneUrl()">
+          <button z-button zType="outline" zSize="sm" (click)="copyCloneUrl()">
             <lucide-angular class="size-4" [img]="copyIcon" />
           </button>
         </div>
