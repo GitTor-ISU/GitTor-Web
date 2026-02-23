@@ -28,7 +28,7 @@
         }
       </z-sidebar-group>
 
-      @if (sessionService.isLoggedIn()) {
+      @if (sessionService.user()) {
         <z-sidebar-group>
           <z-sidebar-group-label [class.hidden]="sidebarCollapsed()">Workspace</z-sidebar-group-label>
           @for (item of workspaceMenuItems; track item.label) {
@@ -76,9 +76,7 @@
             zPlacement="rightBottom"
             data-test="sidebar-user-button"
             [zMenuTriggerFor]="userMenu"
-            [class]="
-              `cursor-pointer gap-2 rounded-md ${sidebarCollapsed() ? 'mt-3 -ml-1 w-max' : 'hover:bg-muted flex items-center p-1'}`
-            "
+            [class]="`cursor-pointer gap-2 rounded-md ${sidebarCollapsed() ? 'mt-3 -ml-1 w-max' : 'hover:bg-muted flex items-center p-1'}`"
           >
             <z-avatar
               zSrc="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDKRD3JXx695EOaMjnRWvaIH0bifN8UqjmBQ&s"

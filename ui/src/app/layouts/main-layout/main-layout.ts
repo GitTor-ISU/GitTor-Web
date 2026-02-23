@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import SessionService from '@core/session-service';
 import { UserDto } from '@generated/openapi/models/user-dto';
@@ -60,14 +60,21 @@ export class MainLayout {
     { icon: SearchIcon, label: 'Search' },
   ];
 
-  protected workspaceMenuItems: MenuItem[] = [
-    {
-      icon: FolderIcon,
-      label: 'Repositories',
-    },
-  ];
+  protected workspaceMenuItems: MenuItem[] = [];
 
   private readonly alertDialogService: ZardAlertDialogService = inject(ZardAlertDialogService);
+
+  public constructor() {
+    effect(() => {
+      this.workspaceMenuItems = [
+        {
+          icon: FolderIcon,
+          label: 'Repositories',
+          route: `/${this.sessionService.user()?.username}`,
+        },
+      ];
+    });
+  }
 
   protected toggleSidebar(): void {
     this.sidebarCollapsed.update((collapsed) => !collapsed);
