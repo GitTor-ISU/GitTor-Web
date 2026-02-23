@@ -42,6 +42,7 @@ public abstract class RoleMapper {
      * @param roleDto Role DTO
      * @return {@link Role}
      */
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "authorities", source = "authorityIds", qualifiedByName = "AuthorityIdstoAuthorities")
     public abstract Role toEntity(RoleDto roleDto);
 

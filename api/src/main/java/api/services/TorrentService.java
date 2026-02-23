@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -73,7 +74,9 @@ public class TorrentService {
      */
     @Transactional(readOnly = true)
     public Optional<Torrent> findWithFile(Long id) {
-        return torrentRepository.findByIdWithFile(id);
+        Optional<Torrent> torrent = find(id);
+        torrent.ifPresent(t -> Hibernate.initialize(t.getFile()));
+        return torrent;
     }
 
     /**
@@ -246,7 +249,7 @@ public class TorrentService {
      */
     @Transactional(readOnly = true)
     public InputStream downloadTorrentFile(Long id) {
-        Torrent torrent = getWithFile(id);
+        Torrent torrent = get(id);
         S3Object file = torrent.getFile();
         if (file == null) {
             throw new IllegalStateException("Torrent " + id + " has no file.");
@@ -263,7 +266,10 @@ public class TorrentService {
     public void delete(Long id) {
         Torrent torrent = get(id);
         torrentRepository.delete(torrent);
-        // S3Object will be deleted automatically due to orphanRemoval = true
+        S3Object file = torrent.getFile();
+        if (file != null) {
+            s3ObjectService.delete(file);
+        }
         log.info("Torrent deleted: " + id);
     }
 
