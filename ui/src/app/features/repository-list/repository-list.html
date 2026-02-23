@@ -1,5 +1,5 @@
 <div class="min-h-screen">
-  <div class="bg-background px-6 pt-6">
+  <div class="bg-background px-6">
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl font-bold">{{ owner() }}</h1>
@@ -25,7 +25,7 @@
           z-input
           type="text"
           placeholder="Find a repository..."
-          class="bg-muted laceholder:text-muted-foreground focus:ring-ring w-full rounded-md border py-1.5 pl-12 text-sm shadow-sm focus:ring-2 focus:outline"
+          class="placeholder:text-muted-foreground focus:ring-ring w-full rounded-md border py-1.5 pl-12 text-sm shadow-sm focus:ring-2 focus:outline"
           [value]="searchQuery()"
           (input)="onSearchChange($event)"
         />

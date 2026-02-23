@@ -89,4 +89,5 @@ export interface MenuItem {
   label: string;
   icon?: LucideIconData;
   route?: string;
+  submenu?: MenuItem[];
 }

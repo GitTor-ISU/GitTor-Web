@@ -1,5 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import SessionService from '@core/session-service';
 import ThemeService from '@core/theme-service';
 import { HeartbeatService } from '@generated/openapi/services/heartbeat';
 import { UsersService } from '@generated/openapi/services/users';
@@ -19,6 +20,7 @@ import { firstValueFrom } from 'rxjs';
 })
 export class App implements OnInit {
   protected readonly themeService = inject(ThemeService);
+  private readonly sessionService = inject(SessionService);
   private readonly heartbeatService = inject(HeartbeatService);
   private readonly usersService = inject(UsersService);
 
@@ -27,6 +29,9 @@ export class App implements OnInit {
       .then(() => toast.success('API: Connected'))
       .catch(() => toast.error('API: Failed to connect'));
 
-    firstValueFrom(this.usersService.getMe()).then(() => toast.success('Authorized'));
+    this.sessionService
+      .setMe()
+      .then(() => toast.success('Authorized'))
+      .catch(() => toast.error('Unauthorized'));
   }
 }

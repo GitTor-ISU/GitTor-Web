@@ -1,44 +1,58 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  input,
+  output,
+  signal,
+  ViewEncapsulation,
+  type TemplateRef,
+} from '@angular/core';
+
 import type { ClassValue } from 'clsx';
 
-import { ChangeDetectionStrategy, Component, computed, effect, input, output, signal, TemplateRef, ViewEncapsulation } from '@angular/core';
-
+import { ZardStringTemplateOutletDirective } from '@shared/components/z-core/directives/string-template-outlet/string-template-outlet.directive';
+import { ZardIconComponent, type ZardIcon } from '@shared/components/z-icon';
+import {
+  sidebarGroupLabelVariants,
+  sidebarGroupVariants,
+  sidebarTriggerVariants,
+  sidebarVariants,
+} from '@shared/components/z-layout/layout.variants';
 import { mergeClasses, transform } from '@shared/utils/merge-classes';
-import { ZardStringTemplateOutletDirective } from '../z-core/directives/string-template-outlet/string-template-outlet.directive';
-import { sidebarGroupLabelVariants, sidebarGroupVariants, sidebarTriggerVariants, sidebarVariants } from './layout.variants';
 
 @Component({
   selector: 'z-sidebar',
-  exportAs: 'zSidebar',
-  standalone: true,
-  imports: [ZardStringTemplateOutletDirective],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None,
+  imports: [ZardStringTemplateOutletDirective, ZardIconComponent],
   template: `
     <aside [class]="classes()" [style.width.px]="currentWidth()" [attr.data-collapsed]="zCollapsed()">
-      <div class="flex-1 overflow-auto">
-        <ng-content></ng-content>
-      </div>
-
       @if (zCollapsible() && !zTrigger()) {
         <div
           [class]="triggerClasses()"
           (click)="toggleCollapsed()"
-          (keydown.enter)="toggleCollapsed(); $event.preventDefault()"
-          (keydown.space)="toggleCollapsed(); $event.preventDefault()"
+          (keydown.{enter,space}.prevent)="toggleCollapsed()"
           tabindex="0"
           role="button"
           [attr.aria-label]="zCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'"
           [attr.aria-expanded]="!zCollapsed()"
         >
-          <i [class]="chevronIcon()"></i>
+          <z-icon [zType]="chevronIcon()" />
         </div>
       }
 
+      <div [class]="'flex-1 overflow-auto ' + ((zCollapsible() && !zTrigger()) ? 'pr-3' : '')">
+        <ng-content />
+      </div>
+
       @if (zCollapsible() && zTrigger()) {
-        <ng-container *zStringTemplateOutlet="zTrigger()"></ng-container>
+        <ng-container *zStringTemplateOutlet="zTrigger()" />
       }
     </aside>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
+  exportAs: 'zSidebar',
 })
 export class SidebarComponent {
   readonly zWidth = input<string | number>(200);
@@ -69,14 +83,14 @@ export class SidebarComponent {
     return typeof width === 'number' ? width : parseInt(width, 10);
   });
 
-  protected readonly chevronIcon = computed(() => {
+  protected readonly chevronIcon = computed((): ZardIcon => {
     const collapsed = this.zCollapsed();
     const reverse = this.zReverseArrow();
 
     if (reverse) {
-      return collapsed ? 'icon-chevron-left text-base' : 'icon-chevron-right text-base';
+      return collapsed ? 'chevron-left' : 'chevron-right';
     }
-    return collapsed ? 'icon-chevron-right text-base' : 'icon-chevron-left text-base';
+    return collapsed ? 'chevron-right' : 'chevron-left';
   });
 
   protected readonly classes = computed(() => mergeClasses(sidebarVariants(), this.class()));
@@ -92,15 +106,14 @@ export class SidebarComponent {
 
 @Component({
   selector: 'z-sidebar-group',
-  exportAs: 'zSidebarGroup',
-  standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None,
   template: `
     <div [class]="classes()">
-      <ng-content></ng-content>
+      <ng-content />
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
+  exportAs: 'zSidebarGroup',
 })
 export class SidebarGroupComponent {
   readonly class = input<ClassValue>('');
@@ -110,15 +123,14 @@ export class SidebarGroupComponent {
 
 @Component({
   selector: 'z-sidebar-group-label',
-  exportAs: 'zSidebarGroupLabel',
-  standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None,
   template: `
     <div [class]="classes()">
-      <ng-content></ng-content>
+      <ng-content />
     </div>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
+  exportAs: 'zSidebarGroupLabel',
 })
 export class SidebarGroupLabelComponent {
   readonly class = input<ClassValue>('');

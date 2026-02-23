@@ -2,25 +2,24 @@ import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation 
 
 import type { ClassValue } from 'clsx';
 
-import { contentVariants } from '@shared/components/z-layout/layout.variants';
+import { skeletonVariants } from './skeleton.variants';
+
 import { mergeClasses } from '@shared/utils/merge-classes';
 
 @Component({
-  selector: 'z-content',
+  selector: 'z-skeleton',
   template: `
-    <main>
-      <ng-content />
-    </main>
+    <div data-slot="skeleton" [class]="classes()"></div>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   encapsulation: ViewEncapsulation.None,
   host: {
-    '[class]': 'classes()',
+    class: 'block',
   },
-  exportAs: 'zContent',
+  exportAs: 'zSkeleton',
 })
-export class ContentComponent {
+export class ZardSkeletonComponent {
   readonly class = input<ClassValue>('');
 
-  protected readonly classes = computed(() => mergeClasses(contentVariants(), this.class()));
+  protected readonly classes = computed(() => mergeClasses(skeletonVariants(), this.class()));
 }

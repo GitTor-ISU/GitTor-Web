@@ -3,20 +3,17 @@ import { authGuard } from '@features/auth/auth-guard';
 
 export const AuthRoutes: Route[] = [
   {
-    path: '',
+    path: 'login',
     loadComponent: () => import('../../layouts/auth-layout/auth-layout').then((m) => m.AuthLayout),
-    canActivateChild: [authGuard],
+    canActivate: [authGuard],
+    children: [{ path: '', loadComponent: () => import('./login/login').then((m) => m.Login), title: 'Login' }],
+  },
+  {
+    path: 'register',
+    loadComponent: () => import('../../layouts/auth-layout/auth-layout').then((m) => m.AuthLayout),
+    canActivate: [authGuard],
     children: [
-      {
-        path: 'login',
-        loadComponent: () => import('./login/login').then((m) => m.Login),
-        title: 'Login',
-      },
-      {
-        path: 'register',
-        loadComponent: () => import('./register/register').then((m) => m.Register),
-        title: 'Register',
-      },
+      { path: '', loadComponent: () => import('./register/register').then((m) => m.Register), title: 'Register' },
     ],
   },
 ];
