@@ -72,10 +72,8 @@
 
         @if (sessionService.user()) {
           <div
-            z-menu
-            zPlacement="rightBottom"
+            appSettings
             data-test="sidebar-user-button"
-            [zMenuTriggerFor]="userMenu"
             [class]="`cursor-pointer gap-2 rounded-md ${sidebarCollapsed() ? 'mt-3 -ml-1 w-max' : 'hover:bg-muted flex items-center p-1'}`"
           >
             <z-avatar
@@ -97,18 +95,6 @@
               />
             }
           </div>
-          <ng-template #userMenu>
-            <div z-menu-content class="w-48">
-              <button type="button" z-menu-item data-test="sidebar-profile-button" (click)="showUser()">
-                <z-icon zType="user" class="mr-2" />
-                Profile
-              </button>
-              <button type="button" z-menu-item>
-                <z-icon zType="settings" class="mr-2" />
-                Settings
-              </button>
-            </div>
-          </ng-template>
         } @else if (sessionService.isLoggedIn()) {
           <div class="-ml-1 flex items-center space-x-4">
             <z-skeleton class="h-11 w-11 rounded-full" />

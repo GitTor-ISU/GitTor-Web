@@ -1,6 +1,7 @@
 import { Component, effect, inject, signal } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import SessionService from '@core/session-service';
+import { SettingsDirective } from '@features/settings/settings-directive';
 import { UserDto } from '@generated/openapi/models/user-dto';
 import { UsersService } from '@generated/openapi/services/users';
 import { Logo } from '@shared/components/logo/logo';
@@ -45,6 +46,7 @@ import { firstValueFrom } from 'rxjs';
     ThemeToggle,
     RouterLink,
     ZardSkeletonComponent,
+    SettingsDirective,
   ],
   templateUrl: './main-layout.html',
 })
