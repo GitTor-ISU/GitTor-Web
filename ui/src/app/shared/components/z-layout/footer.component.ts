@@ -1,21 +1,20 @@
-import type { ClassValue } from 'clsx';
-
 import { ChangeDetectionStrategy, Component, computed, input, ViewEncapsulation } from '@angular/core';
 
+import type { ClassValue } from 'clsx';
+
+import { footerVariants } from '@shared/components/z-layout/layout.variants';
 import { mergeClasses } from '@shared/utils/merge-classes';
-import { footerVariants } from './layout.variants';
 
 @Component({
   selector: 'z-footer',
-  exportAs: 'zFooter',
-  standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  encapsulation: ViewEncapsulation.None,
   template: `
     <footer [class]="classes()" [style.height.px]="zHeight()">
-      <ng-content></ng-content>
+      <ng-content />
     </footer>
   `,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  encapsulation: ViewEncapsulation.None,
+  exportAs: 'zFooter',
 })
 export class FooterComponent {
   readonly class = input<ClassValue>('');

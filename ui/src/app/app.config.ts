@@ -5,12 +5,13 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
 } from '@angular/core';
+import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideRouter, TitleStrategy } from '@angular/router';
 
 import { GlobalErrorHandler } from '@core/global-error-handler';
+import { AppTitleStrategy } from '@core/title-strategy';
 import { tokenInterceptor } from '@core/token-interceptor';
 import { Configuration } from '@generated/openapi/configuration';
-import { AppTitleStrategy } from '@core/title-strategy';
 import { routes } from './app.routes';
 
 /**
@@ -29,6 +30,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
+    provideAnimations(),
     provideRouter(routes),
     provideHttpClient(withInterceptors([tokenInterceptor])),
     {

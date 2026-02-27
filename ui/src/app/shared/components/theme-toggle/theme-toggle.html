@@ -1,11 +1,11 @@
 <div>
   @if (themeService.isDark()) {
-    <button z-button zType="ghost" zShape="circle" zSize="icon" (click)="themeService.toggleTheme()">
-      <lucide-angular [img]="sunIcon" />
+    <button z-button zType="ghost" zTooltip="Light" zPosition="right" (click)="themeService.toggleTheme()">
+      <z-icon zType="sun" />
     </button>
   } @else {
-    <button z-button zType="ghost" zShape="circle" zSize="icon" (click)="themeService.toggleTheme()">
-      <lucide-angular [img]="moonIcon" />
+    <button z-button zType="ghost" zTooltip="Dark" zPosition="right" (click)="themeService.toggleTheme()">
+      <z-icon zType="moon" />
     </button>
   }
 </div>

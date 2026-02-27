@@ -1,0 +1,253 @@
+<div class="min-h-screen">
+  <div class="border-border bg-background px-4 pb-4 md:px-6">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex flex-wrap items-center gap-2">
+        <lucide-angular class="text-muted-foreground size-4" [img]="bookIcon" />
+        <a class="text-blue-500 hover:underline" [href]="`/${owner()}`">{{ owner() }}</a>
+        <span class="text-muted-foreground">/</span>
+        <a class="font-semibold text-blue-500 hover:underline" [href]="`/${owner()}/${repoName()}`">{{ repoName() }}</a>
+        <span class="border-border text-muted-foreground rounded-full border px-2 py-0.5 text-xs">{{
+          visibility()
+        }}</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button z-button zType="outline" zSize="sm" class="gap-1">
+          <lucide-angular class="size-4" [img]="eyeIcon" />
+          Watch
+        </button>
+        <button z-button zType="outline" zSize="sm" class="gap-1">
+          <lucide-angular class="size-4" [img]="starIcon" />
+          Star
+        </button>
+        <button z-button zType="outline" zSize="sm" class="gap-1">
+          <lucide-angular class="size-4" [img]="forkIcon" />
+          Fork
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="border-border bg-background border-b px-4 md:px-6">
+    <div class="flex gap-1 overflow-x-auto">
+      <button
+        z-button
+        zType="ghost"
+        zSize="sm"
+        class="gap-1.5 rounded-b-none border-b-2"
+        [class.border-primary]="activeTab() === 'code'"
+        [class.border-transparent]="activeTab() !== 'code'"
+        (click)="setActiveTab('code')"
+      >
+        <lucide-angular class="size-4" [img]="codeIcon" />
+        Code
+      </button>
+      <button
+        z-button
+        zType="ghost"
+        zSize="sm"
+        class="gap-1.5 rounded-b-none border-b-2"
+        [class.border-primary]="activeTab() === 'issues'"
+        [class.border-transparent]="activeTab() !== 'issues'"
+        (click)="setActiveTab('issues')"
+      >
+        <lucide-angular class="size-4" [img]="issuesIcon" />
+        Issues
+        <span class="bg-muted rounded-full px-1.5 py-0.5 text-xs">23</span>
+      </button>
+      <button
+        z-button
+        zType="ghost"
+        zSize="sm"
+        class="gap-1.5 rounded-b-none border-b-2"
+        [class.border-primary]="activeTab() === 'pulls'"
+        [class.border-transparent]="activeTab() !== 'pulls'"
+        (click)="setActiveTab('pulls')"
+      >
+        <lucide-angular class="size-4" [img]="pullRequestIcon" />
+        Pull Requests
+        <span class="bg-muted rounded-full px-1.5 py-0.5 text-xs">4</span>
+      </button>
+      <button
+        z-button
+        zType="ghost"
+        zSize="sm"
+        class="gap-1.5 rounded-b-none border-b-2"
+        [class.border-primary]="activeTab() === 'insights'"
+        [class.border-transparent]="activeTab() !== 'insights'"
+        (click)="setActiveTab('insights')"
+      >
+        <lucide-angular class="size-4" [img]="insightsIcon" />
+        Insights
+      </button>
+      <button
+        z-button
+        zType="ghost"
+        zSize="sm"
+        class="gap-1.5 rounded-b-none border-b-2"
+        [class.border-primary]="activeTab() === 'settings'"
+        [class.border-transparent]="activeTab() !== 'settings'"
+        (click)="setActiveTab('settings')"
+      >
+        <lucide-angular class="size-4" [img]="settingsIcon" />
+        Settings
+      </button>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-6 p-4 md:flex-row md:p-6">
+    <div class="flex-1">
+      <div class="mb-4 flex flex-wrap items-center gap-3">
+        <button z-button zType="outline" zSize="sm" class="gap-1">
+          <lucide-angular class="size-4" [img]="branchIcon" />
+          {{ currentBranch() }}
+          <lucide-angular class="size-4" [img]="chevronDownIcon" />
+        </button>
+        <div class="w-full flex-1 sm:w-auto">
+          <input
+            type="text"
+            placeholder="Go to file"
+            class="border-input bg-background placeholder:text-muted-foreground focus:ring-ring w-full rounded-md border px-3 py-1.5 text-sm focus:ring-2 focus:outline-none"
+          />
+        </div>
+        <button z-button zType="default" zSize="sm" class="gap-1">
+          Add file
+          <lucide-angular class="size-4" [img]="chevronDownIcon" />
+        </button>
+      </div>
+
+      <z-card class="mb-6 p-0">
+        <div
+          class="border-border flex flex-col gap-2 border-b px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div class="flex items-center gap-2">
+            <div class="flex size-6 items-center justify-center rounded-full bg-blue-500 text-xs text-white">
+              {{ lastCommitAuthor().charAt(0).toUpperCase() }}{{ lastCommitAuthor().charAt(1) }}
+            </div>
+            <span class="font-medium">{{ lastCommitAuthor() }}</span>
+            <span class="text-muted-foreground">{{ lastCommitMessage() }}</span>
+          </div>
+          <div class="text-muted-foreground flex items-center gap-2 text-sm">
+            <lucide-angular class="size-4" [img]="historyIcon" />
+            {{ lastCommitTime() }}
+          </div>
+        </div>
+
+        <div class="divide-border divide-y">
+          @for (file of files(); track file.name) {
+            <div class="hover:bg-muted/50 flex flex-col gap-2 px-4 py-2 sm:flex-row sm:items-center sm:justify-between">
+              <div class="flex items-center gap-3">
+                @if (file.type === 'folder') {
+                  <lucide-angular class="size-4 text-blue-500" [img]="folderIcon" />
+                } @else {
+                  <lucide-angular class="text-muted-foreground size-4" [img]="fileIcon" />
+                }
+                <span class="text-blue-500 hover:underline">{{ file.name }}</span>
+              </div>
+              <div class="text-muted-foreground flex items-center gap-2 text-sm">
+                <lucide-angular class="size-3" [img]="historyIcon" />
+                {{ file.timestamp }}
+              </div>
+            </div>
+          }
+        </div>
+      </z-card>
+
+      <z-card class="p-0">
+        <div class="border-border flex items-center gap-2 border-b px-4 py-3">
+          <lucide-angular class="size-4" [img]="bookIcon" />
+          <span class="font-medium">README.md</span>
+        </div>
+        <div class="prose prose-sm dark:prose-invert max-w-none p-6" [innerHTML]="readmeContent()"></div>
+      </z-card>
+    </div>
+
+    <div class="w-full shrink-0 space-y-4 md:w-80">
+      <z-card zTitle="Clone">
+        <div class="mb-3 flex items-center gap-2">
+          <input
+            type="text"
+            readonly
+            class="border-input bg-muted flex-1 rounded-md border px-3 py-1.5 text-sm"
+            [value]="cloneUrl()"
+          />
+          <button z-button zType="outline" zSize="sm" (click)="copyCloneUrl()">
+            <lucide-angular class="size-4" [img]="copyIcon" />
+          </button>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <button z-button zType="outline" zSize="sm" class="flex-1 gap-1">
+            <lucide-angular class="size-4" [img]="linkIcon" />
+            Link
+          </button>
+          <button z-button zType="outline" zSize="sm" class="flex-1 gap-1">
+            <lucide-angular class="size-4" [img]="terminalIcon" />
+            CLI
+          </button>
+          <button z-button zType="outline" zSize="sm" class="flex-1 gap-1" (click)="downloadTorrent()">
+            <lucide-angular class="size-4" [img]="downloadIcon" />
+            tor
+          </button>
+        </div>
+      </z-card>
+
+      <z-card zTitle="About" [zDescription]="description()">
+        <div class="space-y-2 text-sm">
+          <div class="flex items-center gap-2">
+            <lucide-angular class="size-4" [img]="starIcon" />
+            <span>{{ stars() }} stars</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <lucide-angular class="size-4" [img]="eyeIcon" />
+            <span>{{ watching() }} watching</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <lucide-angular class="size-4" [img]="forkIcon" />
+            <span>{{ forks() }} forks</span>
+          </div>
+        </div>
+      </z-card>
+
+      <z-card zTitle="Contributors">
+        <div class="space-y-3">
+          @for (contributor of contributors(); track contributor.name) {
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div
+                  class="flex size-6 items-center justify-center rounded-full text-xs text-white"
+                  [class]="contributor.color"
+                >
+                  {{ contributor.initials }}
+                </div>
+                <span class="text-sm text-blue-500">{{ contributor.name }}</span>
+              </div>
+              <span class="text-muted-foreground text-xs">{{ contributor.commits }} commits</span>
+            </div>
+          }
+        </div>
+      </z-card>
+
+      <z-card zTitle="Languages">
+        <div class="mb-3 flex h-2 overflow-hidden rounded-full">
+          @for (lang of languages(); track lang.name) {
+            <div [class]="lang.color" [style.width.%]="lang.percentage"></div>
+          }
+        </div>
+        <div class="space-y-2 text-sm">
+          @for (lang of languages(); track lang.name) {
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="size-3 rounded-full" [class]="lang.color"></div>
+                <span>{{ lang.name }}</span>
+              </div>
+              <span class="text-muted-foreground">{{ lang.percentage }}%</span>
+            </div>
+          }
+        </div>
+      </z-card>
+      <div class="border-border bg-muted/30 rounded-lg border px-4 py-3 text-sm">
+        <span class="text-muted-foreground">License: </span>
+        <a href="#" class="text-blue-500 hover:underline">MIT License</a>
+      </div>
+    </div>
+  </div>
+</div>
