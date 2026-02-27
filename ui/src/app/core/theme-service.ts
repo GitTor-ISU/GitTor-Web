@@ -1,36 +1,46 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal, computed, effect } from '@angular/core';
+
+type Theme = 'light' | 'dark';
 
 /**
- * Theme service.
+ * Theme service using Angular signals for reactive theme state.
  */
 @Injectable({
   providedIn: 'root',
 })
 export default class ThemeService {
+  /**
+   * Signal representing the current theme. It is initialized based on local storage or system preference.
+   */
+  public readonly theme = signal<Theme>(this.resolveInitialTheme());
+
+  /**
+   * Computed signal that is `true` when the current theme is dark.
+   */
+  public readonly isDark = computed(() => this.theme() === 'dark');
+
   private readonly THEME_KEY = 'theme';
 
   public constructor() {
-    const savedTheme = localStorage.getItem(this.THEME_KEY);
-    const isDark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
-
-    this.applyTheme(isDark ? 'dark' : 'light');
-  }
-
-  public toggleTheme(): void {
-    const currentTheme = this.getCurrentTheme();
-    this.applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+    effect(() => {
+      this.applyTheme(this.theme());
+    });
   }
 
   /**
-   * Get current theme.
-   *
-   * @returns {'light' | 'dark'} current theme
+   * Toggle the theme between light and dark.
    */
-  public getCurrentTheme(): 'light' | 'dark' {
-    return (localStorage.getItem(this.THEME_KEY) as 'light' | 'dark') || 'light';
+  public toggleTheme(): void {
+    this.theme.update((current) => (current === 'dark' ? 'light' : 'dark'));
   }
 
-  private applyTheme(theme: 'light' | 'dark'): void {
+  private resolveInitialTheme(): Theme {
+    const savedTheme = localStorage.getItem(this.THEME_KEY);
+    const isDark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    return isDark ? 'dark' : 'light';
+  }
+
+  private applyTheme(theme: Theme): void {
     const html = document.documentElement;
     const isDark = theme === 'dark';
 
