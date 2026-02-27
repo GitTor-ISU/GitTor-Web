@@ -1,5 +1,5 @@
 <div>
-  @if (themeService.getCurrentTheme() === 'dark') {
+  @if (themeService.isDark()) {
     <button z-button zType="ghost" zShape="circle" zSize="icon" (click)="themeService.toggleTheme()">
       <lucide-angular [img]="sunIcon" />
     </button>

@@ -24,7 +24,7 @@ export class Logo {
    * @returns Path to image file.
    */
   protected get src(): string {
-    const theme = this.theme() === 'system' ? this.themeService.getCurrentTheme() : this.theme();
+    const theme = this.theme() === 'system' ? this.themeService.theme() : this.theme();
     const mode = this.mode();
 
     switch (mode) {
