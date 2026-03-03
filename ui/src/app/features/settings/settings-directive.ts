@@ -1,6 +1,10 @@
-import { Directive, inject, output } from '@angular/core';
+import { Directive, inject, output, signal, type WritableSignal } from '@angular/core';
 import { ZardDialogService } from '@shared/components/z-dialog';
 import { Settings } from './settings';
+
+export interface iDialogData {
+  $disabled: WritableSignal<boolean>;
+}
 
 /**
  * Settings Directive.
@@ -22,13 +26,17 @@ export class SettingsDirective {
   }
 
   private openDialog(): void {
+    const $disabled = signal(true);
+
     this.dialogService.create({
       zOkText: 'Save changes',
       zTitle: 'Settings',
+      zData: { $disabled } as iDialogData,
       zContent: Settings,
       zOnOk: (instance) => {
-        console.log('Form submitted:', instance);
+        return instance.submit();
       },
+      zOkDisabled: $disabled,
       zWidth: '1000px',
     });
   }

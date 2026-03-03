@@ -17,10 +17,11 @@ import {
   inject,
   NgModule,
   output,
+  type Signal,
   type TemplateRef,
   type Type,
   viewChild,
-  type ViewContainerRef,
+  type ViewContainerRef
 } from '@angular/core';
 
 import { mergeClasses, noopFn } from '@shared/utils/merge-classes';
@@ -46,7 +47,7 @@ export class ZardDialogOptions<T, U> {
   zHideFooter?: boolean;
   zMaskClosable?: boolean;
   zOkDestructive?: boolean;
-  zOkDisabled?: boolean;
+  zOkDisabled?: Signal<boolean>;
   zOkIcon?: ZardIcon;
   zOkText?: string | null;
   zOnCancel?: EventEmitter<T> | OnClickCallback<T> = noopFn;
@@ -112,7 +113,7 @@ export class ZardDialogOptions<T, U> {
             data-testid="z-ok-button"
             z-button
             [zType]="config.zOkDestructive ? 'destructive' : 'default'"
-            [disabled]="config.zOkDisabled"
+            [zDisabled]="config.zOkDisabled?.() ?? true"
             (click)="onOkClick()"
           >
             @if (config.zOkIcon) {

@@ -1,0 +1,44 @@
+<form class="max-w-md space-y-6 text-sm" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <z-form-field>
+    <label z-form-label>Username</label>
+    <z-form-control [helpText]="this.form.controls.username.value ? usernameErrorMessage() : ''">
+      <input
+        z-input
+        zSize="sm"
+        type="text"
+        formControlName="username"
+        data-test="settings-profile-username"
+        appEmptyToNull
+        [placeholder]="sessionService.user()?.username"
+      />
+    </z-form-control>
+  </z-form-field>
+  <z-form-field>
+    <label z-form-label>First Name</label>
+    <z-form-control [helpText]="this.form.controls.firstName.value ? firstNameErrorMessage() : ''">
+      <input
+        z-input
+        zSize="sm"
+        type="text"
+        formControlName="firstName"
+        data-test="settings-profile-first-name"
+        appEmptyToNull
+        [placeholder]="sessionService.user()?.firstname ?? 'Enter your first name'"
+      />
+    </z-form-control>
+  </z-form-field>
+  <z-form-field>
+    <label z-form-label>Last Name</label>
+    <z-form-control [helpText]="this.form.controls.lastName.value ? lastNameErrorMessage() : ''">
+      <input
+        z-input
+        zSize="sm"
+        type="text"
+        formControlName="lastName"
+        data-test="settings-profile-last-name"
+        appEmptyToNull
+        [placeholder]="sessionService.user()?.lastname ?? 'Enter your last name'"
+      />
+    </z-form-control>
+  </z-form-field>
+</form>

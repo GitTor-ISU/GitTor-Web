@@ -10,7 +10,7 @@
     <form class="max-w-md space-y-6 text-sm" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
       <z-form-field>
         <label z-form-label zRequired>Username</label>
-        <z-form-control [helpText]="usernameErrorMessage()">
+        <z-form-control [helpText]="usernameHelpMessage()">
           <input
             z-input
             zSize="sm"
@@ -23,7 +23,7 @@
       </z-form-field>
       <z-form-field>
         <label z-form-label zRequired>Email</label>
-        <z-form-control [helpText]="emailErrorMessage()">
+        <z-form-control [helpText]="emailHelpMessage()">
           <input
             z-input
             zSize="sm"
@@ -36,7 +36,7 @@
       </z-form-field>
       <z-form-field>
         <label z-form-label zRequired>Password</label>
-        <z-form-control [helpText]="passwordErrorMessage()">
+        <z-form-control [helpText]="passwordHelpMessage()">
           <input
             z-input
             zSize="sm"
@@ -49,7 +49,7 @@
       </z-form-field>
       <z-form-field>
         <label z-form-label zRequired>Confirm password</label>
-        <z-form-control [helpText]="confirmPasswordErrorMessage()">
+        <z-form-control [helpText]="confirmPasswordHelpMessage()">
           <input
             z-input
             zSize="sm"

@@ -1,7 +1,7 @@
 <div class="h-[500px] w-full">
-  <z-tab-group>
+  <z-tab-group (zTabChange)="activeTabIndex.set($event.index)">
     <z-tab label="Profile">
-      <p>Is the default tab component</p>
+      <app-profile />
     </z-tab>
     <z-tab label="GPG">
       <p>Content of the second tab</p>
