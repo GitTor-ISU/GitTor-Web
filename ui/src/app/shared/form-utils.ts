@@ -3,8 +3,6 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { AbstractControl, ValidationErrors } from '@angular/forms';
 
 const VALIDATION_MESSAGES = {
-  valueMismatch: 'Values do not match.',
-  valueMatch: 'Values must not match.',
   invalidEmail: 'Invalid email address.',
   usernamePattern: 'Alphanumeric, hyphen, and underscore characters only.',
   invalidCharacters: 'Invalid character(s).',
@@ -21,8 +19,10 @@ export const getErrorMessage = (control: AbstractControl): string => {
 
   if (errors['required']) return '';
 
-  if (errors['controlMismatch']) return errors['controlMismatch']['message'] || VALIDATION_MESSAGES.valueMismatch;
-  if (errors['controlMatch']) return errors['controlMatch']['message'] || VALIDATION_MESSAGES.valueMatch;
+  if (errors['invalidFileType']) return errors['invalidFileType']['message'];
+
+  if (errors['controlMismatch']) return errors['controlMismatch']['message'];
+  if (errors['controlMatch']) return errors['controlMatch']['message'];
 
   if (errors['pattern']?.['requiredPattern'] === USERNAME_PATTERN) return VALIDATION_MESSAGES.usernamePattern;
   if (errors['pattern']) return VALIDATION_MESSAGES.invalidCharacters;

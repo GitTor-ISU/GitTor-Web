@@ -23,14 +23,14 @@ export class ZardDialogRef<T = any, R = any, U = any> {
     private containerInstance: ZardDialogComponent<T, U>,
     @Inject(PLATFORM_ID) private platformId: object,
   ) {
-    this.containerInstance.cancelTriggered.subscribe(() => this.trigger(eTriggerAction.CANCEL));
-    this.containerInstance.okTriggered.subscribe(() => this.trigger(eTriggerAction.OK));
+    this.containerInstance.cancelTriggered.subscribe(() => void this.trigger(eTriggerAction.CANCEL));
+    this.containerInstance.okTriggered.subscribe(() => void this.trigger(eTriggerAction.OK));
 
     if ((this.config.zMaskClosable ?? true) && isPlatformBrowser(this.platformId)) {
       this.overlayRef
         .outsidePointerEvents()
         .pipe(takeUntil(this.destroy$))
-        .subscribe(() => this.close());
+        .subscribe(() => void this.trigger(eTriggerAction.CANCEL));
     }
 
     if (isPlatformBrowser(this.platformId)) {
@@ -39,7 +39,7 @@ export class ZardDialogRef<T = any, R = any, U = any> {
           filter(event => event.key === 'Escape'),
           takeUntil(this.destroy$),
         )
-        .subscribe(() => this.close());
+        .subscribe(() => void this.trigger(eTriggerAction.CANCEL));
     }
   }
 
@@ -71,14 +71,18 @@ export class ZardDialogRef<T = any, R = any, U = any> {
     }, 150);
   }
 
-  private trigger(action: eTriggerAction) {
+  private async trigger(action: eTriggerAction): Promise<void> {
     const trigger = { ok: this.config.zOnOk, cancel: this.config.zOnCancel }[action];
 
     if (trigger instanceof EventEmitter) {
       trigger.emit(this.getContentComponent());
     } else if (typeof trigger === 'function') {
-      const result = trigger(this.getContentComponent()) as R;
-      this.closeWithResult(result);
+      try {
+        const result = await Promise.resolve(trigger(this.getContentComponent()));
+        this.closeWithResult(result);
+      } catch {
+        // Keep dialog open when callback fails.
+      }
     } else {
       this.close();
     }
@@ -88,9 +92,9 @@ export class ZardDialogRef<T = any, R = any, U = any> {
     return this.componentInstance as T;
   }
 
-  private closeWithResult(result: R): void {
+  private closeWithResult(result: unknown): void {
     if (result !== false) {
-      this.close(result);
+      this.close(result as R);
     }
   }
 }

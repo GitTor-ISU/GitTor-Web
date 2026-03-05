@@ -1,9 +1,11 @@
-import { Directive, inject, output, signal, type WritableSignal } from '@angular/core';
+import { Directive, inject, input, output, signal, type WritableSignal } from '@angular/core';
 import { ZardDialogService } from '@shared/components/z-dialog';
 import { Settings } from './settings';
 
-export interface iDialogData {
+export interface iSettingsData {
   $disabled: WritableSignal<boolean>;
+  $hideFooter: WritableSignal<boolean>;
+  currentTab: number;
 }
 
 /**
@@ -17,6 +19,8 @@ export interface iDialogData {
 })
 export class SettingsDirective {
   public readonly appSettingsClick = output<MouseEvent>();
+  public readonly currentTab = input<number>(0);
+  public readonly width = input<number>(1000);
 
   private dialogService = inject(ZardDialogService);
 
@@ -27,17 +31,20 @@ export class SettingsDirective {
 
   private openDialog(): void {
     const $disabled = signal(true);
+    const $hideFooter = signal(false);
 
     this.dialogService.create({
       zOkText: 'Save changes',
       zTitle: 'Settings',
-      zData: { $disabled } as iDialogData,
+      zData: { $disabled, $hideFooter, currentTab: this.currentTab() } as iSettingsData,
       zContent: Settings,
       zOnOk: (instance) => {
         return instance.submit();
       },
+      zOnCancel: (instance) => instance.onDeselected(),
       zOkDisabled: $disabled,
-      zWidth: '1000px',
+      zHideFooter: $hideFooter,
+      zWidth: `${this.width()}px`,
     });
   }
 }

@@ -44,7 +44,7 @@ export class ZardDialogOptions<T, U> {
   zCustomClasses?: string;
   zData?: U;
   zDescription?: string;
-  zHideFooter?: boolean;
+  zHideFooter?: Signal<boolean>;
   zMaskClosable?: boolean;
   zOkDestructive?: boolean;
   zOkDisabled?: Signal<boolean>;
@@ -95,7 +95,7 @@ export class ZardDialogOptions<T, U> {
       }
     </main>
 
-    @if (!config.zHideFooter) {
+    @if (!config.zHideFooter?.()) {
       <footer class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end sm:gap-0 sm:space-x-2">
         @if (config.zCancelText !== null) {
           <button type="button" data-testid="z-cancel-button" z-button zType="outline" (click)="onCloseClick()">

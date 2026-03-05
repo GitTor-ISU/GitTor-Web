@@ -8,6 +8,7 @@ import {
   contentChildren,
   DestroyRef,
   DOCUMENT,
+  effect,
   type ElementRef,
   inject,
   Injector,
@@ -188,13 +189,19 @@ export class ZardTabGroupComponent implements AfterViewInit {
     tab: ZardTabComponent;
   }>();
 
-  protected readonly zDeselect = output<{
-    index: number;
-    label: string;
-    tab: ZardTabComponent;
-  }>();
+  readonly zDeselect = input<
+    (event: {
+      index: number;
+      label: string;
+      tab: ZardTabComponent;
+    }) => boolean | Promise<boolean>
+  >(() => true);
+
+  readonly zActiveTabIndexChange = output<number>();
 
   readonly zTabsPosition = input<ZardTabVariants['zPosition']>('top');
+  readonly zActiveTabIndex = input(0);
+  readonly zClickableTabs = input(true);
   readonly zActivePosition = input<ZardTabVariants['zActivePosition']>('bottom');
   readonly zShowArrow = input(true);
   readonly zScrollAmount = input(100);
@@ -204,12 +211,23 @@ export class ZardTabGroupComponent implements AfterViewInit {
 
   protected readonly showArrow = computed(() => this.zShowArrow() && this.scrollPresent());
 
-  ngAfterViewInit(): void {
-    // default tab selection
-    if (this.tabs().length) {
-      this.setActiveTab(0);
-    }
+  public constructor() {
+    effect(() => {
+      const requestedIndex = Math.trunc(this.zActiveTabIndex());
+      const tabsLength = this.tabs().length;
 
+      if (!tabsLength) {
+        return;
+      }
+
+      const clampedIndex = Math.max(0, Math.min(requestedIndex, tabsLength - 1));
+      if (clampedIndex !== this.activeTabIndex()) {
+        this.activeTabIndex.set(clampedIndex);
+      }
+    });
+  }
+
+  ngAfterViewInit(): void {
     runInInjectionContext(this.injector, () => {
       const observeInputs$ = merge(
         toObservable(this.zShowArrow),
@@ -264,17 +282,26 @@ export class ZardTabGroupComponent implements AfterViewInit {
     return false;
   }
 
-  protected setActiveTab(index: number) {
+  protected async setActiveTab(index: number): Promise<void> {
+    if (index == this.activeTabIndex()) {
+      return;
+    }
+
     const currentTab = this.tabs()[this.activeTabIndex()];
-    if (index !== this.activeTabIndex()) {
-      this.zDeselect.emit({
-        index: this.activeTabIndex(),
-        label: currentTab.label(),
-        tab: currentTab,
-      });
+
+    const canDeselect = await this.zDeselect()({
+      index: this.activeTabIndex(),
+      label: currentTab.label(),
+      tab: currentTab,
+    });
+
+    if (!canDeselect) {
+      return;
     }
 
     this.activeTabIndex.set(index);
+    this.zActiveTabIndexChange.emit(index);
+
     const activeTabComponent = this.tabs()[index];
     if (activeTabComponent) {
       this.zTabChange.emit({
@@ -336,7 +363,7 @@ export class ZardTabGroupComponent implements AfterViewInit {
 
   selectTabByIndex(index: number): void {
     if (index >= 0 && index < this.tabs().length) {
-      this.setActiveTab(index);
+      void this.setActiveTab(index);
     } else {
       console.warn(`Index ${index} outside the range of available tabs.`);
     }
