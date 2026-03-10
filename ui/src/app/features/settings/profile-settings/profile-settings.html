@@ -74,5 +74,8 @@
       </z-form-field>
     </div>
   </form>
-  <z-button class="my-3 w-30" zType="destructive" (click)="onDeleteAccount()">Delete Account</z-button>
+  <div class="my-3">
+    <z-button class="mr-4" zType="secondary" (click)="onChangePassword()">Change Password</z-button>
+    <z-button zType="destructive" (click)="onDeleteAccount()">Delete Account</z-button>
+  </div>
 </div>

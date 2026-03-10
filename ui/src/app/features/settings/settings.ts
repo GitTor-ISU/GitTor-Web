@@ -1,14 +1,5 @@
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import {
-  afterRenderEffect,
-  Component,
-  computed,
-  inject,
-  input,
-  signal,
-  viewChildren,
-  ViewContainerRef,
-} from '@angular/core';
+import { afterRenderEffect, Component, computed, inject, input, signal, viewChildren } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormGroup } from '@angular/forms';
 import SessionService from '@core/session-service';
@@ -18,6 +9,7 @@ import { ZardCardComponent } from '@shared/components/z-card';
 import { ZardTabComponent, ZardTabGroupComponent, zPosition } from '@shared/components/z-tabs';
 import { firstValueFrom, map } from 'rxjs';
 import { ProfileSettings } from './profile-settings/profile-settings';
+import { RepositorySettings } from './repository-settings/repository-settings';
 import { SETTINGS_TAB } from './settings-tab';
 
 /**
@@ -25,7 +17,14 @@ import { SETTINGS_TAB } from './settings-tab';
  */
 @Component({
   selector: 'app-settings',
-  imports: [ZardTabComponent, ZardTabGroupComponent, ProfileSettings, ZardButtonComponent, ZardCardComponent],
+  imports: [
+    ZardTabComponent,
+    ZardTabGroupComponent,
+    ProfileSettings,
+    ZardButtonComponent,
+    ZardCardComponent,
+    RepositorySettings,
+  ],
   templateUrl: './settings.html',
 })
 export class Settings {
@@ -43,10 +42,10 @@ export class Settings {
 
   protected readonly tabs = viewChildren(SETTINGS_TAB);
   protected readonly activeTab = computed(() => this.tabs()[this.activeTabIndex()]);
+  protected readonly submit = computed(() => this.activeTab()?.onSubmit());
   protected readonly activeForm = signal<FormGroup | null>(null);
 
   private readonly alertDialogService = inject(ZardAlertDialogService);
-  private readonly viewContainerRef = inject(ViewContainerRef);
 
   public constructor() {
     this.activeTabIndex.set(this.currentTab());
@@ -54,13 +53,6 @@ export class Settings {
     afterRenderEffect(() => {
       this.activeForm.set(this.activeTab()?.form ?? null);
     });
-  }
-
-  /**
-   * Submit the active tab's form.
-   */
-  public submit(): void {
-    this.activeTab()?.onSubmit();
   }
 
   public readonly onDeselected = async (): Promise<boolean> => {
@@ -75,7 +67,6 @@ export class Settings {
       zOkText: 'Continue',
       zCancelText: 'Cancel',
       zOnOk: () => ({ confirmed: true }),
-      zViewContainerRef: this.viewContainerRef,
     });
 
     const result = await firstValueFrom(alertRef.afterClosed());

@@ -5,6 +5,7 @@ import SessionService from '@core/session-service';
 import { ZardAlertDialogService } from '@shared/components/z-alert-dialog/alert-dialog.service';
 import { ZardAvatarComponent } from '@shared/components/z-avatar';
 import { ZardButtonComponent } from '@shared/components/z-button';
+import { ZardDialogService } from '@shared/components/z-dialog';
 import { ZardFormModule } from '@shared/components/z-form/form.module';
 import { ZardIconComponent } from '@shared/components/z-icon';
 import { ZardInputDirective } from '@shared/components/z-input/input.directive';
@@ -14,7 +15,8 @@ import { formDiffValidator } from '@shared/form-diff-validator';
 import { createFormValueSignal, createHelpMessageSignal } from '@shared/form-utils';
 import { LucideIconData, UploadIcon } from 'lucide-angular';
 import { map } from 'rxjs';
-import { SETTINGS_TAB, SettingsTab } from '../settings-tab';
+import { SETTINGS_TAB, SettingsFormTab } from '../settings-tab';
+import { ChangePassword } from './change-password';
 
 /**
  * Profile settings page.
@@ -33,7 +35,7 @@ import { SETTINGS_TAB, SettingsTab } from '../settings-tab';
   templateUrl: './profile-settings.html',
   providers: [{ provide: SETTINGS_TAB, useExisting: ProfileSettings }],
 })
-export class ProfileSettings implements SettingsTab {
+export class ProfileSettings implements SettingsFormTab {
   private static readonly DEFAULT_AVATAR_URL =
     'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDKRD3JXx695EOaMjnRWvaIH0bifN8UqjmBQ&s';
 
@@ -73,6 +75,7 @@ export class ProfileSettings implements SettingsTab {
   protected readonly uploadIcon: LucideIconData = UploadIcon;
 
   private readonly alertDialogService = inject(ZardAlertDialogService);
+  private readonly dialogService = inject(ZardDialogService);
 
   public constructor() {
     effect(() => {
@@ -111,6 +114,21 @@ export class ProfileSettings implements SettingsTab {
       zOkText: 'Continue',
       zOkDestructive: true,
       zCancelText: 'Cancel',
+    });
+  }
+
+  protected onChangePassword(): void {
+    const disabled = signal(true);
+
+    this.dialogService.create({
+      zTitle: 'Change Password',
+      zContent: ChangePassword,
+      zData: { disabled },
+      zOkText: 'Update',
+      zOkDisabled: disabled,
+      zOnOk: (instance) => {
+        console.log('Form submitted:', instance.form.value);
+      },
     });
   }
 }
