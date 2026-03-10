@@ -1,7 +1,8 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import SessionService from '@core/session-service';
+import { ZardAlertDialogService } from '@shared/components/z-alert-dialog/alert-dialog.service';
 import { ZardAvatarComponent } from '@shared/components/z-avatar';
 import { ZardButtonComponent } from '@shared/components/z-button';
 import { ZardFormModule } from '@shared/components/z-form/form.module';
@@ -13,7 +14,7 @@ import { formDiffValidator } from '@shared/form-diff-validator';
 import { createFormValueSignal, createHelpMessageSignal } from '@shared/form-utils';
 import { LucideIconData, UploadIcon } from 'lucide-angular';
 import { map } from 'rxjs';
-import { SETTINGS_TAB, type SettingsTab } from '../settings-tab';
+import { SETTINGS_TAB, SettingsTab } from '../settings-tab';
 
 /**
  * Profile settings page.
@@ -55,6 +56,7 @@ export class ProfileSettings implements SettingsTab {
   });
 
   protected sessionService = inject(SessionService);
+  protected readonly user = computed(() => this.sessionService.user());
 
   protected readonly formValue = createFormValueSignal(this.form);
   protected readonly avatarHelpMessage = signal('');
@@ -70,11 +72,15 @@ export class ProfileSettings implements SettingsTab {
   );
   protected readonly uploadIcon: LucideIconData = UploadIcon;
 
+  private readonly alertDialogService = inject(ZardAlertDialogService);
+
   public constructor() {
-    this.form.addValidators(formDiffValidator(this.form.getRawValue()));
-    this.form.controls.username.addValidators(controlMatchValidator(this.sessionService.user()?.username ?? ''));
-    this.form.controls.firstName.addValidators(controlMatchValidator(this.sessionService.user()?.firstname ?? ''));
-    this.form.controls.lastName.addValidators(controlMatchValidator(this.sessionService.user()?.lastname ?? ''));
+    effect(() => {
+      this.form.addValidators(formDiffValidator(this.form.getRawValue()));
+      this.form.controls.username.addValidators(controlMatchValidator(this.user()?.username ?? ''));
+      this.form.controls.firstName.addValidators(controlMatchValidator(this.user()?.firstname ?? ''));
+      this.form.controls.lastName.addValidators(controlMatchValidator(this.user()?.lastname ?? ''));
+    });
   }
 
   public onSubmit(): void {
@@ -96,5 +102,15 @@ export class ProfileSettings implements SettingsTab {
     }
 
     input.value = '';
+  }
+
+  protected onDeleteAccount(): void {
+    this.alertDialogService.confirm({
+      zTitle: 'Are you sure?',
+      zDescription: 'This action cannot be undone.',
+      zOkText: 'Continue',
+      zOkDestructive: true,
+      zCancelText: 'Cancel',
+    });
   }
 }

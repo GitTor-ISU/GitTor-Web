@@ -1,2 +1,13 @@
-<z-toaster data-test="toast" [richColors]="true" [expand]="true" [theme]="themeService.getCurrentTheme()" />
+<z-toaster
+  data-test="toast"
+  [richColors]="true"
+  [expand]="true"
+  [theme]="themeService.getCurrentTheme()"
+  [closeButton]="true"
+/>
+@if (isLoading()) {
+  <div class="bg-background/40 fixed inset-0 z-50 flex items-center justify-center">
+    <z-loader zSize="lg" />
+  </div>
+}
 <router-outlet />

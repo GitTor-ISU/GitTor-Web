@@ -1,19 +1,22 @@
-<div class="w-full" [style.height.px]="zData.$hideFooter() ? 552 : 500">
+<z-card zTitle="Settings" class="m-6 mx-auto flex h-[calc(100vh-3rem)] max-w-4xl flex-col">
   <z-tab-group
-    class="h-full"
+    class="flex-1"
+    [zActivePosition]="tabsPosition() === 'top' ? 'bottom' : 'left'"
     [zTabsPosition]="tabsPosition()"
     [zDeselect]="onDeselected"
     [(zActiveTabIndex)]="activeTabIndex"
-    (zTabChange)="activeTab?.form?.reset()"
+    (zTabChange)="activeForm()?.reset()"
   >
     <z-tab label="Profile">
       <app-profile />
     </z-tab>
-    <z-tab label="Repository">
-      <p>Content of the second tab</p>
-    </z-tab>
-    <z-tab label="GPG">
-      <p>Content of the third tab</p>
-    </z-tab>
+    <z-tab label="Repository"> Repo Page </z-tab>
+    <z-tab label="GPG"> GPG Page </z-tab>
   </z-tab-group>
-</div>
+  @if (activeForm(); as form) {
+    <div class="mt-5 flex items-center justify-end gap-2">
+      <button z-button zType="secondary" [zDisabled]="form.pristine" (click)="form.reset()">Reset</button>
+      <button z-button [zDisabled]="form.invalid" (click)="submit()">Save</button>
+    </div>
+  }
+</z-card>

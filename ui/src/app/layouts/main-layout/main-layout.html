@@ -28,7 +28,7 @@
         }
       </z-sidebar-group>
 
-      @if (sessionService.user()) {
+      @if (user()) {
         <z-sidebar-group>
           <z-sidebar-group-label [class.hidden]="sidebarCollapsed()">Workspace</z-sidebar-group-label>
           @for (item of workspaceMenuItems; track item.label) {
@@ -56,24 +56,24 @@
             zType="ghost"
             zPosition="right"
             class="mb-1 justify-start"
-            [attr.data-test]="sessionService.isLoggedIn() ? 'sidebar-logout-button' : 'sidebar-login-button'"
+            [attr.data-test]="sessionService.hasToken() ? 'sidebar-logout-button' : 'sidebar-login-button'"
             [class.w-full]="sidebarCollapsed()"
-            [zTooltip]="sidebarCollapsed() ? (sessionService.isLoggedIn() ? 'Log Out' : 'Log In') : ''"
-            [routerLink]="!sessionService.isLoggedIn() ? '/login' : ''"
-            (click)="sessionService.isLoggedIn() && sessionService.logout()"
+            [zTooltip]="sidebarCollapsed() ? (sessionService.hasToken() ? 'Log Out' : 'Log In') : ''"
+            [routerLink]="!sessionService.hasToken() ? '/login' : ''"
+            (click)="sessionService.hasToken() && sessionService.logout()"
           >
-            <z-icon class="-ml-[3px]" [zType]="sessionService.isLoggedIn() ? 'log-out' : logInIcon" />
+            <z-icon class="-ml-[3px]" [zType]="sessionService.hasToken() ? 'log-out' : logInIcon" />
             <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{
-              sessionService.isLoggedIn() ? 'Log Out' : 'Log In'
+              sessionService.hasToken() ? 'Log Out' : 'Log In'
             }}</span>
           </button>
           <app-theme-toggle />
         </div>
 
-        @if (sessionService.user()) {
+        @if (user()) {
           <div
-            appSettings
             data-test="sidebar-user-button"
+            routerLink="/settings"
             [class]="`cursor-pointer gap-2 rounded-md ${sidebarCollapsed() ? 'mt-3 -ml-1 w-max' : 'hover:bg-muted flex items-center p-1'}`"
           >
             <z-avatar
@@ -86,7 +86,7 @@
                 class="min-w-0 overflow-hidden"
                 [class]="sidebarCollapsed() ? 'max-w-0 opacity-0' : 'max-w-[200px] opacity-100'"
               >
-                <span class="block truncate font-medium">{{ sessionService.user()?.username }}</span>
+                <span class="block truncate font-medium">{{ user()?.username }}</span>
               </div>
               <z-icon
                 zType="chevrons-up-down"
@@ -94,14 +94,6 @@
                 [class]="sidebarCollapsed() ? 'opacity-0' : 'opacity-100'"
               />
             }
-          </div>
-        } @else if (sessionService.isLoggedIn()) {
-          <div class="-ml-1 flex items-center space-x-4">
-            <z-skeleton class="h-11 w-11 rounded-full" />
-            <div class="space-y-2">
-              <z-skeleton class="h-4 w-[100px]" />
-              <z-skeleton class="h-4 w-[75px]" />
-            </div>
           </div>
         }
       </div>

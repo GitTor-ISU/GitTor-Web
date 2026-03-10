@@ -6,7 +6,7 @@ import { RegisterDto } from '@generated/openapi/models/register-dto';
 import { UserDto } from '@generated/openapi/models/user-dto';
 import { AuthenticationService } from '@generated/openapi/services/authentication';
 import { UsersService } from '@generated/openapi/services/users';
-import { firstValueFrom } from 'rxjs';
+import { catchError, firstValueFrom, Observable, of, tap } from 'rxjs';
 
 /**
  * Auth service.
@@ -15,13 +15,13 @@ import { firstValueFrom } from 'rxjs';
   providedIn: 'root',
 })
 export default class SessionService {
-  public readonly accessToken: WritableSignal<AuthenticationDto | undefined> = signal(undefined);
-  public readonly isLoggedIn: Signal<boolean> = computed(() => !!this.accessToken());
-  public readonly user: WritableSignal<UserDto | null> = signal(null);
+  public readonly accessToken: WritableSignal<AuthenticationDto | null> = signal(null);
+  public readonly hasToken: Signal<boolean> = computed(() => !!this.accessToken());
+  public readonly user: WritableSignal<UserDto | null> = signal<UserDto | null>(null);
 
   private readonly TOKEN_KEY = 'accessToken';
   private readonly authService: AuthenticationService = inject(AuthenticationService);
-  private readonly usersService: UsersService = inject(UsersService);
+  private readonly usersService = inject(UsersService);
   private readonly router: Router = inject(Router);
 
   public constructor() {
@@ -57,10 +57,8 @@ export default class SessionService {
     try {
       const result = await firstValueFrom(this.authService.refresh(''));
       this.accessToken.set(result);
-      this.setMe();
     } catch (error) {
-      this.accessToken.set(undefined);
-      this.user.set(null);
+      this.accessToken.set(null);
       throw error;
     }
   }
@@ -74,10 +72,8 @@ export default class SessionService {
     try {
       const result = await firstValueFrom(this.authService.login(data));
       this.accessToken.set(result);
-      this.setMe();
     } catch (error) {
-      this.accessToken.set(undefined);
-      this.user.set(null);
+      this.accessToken.set(null);
       throw error;
     }
   }
@@ -91,10 +87,8 @@ export default class SessionService {
     try {
       const result = await firstValueFrom(this.authService.register(data));
       this.accessToken.set(result);
-      this.setMe();
     } catch (error) {
-      this.accessToken.set(undefined);
-      this.user.set(null);
+      this.accessToken.set(null);
       throw error;
     }
   }
@@ -105,30 +99,35 @@ export default class SessionService {
   public async logout(): Promise<void> {
     try {
       await firstValueFrom(this.authService.logout(''));
-      this.accessToken.set(undefined);
+      this.accessToken.set(null);
       this.user.set(null);
+      window.location.reload();
     } catch (error) {
-      this.accessToken.set(undefined);
+      this.accessToken.set(null);
       this.user.set(null);
       throw error;
     }
   }
 
   /**
-   * Set user info.
+   * Fetch current user as an observable stream.
+   *
+   * @returns User stream with null fallback on failure
    */
-  public async setMe(): Promise<void> {
-    try {
-      const user = await firstValueFrom(this.usersService.getMe());
-      this.user.set(user!);
-    } catch (error) {
-      this.user.set(null);
-      throw error;
-    }
+  public fetchMe$(): Observable<UserDto | null> {
+    return this.usersService.getMe().pipe(
+      tap((user) => {
+        this.user.set(user);
+      }),
+      catchError(() => {
+        void this.logout();
+        return of(null);
+      })
+    );
   }
 
-  private getStoredToken(): AuthenticationDto | undefined {
+  private getStoredToken(): AuthenticationDto | null {
     const tokenString = localStorage.getItem(this.TOKEN_KEY);
-    return tokenString ? JSON.parse(tokenString) : undefined;
+    return tokenString ? JSON.parse(tokenString) : null;
   }
 }

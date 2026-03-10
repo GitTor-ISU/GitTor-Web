@@ -62,7 +62,7 @@ export class ZardTabComponent {
       <ng-container [ngTemplateOutlet]="navigationBlock" />
     }
 
-    <div class="tab-content flex-1">
+    <div class="tab-content min-h-0 flex-1 overflow-auto">
       @for (tab of tabs(); track $index; let index = $index) {
         <div
           role="tabpanel"
