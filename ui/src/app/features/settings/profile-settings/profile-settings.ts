@@ -15,7 +15,7 @@ import { formDiffValidator } from '@shared/form-diff-validator';
 import { createFormValueSignal, createHelpMessageSignal } from '@shared/form-utils';
 import { LucideIconData, UploadIcon } from 'lucide-angular';
 import { map } from 'rxjs';
-import { SETTINGS_TAB, SettingsFormTab } from '../settings-tab';
+import { SETTINGS_TAB, SettingsFormTab } from '../settings-service';
 import { ChangePassword } from './change-password';
 
 /**
@@ -88,6 +88,10 @@ export class ProfileSettings implements SettingsFormTab {
 
   public onSubmit(): void {
     console.log('Profile form submitted:', this.form.value);
+  }
+
+  public onReset(): void {
+    this.form.reset();
   }
 
   protected onFileSelected(event: Event): void {

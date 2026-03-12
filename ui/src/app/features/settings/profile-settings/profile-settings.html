@@ -1,4 +1,4 @@
-<div class="m-6 flex flex-col gap-6">
+<div class="flex flex-col gap-6 p-6">
   <form
     class="flex flex-col gap-6 text-sm md:flex-row md:items-start md:gap-16"
     [formGroup]="form"
@@ -49,7 +49,7 @@
       <z-form-field class="w-full">
         <label z-form-label>Profile picture</label>
         <z-form-control [errorMessage]="avatarHelpMessage()">
-          <div class="m-4 flex items-center gap-4">
+          <div class="m-2 flex items-center gap-4">
             <z-avatar
               zAlt="User Avatar"
               class="h-45 w-45 shrink-0 cursor-pointer"
@@ -58,7 +58,7 @@
             />
             <button z-button type="button" zType="secondary" (click)="fileUpload.click()">
               <z-icon [zType]="uploadIcon" />
-              Edit
+              Upload
             </button>
           </div>
           <input
@@ -75,7 +75,7 @@
     </div>
   </form>
   <div class="my-3">
-    <z-button class="mr-4" zType="secondary" (click)="onChangePassword()">Change Password</z-button>
+    <z-button class="mr-2" zType="secondary" (click)="onChangePassword()">Change Password</z-button>
     <z-button zType="destructive" (click)="onDeleteAccount()">Delete Account</z-button>
   </div>
 </div>

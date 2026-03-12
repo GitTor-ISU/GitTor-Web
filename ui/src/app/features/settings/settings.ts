@@ -3,14 +3,13 @@ import { afterRenderEffect, Component, computed, inject, input, signal, viewChil
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormGroup } from '@angular/forms';
 import SessionService from '@core/session-service';
-import { ZardAlertDialogService } from '@shared/components/z-alert-dialog/alert-dialog.service';
 import { ZardButtonComponent } from '@shared/components/z-button';
 import { ZardCardComponent } from '@shared/components/z-card';
 import { ZardTabComponent, ZardTabGroupComponent, zPosition } from '@shared/components/z-tabs';
-import { firstValueFrom, map } from 'rxjs';
+import { map } from 'rxjs';
 import { ProfileSettings } from './profile-settings/profile-settings';
 import { RepositorySettings } from './repository-settings/repository-settings';
-import { SETTINGS_TAB } from './settings-tab';
+import { SETTINGS_TAB, SettingsService } from './settings-service';
 
 /**
  * Settings component.
@@ -26,6 +25,7 @@ import { SETTINGS_TAB } from './settings-tab';
     RepositorySettings,
   ],
   templateUrl: './settings.html',
+  providers: [SettingsService],
 })
 export class Settings {
   public readonly currentTab = input<number>(0);
@@ -45,7 +45,7 @@ export class Settings {
   protected readonly submit = computed(() => this.activeTab()?.onSubmit());
   protected readonly activeForm = signal<FormGroup | null>(null);
 
-  private readonly alertDialogService = inject(ZardAlertDialogService);
+  private readonly settingsService = inject(SettingsService);
 
   public constructor() {
     this.activeTabIndex.set(this.currentTab());
@@ -56,20 +56,6 @@ export class Settings {
   }
 
   public readonly onDeselected = async (): Promise<boolean> => {
-    const form = this.activeForm();
-    if (!form || !form.dirty) {
-      return true;
-    }
-
-    const alertRef = this.alertDialogService.confirm({
-      zTitle: 'Unsaved changes',
-      zDescription: 'You have unsaved changes. Are you sure you want to leave?',
-      zOkText: 'Continue',
-      zCancelText: 'Cancel',
-      zOnOk: () => ({ confirmed: true }),
-    });
-
-    const result = await firstValueFrom(alertRef.afterClosed());
-    return result !== undefined;
+    return this.settingsService.confirmDiscardChanges(this.activeForm());
   };
 }

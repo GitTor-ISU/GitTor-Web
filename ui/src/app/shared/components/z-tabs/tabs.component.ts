@@ -70,7 +70,7 @@ export class ZardTabComponent {
           [attr.aria-labelledby]="'tab-' + index"
           [attr.tabindex]="0"
           [hidden]="activeTabIndex() !== index"
-          class="focus-visible:ring-primary/50 outline-none focus-visible:ring-2"
+          class="h-full focus-visible:ring-primary/50 outline-none focus-visible:ring-2"
         >
           <ng-container [ngTemplateOutlet]="tab.contentTemplate()" />
         </div>

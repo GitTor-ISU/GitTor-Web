@@ -1,6 +1,6 @@
 <z-card zTitle="Settings" class="m-6 mx-auto flex h-[calc(100vh-3rem)] max-w-4xl flex-col">
   <z-tab-group
-    class="flex-1"
+    class="min-h-0 flex-1"
     [zActivePosition]="tabsPosition() === 'top' ? 'bottom' : 'left'"
     [zTabsPosition]="tabsPosition()"
     [zDeselect]="onDeselected"
@@ -15,9 +15,9 @@
     </z-tab>
     <z-tab label="GPG"> GPG Page </z-tab>
   </z-tab-group>
-  @if (activeTab()) {
+  @if (activeForm()) {
     <div class="mt-5 flex items-center justify-end gap-2">
-      <button z-button zType="secondary" [zDisabled]="activeForm()?.pristine" (click)="activeForm()?.reset()">
+      <button z-button zType="secondary" [zDisabled]="activeForm()?.pristine" (click)="activeTab().onReset()">
         Reset
       </button>
       <button z-button [zDisabled]="activeForm()?.invalid" (click)="activeTab().onSubmit()">Save</button>
