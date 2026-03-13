@@ -59,7 +59,7 @@ public class TorrentController {
     @Value("${pagination.max-page-size:100}")
     private int maxPageSize;
 
-    private static final String TORRENT_MIME_TYPE = "application/x-bittorrent";
+    public static final String TORRENT_MIME_TYPE = "application/x-bittorrent";
 
     /**
      * Upload new torrent. Client sends multipart/form-data with: - "metadata" part (application/json) -

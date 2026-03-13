@@ -10,7 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -26,19 +28,24 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import api.BasicContext;
 import api.controllers.AuthenticationController;
+import api.controllers.TorrentController;
 import api.dtos.AuthenticationDto;
 import api.dtos.AuthorityDto;
 import api.dtos.ErrorDto;
 import api.dtos.LoginDto;
 import api.dtos.RegisterDto;
+import api.dtos.TorrentDto;
 import api.dtos.UserDto;
+import api.entities.Torrent;
 import api.entities.User;
 import api.services.TokenService;
+import api.services.TorrentService;
 import api.services.UserService;
 
 /**
@@ -49,6 +56,8 @@ public class UserControllerTest extends BasicContext {
     private UserService userService;
     @Autowired
     private TokenService tokenService;
+    @Autowired
+    private TorrentController torrentController;
     @Autowired
     private AuthenticationController authenticationController;
 
@@ -413,6 +422,160 @@ public class UserControllerTest extends BasicContext {
                 () -> assertTrue(authorities.size() > 0, "Admin should have at least one authority"),
                 () -> assertTrue(authorities.stream().allMatch(a -> a.getId() != null && a.getAuthority() != null),
                     "All authorities should have valid structure"));
+        }
+    }
+
+    /**
+     * {@link UserController#getMyTorrents} test.
+     */
+    @Nested
+    public class GetMyTorrents {
+        private static final String ENDPOINT = "/users/me/torrents";
+
+        @Test
+        public void shouldGetMyTorrents_whenJwtAuthentication() {
+            // GIVEN: New user registered
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            AuthenticationDto auth = authenticationController.register(register).getBody();
+
+            // GIVEN: JWT authentication
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(auth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // WHEN: Get my torrents
+            ResponseEntity<List<TorrentDto>> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET,
+                request, new ParameterizedTypeReference<List<TorrentDto>>() {});
+
+            // THEN: Returns my torrents
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()));
+        }
+
+        @Test
+        public void shouldGetMyTorrents_whenBasicAuthentication() {
+            // GIVEN: New user registered
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            String password = register.getPassword();
+            authenticationController.register(register).getBody();
+
+            // GIVEN: Basic authentication
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBasicAuth(username, password);
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // WHEN: Get my torrents
+            ResponseEntity<List<TorrentDto>> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET,
+                request, new ParameterizedTypeReference<List<TorrentDto>>() {});
+
+            // THEN: Returns my torrents
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()));
+        }
+
+        @Test
+        public void should401_whenNoAuthentication() {
+            // GIVEN: No authentication
+
+            // WHEN: Get my torrents
+            ResponseEntity<String> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET, null,
+                new ParameterizedTypeReference<String>() {});
+
+            // THEN: Responds unauthorized
+            assertAll(() -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
+                () -> assertNull(responseEntity.getBody()));
+        }
+
+        @Test
+        public void should401_whenJwtAuthenticationExpires() {
+            // GIVEN: New user registered
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register).getBody();
+
+            // GIVEN: JWT authentication
+            AuthenticationDto auth = tokenService.generateAccessToken(username);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(auth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // GIVEN: Wait till token expires
+            instant = instant.plus(expires, ChronoUnit.MINUTES).plus(1, ChronoUnit.SECONDS);
+
+            // WHEN: Get my torrents
+            ResponseEntity<String> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET, request,
+                new ParameterizedTypeReference<String>() {});
+
+            // THEN: Responds unauthorized
+            assertAll(() -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
+                () -> assertNull(responseEntity.getBody()));
+        }
+
+        @Test
+        public void should401_whenJwtAuthenticationInvalid() {
+            // GIVEN: New user registered
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register).getBody();
+
+            // GIVEN: Invalid JWT authentication
+            String invalidToken = Jwts.builder().subject(username).signWith(Jwts.SIG.HS512.key().build()).compact();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(invalidToken);
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // WHEN: Get my torrents
+            ResponseEntity<String> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET, request,
+                new ParameterizedTypeReference<String>() {});
+
+            // THEN: Responds unauthorized
+            assertAll(() -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
+                () -> assertNull(responseEntity.getBody()));
+        }
+
+        @Test
+        public void should401_whenBasicAuthenticationIncorrectUsername() {
+            // GIVEN: New user registered
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            String password = register.getPassword();
+            authenticationController.register(register).getBody();
+
+            // GIVEN: Basic authentication with incorrect username
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBasicAuth(username + "_incorrect", password);
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // WHEN: Get my torrents
+            ResponseEntity<String> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET, request,
+                new ParameterizedTypeReference<String>() {});
+
+            // THEN: Responds unauthorized
+            assertAll(() -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
+                () -> assertNull(responseEntity.getBody()));
+        }
+
+        @Test
+        public void should401_whenBasicAuthenticationIncorrectPassword() {
+            // GIVEN: New user registered
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            String password = register.getPassword();
+            authenticationController.register(register).getBody();
+
+            // GIVEN: Basic authentication with incorrect password
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBasicAuth(username, password + "_incorrect");
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // WHEN: Get my torrents
+            ResponseEntity<String> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET, request,
+                new ParameterizedTypeReference<String>() {});
+
+            // THEN: Responds unauthorized
+            assertAll(() -> assertEquals(HttpStatus.UNAUTHORIZED, responseEntity.getStatusCode()),
+                () -> assertNull(responseEntity.getBody()));
         }
     }
 
@@ -1066,6 +1229,144 @@ public class UserControllerTest extends BasicContext {
                 () -> assertNotNull(responseEntity.getBody()),
                 () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
                 () -> assertEquals("User " + wrongId + " not found.", responseEntity.getBody().getMessage()));
+        }
+    }
+
+    /**
+     * {@link UserController#getUserTorrents} test.
+     */
+    @Nested
+    public class GetUserTorrents {
+        private static final String ENDPOINT = "/users/{id}/torrents";
+
+        @Test
+        public void shouldGetUserTorrents() {
+            // GIVEN: New user registered
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register).getBody();
+            User user = userService.get(username);
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // WHEN: Get user torrents
+            ResponseEntity<List<TorrentDto>> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET,
+                request, new ParameterizedTypeReference<List<TorrentDto>>() {}, user.getId());
+
+            // THEN: Returns user torrents
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()));
+        }
+
+        @Test
+        public void should403_whenUnauthorized() {
+            // GIVEN: New user registered
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            AuthenticationDto auth = authenticationController.register(register).getBody();
+            User user = userService.get(username);
+
+            // GIVEN: JWT authentication
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(auth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // WHEN: Get user
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET, request,
+                new ParameterizedTypeReference<ErrorDto>() {}, user.getId());
+
+            // THEN: Responds forbidden
+            assertAll(() -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage()));
+        }
+
+        @Test
+        public void should404_whenNonexistent() {
+            // GIVEN: New user registered
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register).getBody();
+            User user = userService.get(username);
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // GIVEN: Wrong user id in path
+            int wrongId = user.getId() + 1;
+
+            // WHEN: Get user
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET, request,
+                new ParameterizedTypeReference<ErrorDto>() {}, wrongId);
+
+            // THEN: Responds not found
+            assertAll(() -> assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
+                () -> assertEquals("User " + wrongId + " not found.", responseEntity.getBody().getMessage()));
+        }
+
+        @Test
+        public void shouldGetEmptyList_whenUserHasNoTorrents() {
+            // GIVEN: New user registered
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register).getBody();
+            User user = userService.get(username);
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // WHEN: Get user torrents
+            ResponseEntity<List<TorrentDto>> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET,
+                request, new ParameterizedTypeReference<List<TorrentDto>>() {}, user.getId());
+
+            // THEN: Returns empty list
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()), () -> assertTrue(responseEntity.getBody().isEmpty()));
+        }
+
+        @Test
+        public void shouldGetUserTorrents_whenUserHasTorrents() {
+            // GIVEN: New user registered
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register).getBody();
+            User user = userService.getWithRoles(username);
+
+            // GIVEN: New torrent added for user
+            TorrentDto metadata = fixtureMonkey.giveMeOne(TorrentDto.class);
+            byte[] content = "fake-torrent-content".getBytes(StandardCharsets.UTF_8);
+            MockMultipartFile file =
+                new MockMultipartFile("file", "test.torrent", TorrentController.TORRENT_MIME_TYPE, content);
+            TorrentDto torrent;
+            try {
+                torrent = torrentController.uploadTorrent(user, metadata, file);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to upload test torrent", e);
+            }
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
+
+            // WHEN: Get user torrents
+            ResponseEntity<List<TorrentDto>> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET,
+                request, new ParameterizedTypeReference<List<TorrentDto>>() {}, user.getId());
+
+            // THEN: Returns list with torrent
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()), () -> assertEquals(1, responseEntity.getBody().size()),
+                () -> assertEquals(torrent.getId(), responseEntity.getBody().get(0).getId()));
         }
     }
 
