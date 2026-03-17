@@ -1,4 +1,4 @@
-<div class="flex h-full min-h-0 flex-col gap-4 p-6">
+<div class="flex h-full min-h-0 flex-col gap-4 p-4">
   @if (repositories.length === 0) {
     <div class="-mt-16 flex flex-1 items-center justify-center">
       <z-empty
@@ -21,7 +21,7 @@
         emptyText="No repository found."
         [options]="repositoryOptions()"
         [(value)]="selectedValue"
-        (zComboSelected)="onRepositoryChange($event)"
+        (zComboSelected)="onRepositoryChange($event.value)"
       />
     </div>
     <div class="flex max-w-sm flex-col gap-4">

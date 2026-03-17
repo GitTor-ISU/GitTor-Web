@@ -15,7 +15,7 @@ import { formDiffValidator } from '@shared/form-diff-validator';
 import { createFormValueSignal, createHelpMessageSignal } from '@shared/form-utils';
 import { LucideIconData, UploadIcon } from 'lucide-angular';
 import { map } from 'rxjs';
-import { SETTINGS_TAB, SettingsFormTab } from '../settings-service';
+import { SettingsFormTab } from '../settings-service';
 import { ChangePassword } from './change-password';
 
 /**
@@ -33,7 +33,6 @@ import { ChangePassword } from './change-password';
     ZardIconComponent,
   ],
   templateUrl: './profile-settings.html',
-  providers: [{ provide: SETTINGS_TAB, useExisting: ProfileSettings }],
 })
 export class ProfileSettings implements SettingsFormTab {
   private static readonly DEFAULT_AVATAR_URL =

@@ -1,0 +1,39 @@
+<div class="flex flex-col gap-4 p-4 pr-6">
+  <div class="flex items-center justify-between">
+    <label class="text-lg font-semibold">GPG Keys</label>
+    <button z-button (click)="onNew()"><z-icon zType="plus" /> Add GPG Key</button>
+  </div>
+  <div class="flex flex-col gap-4">
+    @for (key of gpgKeys; track key.keyId) {
+      <z-card>
+        <div class="flex items-start justify-between">
+          <div>
+            <label class="font-semibold">{{ key.title }}</label>
+            <p class="text-muted-foreground text-sm">{{ key.email }}</p>
+          </div>
+          <button z-button zType="destructive" zSize="sm" (click)="onDelete(key.id)">Delete</button>
+        </div>
+        <dl class="mt-3 grid grid-cols-1 gap-2 text-sm md:grid-cols-2">
+          <div>
+            <dt class="font-medium">Key ID</dt>
+            <dd class="text-muted-foreground">{{ key.keyId }}</dd>
+          </div>
+          <div class="md:row-span-2">
+            <dt class="font-medium">Subkeys</dt>
+            <dd>
+              <ul class="mt-1 list-disc space-y-1 pl-5">
+                @for (subkey of key.subkeys; track subkey) {
+                  <li class="text-muted-foreground">{{ subkey }}</li>
+                }
+              </ul>
+            </dd>
+          </div>
+          <div>
+            <dt class="font-medium">Added on</dt>
+            <dd class="text-muted-foreground">{{ key.addedOn.toLocaleDateString() }}</dd>
+          </div>
+        </dl>
+      </z-card>
+    }
+  </div>
+</div>

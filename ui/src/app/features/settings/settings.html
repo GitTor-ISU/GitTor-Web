@@ -3,24 +3,19 @@
     class="min-h-0 flex-1"
     [zActivePosition]="tabsPosition() === 'top' ? 'bottom' : 'left'"
     [zTabsPosition]="tabsPosition()"
-    [zDeselect]="onDeselected"
     [(zActiveTabIndex)]="activeTabIndex"
-    (zTabChange)="activeForm()?.reset()"
+    (zTabChange)="onTabChange($event.component)"
   >
-    <z-tab label="Profile">
-      <app-profile />
-    </z-tab>
-    <z-tab label="Repository">
-      <app-repository-settings />
-    </z-tab>
-    <z-tab label="GPG"> GPG Page </z-tab>
+    @for (label of tabLabels; track label; let index = $index) {
+      <z-tab [label]="label" [routerLink]="`settings/${label.toLowerCase()}`" />
+    }
   </z-tab-group>
-  @if (activeForm()) {
+  @if (activeTab() && activeForm()) {
     <div class="mt-5 flex items-center justify-end gap-2">
-      <button z-button zType="secondary" [zDisabled]="activeForm()?.pristine" (click)="activeTab().onReset()">
+      <button z-button zType="secondary" [zDisabled]="activeForm()?.pristine" (click)="activeTab()?.onReset()">
         Reset
       </button>
-      <button z-button [zDisabled]="activeForm()?.invalid" (click)="activeTab().onSubmit()">Save</button>
+      <button z-button [zDisabled]="activeForm()?.invalid" (click)="activeTab()?.onSubmit()">Save</button>
     </div>
   }
 </z-card>

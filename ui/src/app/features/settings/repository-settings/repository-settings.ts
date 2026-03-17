@@ -1,8 +1,9 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TorrentDto } from '@generated/openapi/models/torrent-dto';
 import { ZardButtonComponent } from '@shared/components/z-button';
-import { ZardComboboxComponent, ZardComboboxOption } from '@shared/components/z-combobox';
+import { ZardComboboxComponent } from '@shared/components/z-combobox';
 import { ZardEmptyComponent } from '@shared/components/z-empty';
 import { ZardFormModule } from '@shared/components/z-form/form.module';
 import { ZardInputDirective } from '@shared/components/z-input/input.directive';
@@ -12,10 +13,10 @@ import { EmptyToNullDirective } from '@shared/empty-to-null';
 import { formDiffValidator } from '@shared/form-diff-validator';
 import { createFormValueSignal, createHelpMessageSignal } from '@shared/form-utils';
 import { FolderGit2Icon } from 'lucide-angular';
-import { SETTINGS_TAB, SettingsFormTab, SettingsService } from '../settings-service';
+import { SettingsFormTab, SettingsService } from '../settings-service';
 
 interface Repository {
-  id: string;
+  id: number;
   name: string;
   about: string;
   torrent: TorrentDto;
@@ -24,28 +25,28 @@ interface Repository {
 
 const mockRepositories: Repository[] = [
   {
-    id: '1',
+    id: 12,
     name: 'design-system',
     about: 'Reusable UI components, themes, and accessibility primitives for all frontend apps.',
     torrent: {} as TorrentDto,
     visibility: 'public',
   },
   {
-    id: '2',
+    id: 22,
     name: 'ml-experiments',
     about: 'Model training notebooks, evaluation scripts, and experiment tracking for recommendation research.',
     torrent: {} as TorrentDto,
     visibility: 'private',
   },
   {
-    id: '3',
+    id: 32,
     name: 'infra-terraform',
     about: 'Infrastructure-as-code for cloud networking, Kubernetes clusters, and deployment pipelines.',
     torrent: {} as TorrentDto,
     visibility: 'private',
   },
   {
-    id: '4',
+    id: 42,
     name: 'mobile_app_flutter',
     about: 'Cross-platform mobile client with offline sync, push notifications, and biometric login support.',
     torrent: {} as TorrentDto,
@@ -69,7 +70,7 @@ const mockRepositories: Repository[] = [
     ZardComboboxComponent,
   ],
   templateUrl: './repository-settings.html',
-  providers: [{ provide: SETTINGS_TAB, useExisting: RepositorySettings }, SettingsService],
+  providers: [SettingsService],
 })
 export class RepositorySettings implements SettingsFormTab {
   public form = new FormGroup({
@@ -87,25 +88,39 @@ export class RepositorySettings implements SettingsFormTab {
   });
 
   protected readonly repositories = mockRepositories;
-  protected readonly selectedValue = signal<string>('0');
-  protected readonly repository = computed(() => this.repositories[Number(this.selectedValue())]);
+  protected readonly selectedValue = signal<string>('');
+  protected readonly repository = computed(
+    () => this.repositories.find((repo) => repo.id.toString() === this.selectedValue()) ?? this.repositories[0]
+  );
   protected readonly visibility = signal<string>('');
   protected readonly repositoryOptions = computed(() =>
-    this.repositories.map((repository, index) => ({ label: repository.name, value: index.toString() }))
+    this.repositories.map((repository) => ({ label: repository.name, value: repository.id.toString() }))
   );
   protected readonly folderGitIcon = FolderGit2Icon;
   protected readonly visibilityOptions = [
     { label: 'Public', value: 'public' },
     { label: 'Private', value: 'private' },
   ];
-
   protected readonly formValue = createFormValueSignal(this.form);
   protected readonly nameHelpMessage = createHelpMessageSignal(this.form.controls.name, this.formValue);
   protected readonly aboutHelpMessage = createHelpMessageSignal(this.form.controls.about, this.formValue);
+
+  private readonly activatedRoute = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly settingsService = inject(SettingsService);
 
   public constructor() {
-    this.onReset();
+    this.onRepositoryChange(this.repositories[0].id.toString());
+    effect(() => {
+      const id = this.repository()?.id.toString() ?? this.repositories[0].id.toString();
+      this.router.navigate([], {
+        relativeTo: this.activatedRoute,
+        queryParams: { id: id },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
+      untracked(() => this.onReset());
+    });
   }
 
   public onSubmit(): void {
@@ -120,12 +135,10 @@ export class RepositorySettings implements SettingsFormTab {
     this.form.updateValueAndValidity();
   }
 
-  protected async onRepositoryChange($event: ZardComboboxOption): Promise<void> {
-    if (!(await this.settingsService.confirmDiscardChanges(this.form))) {
-      return;
+  protected async onRepositoryChange(repo: string): Promise<void> {
+    if (await this.settingsService.confirmDiscardChanges(this.form)) {
+      this.selectedValue.set(repo);
     }
-    this.selectedValue.set($event.value);
-    this.onReset();
   }
 
   protected updateVisibility(visibility: string): void {

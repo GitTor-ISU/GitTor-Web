@@ -7,13 +7,13 @@ import { controlMisMatchValidator } from '@shared/control-match-validator';
 import { createFormValueSignal, createHelpMessageSignal } from '@shared/form-utils';
 
 /**
- * Change password page.
+ * Change password form.
  */
 @Component({
   selector: 'app-change-password',
   imports: [ZardFormModule, ReactiveFormsModule, ZardInputDirective],
   template: `
-    <form class="mb-4 max-w-md space-y-6 text-sm" [formGroup]="form" (ngSubmit)="onSubmit()">
+    <form class="mb-4 max-w-md space-y-6 text-sm" [formGroup]="form">
       <z-form-field>
         <label z-form-label zRequired>New password</label>
         <z-form-control [helpText]="passwordHelpMessage()">
@@ -71,9 +71,5 @@ export class ChangePassword {
       });
       cleanup(() => sub.unsubscribe());
     });
-  }
-
-  protected onSubmit(): void {
-    console.log('Change password form submitted:', this.form.value);
   }
 }

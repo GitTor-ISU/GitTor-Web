@@ -26,6 +26,7 @@ import clsx from 'clsx';
 import { debounceTime, distinctUntilChanged, fromEvent, map, merge } from 'rxjs';
 import { twMerge } from 'tailwind-merge';
 
+import { Router, RouterOutlet } from "@angular/router";
 import { ZardButtonComponent } from '@shared/components/z-button';
 import { ZardIconComponent } from '@shared/components/z-icon';
 import {
@@ -43,7 +44,9 @@ export type zAlign = 'center' | 'start' | 'end';
   imports: [],
   template: `
     <ng-template #content>
-      <ng-content />
+      @if (!routerLink()) {
+        <ng-content />
+      }
     </ng-template>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -51,12 +54,13 @@ export type zAlign = 'center' | 'start' | 'end';
 })
 export class ZardTabComponent {
   readonly label = input.required<string>();
+  readonly routerLink = input<string | null>(null);
   readonly contentTemplate = viewChild.required<TemplateRef<unknown>>('content');
 }
 
 @Component({
   selector: 'z-tab-group',
-  imports: [NgTemplateOutlet, ZardButtonComponent, ZardIconComponent],
+  imports: [NgTemplateOutlet, ZardButtonComponent, ZardIconComponent, RouterOutlet],
   template: `
     @if (navBeforeContent()) {
       <ng-container [ngTemplateOutlet]="navigationBlock" />
@@ -64,17 +68,22 @@ export class ZardTabComponent {
 
     <div class="tab-content min-h-0 flex-1 overflow-auto">
       @for (tab of tabs(); track $index; let index = $index) {
-        <div
-          role="tabpanel"
-          [attr.id]="'tabpanel-' + index"
-          [attr.aria-labelledby]="'tab-' + index"
-          [attr.tabindex]="0"
-          [hidden]="activeTabIndex() !== index"
-          class="h-full focus-visible:ring-primary/50 outline-none focus-visible:ring-2"
-        >
-          <ng-container [ngTemplateOutlet]="tab.contentTemplate()" />
-        </div>
+        @if (!tab.routerLink()) {
+          <div
+            role="tabpanel"
+            [attr.id]="'tabpanel-' + index"
+            [attr.aria-labelledby]="'tab-' + index"
+            [attr.tabindex]="0"
+            [hidden]="activeTabIndex() !== index"
+            class="h-full focus-visible:ring-primary/50 outline-none focus-visible:ring-2"
+          >
+            <ng-container [ngTemplateOutlet]="tab.contentTemplate()" />
+          </div>
+        }
       }
+      <div [hidden]="!tabs()[activeTabIndex()]?.routerLink()">
+        <router-outlet (activate)="onRouteActivate($event)" (deactivate)="onRouteDeactivate()" />
+      </div>
     </div>
 
     @if (!navBeforeContent()) {
@@ -178,15 +187,18 @@ export class ZardTabGroupComponent implements AfterViewInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly injector = inject(Injector);
   private readonly window = inject(DOCUMENT).defaultView;
+  private readonly router = inject(Router);
 
   protected readonly tabs = computed(() => this.tabComponents());
   protected readonly activeTabIndex = signal<number>(0);
   protected readonly scrollPresent = signal<boolean>(false);
+  private readonly routedComponent = signal<unknown | null>(null);
 
   protected readonly zTabChange = output<{
     index: number;
     label: string;
     tab: ZardTabComponent;
+    component?: unknown;
   }>();
 
   readonly zDeselect = input<
@@ -283,14 +295,20 @@ export class ZardTabGroupComponent implements AfterViewInit {
   }
 
   protected async setActiveTab(index: number): Promise<void> {
-    if (index == this.activeTabIndex()) {
+    const currentIndex = this.activeTabIndex();
+    if (index === currentIndex) {
       return;
     }
 
-    const currentTab = this.tabs()[this.activeTabIndex()];
+    const tabs = this.tabs();
+    const currentTab = tabs[currentIndex];
+    const nextTab = tabs[index];
+    if (!currentTab || !nextTab) {
+      return;
+    }
 
     const canDeselect = await this.zDeselect()({
-      index: this.activeTabIndex(),
+      index: currentIndex,
       label: currentTab.label(),
       tab: currentTab,
     });
@@ -300,16 +318,52 @@ export class ZardTabGroupComponent implements AfterViewInit {
     }
 
     this.activeTabIndex.set(index);
-    this.zActiveTabIndexChange.emit(index);
+    const nextTabRoute = nextTab.routerLink();
+    if (!nextTabRoute) {
+      this.zActiveTabIndexChange.emit(index);
 
-    const activeTabComponent = this.tabs()[index];
-    if (activeTabComponent) {
       this.zTabChange.emit({
         index,
-        label: activeTabComponent.label(),
-        tab: activeTabComponent,
+        label: nextTab.label(),
+        tab: nextTab,
+        component: undefined,
       });
+      return;
     }
+
+    const didNavigate = await this.router.navigateByUrl(nextTabRoute);
+    if (didNavigate) {
+      this.zActiveTabIndexChange.emit(index);
+      return;
+    }
+
+    this.activeTabIndex.set(currentIndex);
+    this.zActiveTabIndexChange.emit(currentIndex);
+  }
+
+  protected onRouteActivate(component: unknown): void {
+    this.routedComponent.set(component);
+
+    runInInjectionContext(this.injector, () => {
+      afterNextRender(() => {
+        const index = this.activeTabIndex();
+        const activeTabComponent = this.tabs()[index];
+        if (!activeTabComponent) {
+          return;
+        }
+
+        this.zTabChange.emit({
+          index,
+          label: activeTabComponent.label(),
+          tab: activeTabComponent,
+          component,
+        });
+      });
+    });
+  }
+
+  protected onRouteDeactivate(): void {
+    this.routedComponent.set(null);
   }
 
   protected readonly navBeforeContent = computed(() => {

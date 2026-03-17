@@ -1,15 +1,13 @@
-import { inject, Injectable, InjectionToken } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ZardAlertDialogService } from '@shared/components/z-alert-dialog/alert-dialog.service';
 import { firstValueFrom } from 'rxjs';
 
 export interface SettingsFormTab {
-  form: FormGroup | null;
+  form: FormGroup;
   onSubmit(): void;
   onReset(): void;
 }
-
-export const SETTINGS_TAB = new InjectionToken<SettingsFormTab>('SETTINGS_TAB');
 
 /**
  * Settings helper service.
