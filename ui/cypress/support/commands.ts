@@ -47,7 +47,17 @@ Cypress.Commands.add('register', (username, email, password, confirmPassword?) =
 });
 
 Cypress.Commands.add('verifyLogin', () => {
-  cy.visit('');
+  cy.intercept('GET', '/api/users/me').as('me');
+  cy.visit('/');
+
+  cy.wait('@me');
+  cy.get('body').should(($body) => {
+    const hasAuthControl =
+      $body.find('[data-test="sidebar-logout-button"]').length > 0 ||
+      $body.find('[data-test="sidebar-login-button"]').length > 0;
+
+    expect(hasAuthControl).to.equal(true);
+  });
 
   return cy.get('body').then(($body) => {
     return $body.find('[data-test="sidebar-logout-button"]').length > 0;
