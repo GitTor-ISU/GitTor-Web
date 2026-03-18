@@ -1,4 +1,5 @@
 <div class="flex h-full min-h-0 flex-col gap-4 p-4">
+  <label class="text-lg font-semibold">Repository Settings</label>
   @if (repositories.length === 0) {
     <div class="-mt-16 flex flex-1 items-center justify-center">
       <z-empty
@@ -60,6 +61,7 @@
         </div>
       </form>
       <z-segmented [zOptions]="visibilityOptions" [(selectedValue)]="visibility" (zChange)="updateVisibility($event)" />
+      <z-button zType="destructive" class="mt-1 max-w-[145px]" (click)="onDeleteRepo()">Delete Repository</z-button>
     </div>
   }
 </div>

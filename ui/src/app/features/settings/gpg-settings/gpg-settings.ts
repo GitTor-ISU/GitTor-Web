@@ -63,7 +63,7 @@ export class GpgSettings {
       zTitle: 'Add a GPG key',
       zContent: AddGpgKey,
       zData: { disabled },
-      zOkText: 'Update',
+      zOkText: 'Add',
       zOkDisabled: disabled,
       zOnOk: (instance) => {
         console.log('Form submitted:', instance.form.value);

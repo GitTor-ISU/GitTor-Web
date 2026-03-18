@@ -2,6 +2,7 @@ import { Component, computed, effect, inject, signal, untracked } from '@angular
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TorrentDto } from '@generated/openapi/models/torrent-dto';
+import { ZardAlertDialogService } from '@shared/components/z-alert-dialog/alert-dialog.service';
 import { ZardButtonComponent } from '@shared/components/z-button';
 import { ZardComboboxComponent } from '@shared/components/z-combobox';
 import { ZardEmptyComponent } from '@shared/components/z-empty';
@@ -108,6 +109,7 @@ export class RepositorySettings implements SettingsFormTab {
   private readonly activatedRoute = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly settingsService = inject(SettingsService);
+  private readonly alertDialogService = inject(ZardAlertDialogService);
 
   public constructor() {
     this.onRepositoryChange(this.repositories[0].id.toString());
@@ -151,5 +153,15 @@ export class RepositorySettings implements SettingsFormTab {
       this.form.controls.visibility.setValue(visibility);
       this.form.controls.visibility.markAsDirty();
     }
+  }
+
+  protected onDeleteRepo(): void {
+    this.alertDialogService.confirm({
+      zTitle: 'Are you sure?',
+      zDescription: 'This action cannot be undone.',
+      zOkText: 'Continue',
+      zOkDestructive: true,
+      zCancelText: 'Cancel',
+    });
   }
 }
