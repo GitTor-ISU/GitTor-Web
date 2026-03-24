@@ -42,10 +42,8 @@ import api.dtos.LoginDto;
 import api.dtos.RegisterDto;
 import api.dtos.TorrentDto;
 import api.dtos.UserDto;
-import api.entities.Torrent;
 import api.entities.User;
 import api.services.TokenService;
-import api.services.TorrentService;
 import api.services.UserService;
 
 /**
@@ -1162,12 +1160,33 @@ public class UserControllerTest extends BasicContext {
             headers.setBearerAuth(adminAuth.getAccessToken());
             HttpEntity<Void> request = new HttpEntity<>(null, headers);
 
-            // GIVEN: New user id in path
-            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(user.getId()).toUri();
+            // WHEN: Get user
+            ResponseEntity<UserDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET, request,
+                new ParameterizedTypeReference<UserDto>() {}, user.getId());
+
+            // THEN: Returns user
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(user.getId(), responseEntity.getBody().getId()),
+                () -> assertEquals(username, responseEntity.getBody().getUsername()));
+        }
+
+        @Test
+        public void shouldGetUserByUsername() {
+            // GIVEN: New user registered
+            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
+            String username = register.getUsername();
+            authenticationController.register(register).getBody();
+            User user = userService.get(username);
+
+            // GIVEN: Admin authentication header
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+            HttpEntity<Void> request = new HttpEntity<>(null, headers);
 
             // WHEN: Get user
-            ResponseEntity<UserDto> responseEntity =
-                testRestTemplate.exchange(uri, HttpMethod.GET, request, new ParameterizedTypeReference<UserDto>() {});
+            ResponseEntity<UserDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET, request,
+                new ParameterizedTypeReference<UserDto>() {}, username);
 
             // THEN: Returns user
             assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
