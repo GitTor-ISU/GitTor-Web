@@ -1,91 +1,85 @@
-<div class="flex flex-col gap-10 p-6">
-  <z-card>
-    <div class="flex flex-col gap-5">
+<section class="relative overflow-hidden">
+  <om-gridpattern
+    class="pointer-events-none absolute inset-0 z-0"
+    [gradientColor]="themeService.isDark() ? 'rgb(15, 15, 20)' : 'rgb(228, 232, 240)'"
+    [gridColor]="themeService.isDark() ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.07)'"
+  />
+  <div
+    class="pointer-events-none absolute top-0 left-1/2 z-0 h-96 w-96 -translate-x-1/2 rounded-full opacity-30 blur-3xl"
+    style="background: radial-gradient(circle, oklch(0.65 0.18 256), transparent 70%)"
+  ></div>
+
+  <div class="relative z-1 mx-auto max-w-6xl px-6 py-24 md:py-32">
+    <div class="flex flex-col items-center gap-10 text-center lg:flex-row lg:items-center lg:gap-16 lg:text-left">
+      <div class="flex flex-1 flex-col gap-6">
+        <h1 class="text-foreground text-4xl leading-tight font-bold tracking-tight md:text-5xl lg:text-6xl">GitTor.</h1>
+        <p class="text-muted-foreground max-w-lg self-center text-lg leading-relaxed lg:self-start">
+          A decentralized Git platform powered by the BitTorrent protocol. No servers to trust, no single points of
+          failure.
+        </p>
+        <div class="flex flex-wrap justify-center gap-3 lg:justify-start">
+          @if (sessionService.isLoggedIn()) {
+            <a z-button zType="default" class="gap-2" [routerLink]="`/${sessionService.user()?.username}`">
+              <lucide-angular class="size-4" [img]="branchIcon" />
+              My Repositories
+            </a>
+          } @else {
+            <a z-button zType="default" class="gap-2" routerLink="/register">
+              Get Started Free
+              <lucide-angular class="size-4" [img]="arrowRightIcon" />
+            </a>
+            <a z-button zType="secondary" routerLink="/login">Sign In</a>
+          }
+          <a z-button zType="secondary" class="gap-2" routerLink="/about">
+            <lucide-angular class="size-4" [img]="terminalIcon" />
+            Documentation
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="border-border/50 border-t">
+  <div class="mx-auto max-w-6xl px-6 py-20">
+    <div class="mb-12 text-center">
+      <h2 class="text-foreground mb-3 text-3xl font-bold tracking-tight">Why GitTor?</h2>
+      <p class="text-muted-foreground mx-auto max-w-xl">
+        Your code shouldn't depend on someone else's infrastructure. Here's what we do differently:
+      </p>
+    </div>
+    <div class="grid gap-6 sm:grid-cols-3">
+      @for (feature of features; track feature.title) {
+        <z-card class="flex flex-col gap-4">
+          <div class="border-border bg-muted flex size-10 items-center justify-center rounded-lg border">
+            <lucide-angular class="text-primary size-5" [img]="feature.icon" />
+          </div>
+          <div class="flex flex-col gap-2">
+            <h3 class="text-foreground font-semibold">{{ feature.title }}</h3>
+            <p class="text-muted-foreground text-sm leading-relaxed">{{ feature.description }}</p>
+          </div>
+        </z-card>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="border-border/50 border-t">
+  <div class="mx-auto max-w-6xl px-6 py-20">
+    <z-card class="flex flex-col items-center gap-6 text-center">
       <div class="flex flex-col gap-3">
-        <z-skeleton class="h-8 w-2/3" />
-        <z-skeleton class="h-4 w-1/2" />
+        <h2 class="text-foreground text-3xl font-bold tracking-tight">Take back your repositories</h2>
+        <p class="text-muted-foreground mx-auto max-w-lg">
+          Free, open source, and self-hostable. GitTor is for developers who believe infrastructure should never be a
+          single point of trust.
+        </p>
       </div>
-      <div class="flex flex-wrap gap-3">
-        <z-skeleton class="h-10 w-28 rounded-full" />
-        <z-skeleton class="h-10 w-24 rounded-full" />
-        <z-skeleton class="h-10 w-32 rounded-full" />
-      </div>
-      <div class="grid gap-3 sm:grid-cols-2">
-        <z-skeleton class="h-16 w-full" />
-        <z-skeleton class="h-16 w-full" />
-      </div>
-    </div>
-  </z-card>
-
-  <section class="grid gap-6 md:grid-cols-3">
-    <z-card>
-      <div class="flex flex-col gap-4">
-        <z-skeleton class="h-36 w-full" />
-        <div class="flex flex-col gap-2">
-          <z-skeleton class="h-4 w-3/4" />
-          <z-skeleton class="h-4 w-2/3" />
-          <z-skeleton class="h-4 w-1/2" />
-        </div>
-        <z-skeleton class="h-9 w-24" />
+      <div class="mt-3 flex flex-wrap justify-center gap-3">
+        <a z-button zType="outline" class="gap-2" routerLink="/about">
+          <lucide-angular class="size-4" [img]="downloadIcon" />
+          Download CLI
+        </a>
       </div>
     </z-card>
-    <z-card>
-      <div class="flex flex-col gap-4">
-        <z-skeleton class="h-36 w-full" />
-        <div class="flex flex-col gap-2">
-          <z-skeleton class="h-4 w-3/4" />
-          <z-skeleton class="h-4 w-2/3" />
-          <z-skeleton class="h-4 w-1/2" />
-        </div>
-        <z-skeleton class="h-9 w-24" />
-      </div>
-    </z-card>
-    <z-card>
-      <div class="flex flex-col gap-4">
-        <z-skeleton class="h-36 w-full" />
-        <div class="flex flex-col gap-2">
-          <z-skeleton class="h-4 w-3/4" />
-          <z-skeleton class="h-4 w-2/3" />
-          <z-skeleton class="h-4 w-1/2" />
-        </div>
-        <z-skeleton class="h-9 w-24" />
-      </div>
-    </z-card>
-  </section>
-
-  <z-card>
-    <div class="flex items-center justify-between">
-      <div class="flex flex-col gap-2">
-        <z-skeleton class="h-5 w-40" />
-        <z-skeleton class="h-4 w-64" />
-      </div>
-      <z-skeleton class="h-10 w-24" />
-    </div>
-    <div class="mt-6 space-y-4">
-      <div class="flex items-center gap-4">
-        <z-skeleton class="h-10 w-10 rounded-full" />
-        <div class="flex flex-1 flex-col gap-2">
-          <z-skeleton class="h-4 w-1/2" />
-          <z-skeleton class="h-4 w-1/3" />
-        </div>
-        <z-skeleton class="h-4 w-16" />
-      </div>
-      <div class="flex items-center gap-4">
-        <z-skeleton class="h-10 w-10 rounded-full" />
-        <div class="flex flex-1 flex-col gap-2">
-          <z-skeleton class="h-4 w-2/3" />
-          <z-skeleton class="h-4 w-1/2" />
-        </div>
-        <z-skeleton class="h-4 w-20" />
-      </div>
-      <div class="flex items-center gap-4">
-        <z-skeleton class="h-10 w-10 rounded-full" />
-        <div class="flex flex-1 flex-col gap-2">
-          <z-skeleton class="h-4 w-3/5" />
-          <z-skeleton class="h-4 w-2/5" />
-        </div>
-        <z-skeleton class="h-4 w-14" />
-      </div>
-    </div>
-  </z-card>
-</div>
+  </div>
+</section>
