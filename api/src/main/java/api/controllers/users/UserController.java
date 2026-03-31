@@ -209,7 +209,6 @@ public class UserController {
             content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @GetMapping("")
-    @PreAuthorize("hasAuthority(@DbSetup.USER_READ)")
     public List<UserDto> getUsers(@RequestParam(defaultValue = "0") int page,
         @RequestParam(required = false) Integer size) {
         int requestedSize = size != null ? size : defaultPageSize;
@@ -236,7 +235,6 @@ public class UserController {
             content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority(@DbSetup.USER_READ)")
     public UserDto getUser(@PathVariable String id) {
         User user = id.matches("\\d+") ? userService.get(Integer.parseInt(id)) : userService.get(id);
         Hibernate.initialize(user);
@@ -265,7 +263,6 @@ public class UserController {
             content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @GetMapping("/{id}/torrents")
-    @PreAuthorize("hasAuthority(@DbSetup.USER_READ)")
     public List<TorrentDto> getUserTorrents(@PathVariable String id, @RequestParam(defaultValue = "0") int page,
         @RequestParam(required = false) Integer size) {
         int requestedSize = size != null ? size : defaultPageSize;

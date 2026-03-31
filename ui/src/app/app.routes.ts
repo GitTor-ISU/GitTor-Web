@@ -6,7 +6,7 @@ import { NotFound } from '@features/not-found/not-found';
 import { RepositoryList } from '@features/repository-list/repository-list';
 import { Repository } from '@features/repository/repository';
 import { SettingsRoutes } from '@features/settings/settings-routes';
-import { usernameGuard } from '@shared/username-guard';
+import { validUserPathGuard } from '@shared/user-path-guards';
 import { MainLayout } from './layouts/main-layout/main-layout';
 import { currentUserResolver } from './shared/current-user-resolver';
 
@@ -20,13 +20,13 @@ export const routes: Routes = [
       { path: 'about', component: About, title: 'About' },
       {
         path: ':owner',
-        canMatch: [usernameGuard],
+        canMatch: [validUserPathGuard],
         component: RepositoryList,
         title: (route) => `${route.params['owner']}`,
       },
       {
         path: ':owner/:name',
-        canMatch: [usernameGuard],
+        canMatch: [validUserPathGuard],
         component: Repository,
         title: (route) => `${route.params['owner']}/${route.params['name']}`,
       },
