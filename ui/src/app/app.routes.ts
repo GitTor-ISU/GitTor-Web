@@ -9,11 +9,11 @@ import { usernameGuard } from '@shared/username-guard';
 import { MainLayout } from './layouts/main-layout/main-layout';
 
 export const routes: Routes = [
+  { path: '', component: Home },
   {
     path: '',
     component: MainLayout,
     children: [
-      { path: '', component: Home },
       { path: 'about', component: About, title: 'About' },
       {
         path: ':owner',
