@@ -16,7 +16,7 @@ import {
 import { MenuItem } from '@shared/components/z-menu/menu-item.directive';
 import { ZardMenuModule } from '@shared/components/z-menu/menu.module';
 import { ZardTooltipImports } from '@shared/components/z-tooltip';
-import { FolderIcon, HouseIcon, InfoIcon, LogInIcon, SearchIcon } from 'lucide-angular';
+import { FolderIcon, HouseIcon, InfoIcon, LogInIcon, SearchIcon, SettingsIcon } from 'lucide-angular';
 
 /**
  * Main layout component.
@@ -62,6 +62,11 @@ export class MainLayout {
           icon: FolderIcon,
           label: 'Repositories',
           route: `/${this.user()?.username}`,
+        },
+        {
+          icon: SettingsIcon,
+          label: 'Settings',
+          route: `/settings/profile`,
         },
       ];
     });

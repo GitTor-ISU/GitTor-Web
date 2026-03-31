@@ -109,7 +109,7 @@ module.exports = [
       '@typescript-eslint/array-type': 'error',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-inferrable-types': 'off',
-      '@typescript-eslint/member-ordering': 'error',
+      '@typescript-eslint/member-ordering': ['error', { 'default': ['signature', 'field', 'constructor', 'method'] }],
       '@typescript-eslint/explicit-member-accessibility': ['error', { 'accessibility': 'explicit' }],
       '@typescript-eslint/explicit-function-return-type': 'error',
       'rxjs-x/no-ignored-subscription': 'error',

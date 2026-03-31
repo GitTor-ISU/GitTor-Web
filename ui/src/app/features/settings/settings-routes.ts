@@ -7,8 +7,9 @@ export const SettingsRoutes: Route[] = [
     path: 'settings',
     canActivate: [requireAuthGuard],
     canDeactivate: [async (component: Settings): Promise<boolean> => await component.onDeselected()],
+    runGuardsAndResolvers: 'always',
     resolve: {
-      page: (route: ActivatedRouteSnapshot) => route.firstChild?.routeConfig?.path ?? 'profile',
+      page: (route: ActivatedRouteSnapshot) => route.firstChild?.routeConfig?.path || 'profile',
     },
     loadComponent: () => import('./settings').then((m) => m.Settings),
     children: [

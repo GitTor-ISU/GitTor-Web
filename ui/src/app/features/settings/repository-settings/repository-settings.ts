@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -8,6 +9,7 @@ import { ZardComboboxComponent } from '@shared/components/z-combobox';
 import { ZardEmptyComponent } from '@shared/components/z-empty';
 import { ZardFormModule } from '@shared/components/z-form/form.module';
 import { ZardInputDirective } from '@shared/components/z-input/input.directive';
+import { ZardLoaderComponent } from '@shared/components/z-loader/loader.component';
 import { ZardSegmentedComponent } from '@shared/components/z-segmented';
 import { controlMatchValidator } from '@shared/control-match-validator';
 import { EmptyToNullDirective } from '@shared/empty-to-null';
@@ -24,37 +26,6 @@ interface Repository {
   visibility: 'public' | 'private';
 }
 
-const mockRepositories: Repository[] = [
-  {
-    id: 12,
-    name: 'design-system',
-    about: 'Reusable UI components, themes, and accessibility primitives for all frontend apps.',
-    torrent: {} as TorrentDto,
-    visibility: 'public',
-  },
-  {
-    id: 22,
-    name: 'ml-experiments',
-    about: 'Model training notebooks, evaluation scripts, and experiment tracking for recommendation research.',
-    torrent: {} as TorrentDto,
-    visibility: 'private',
-  },
-  {
-    id: 32,
-    name: 'infra-terraform',
-    about: 'Infrastructure-as-code for cloud networking, Kubernetes clusters, and deployment pipelines.',
-    torrent: {} as TorrentDto,
-    visibility: 'private',
-  },
-  {
-    id: 42,
-    name: 'mobile_app_flutter',
-    about: 'Cross-platform mobile client with offline sync, push notifications, and biometric login support.',
-    torrent: {} as TorrentDto,
-    visibility: 'public',
-  },
-];
-
 /**
  * Repository settings page.
  */
@@ -69,6 +40,8 @@ const mockRepositories: Repository[] = [
     ZardInputDirective,
     EmptyToNullDirective,
     ZardComboboxComponent,
+    ZardLoaderComponent,
+    NgTemplateOutlet,
   ],
   templateUrl: './repository-settings.html',
   providers: [SettingsService],
@@ -88,14 +61,20 @@ export class RepositorySettings implements SettingsFormTab {
     }),
   });
 
-  protected readonly repositories = mockRepositories;
-  protected readonly selectedValue = signal<string>('');
-  protected readonly repository = computed(
-    () => this.repositories.find((repo) => repo.id.toString() === this.selectedValue()) ?? this.repositories[0]
+  protected readonly repositories = signal<Repository[] | undefined>(undefined); // TODO: Replace with API call to fetch repositories
+  public readonly showFooter = computed(() => this.repositories() !== undefined && this.repositories()!.length > 0);
+
+  private readonly activatedRoute = inject(ActivatedRoute);
+  protected readonly selectedValue = signal<string>(this.activatedRoute.snapshot.queryParamMap.get('id') ?? '');
+  protected readonly repository = computed<Repository>(
+    () =>
+      this.repositories()?.find((repo) => repo?.id.toString() === this.selectedValue()) ??
+      this.repositories()?.[0] ??
+      ({} as Repository)
   );
   protected readonly visibility = signal<string>('');
   protected readonly repositoryOptions = computed(() =>
-    this.repositories.map((repository) => ({ label: repository.name, value: repository.id.toString() }))
+    this.repositories()?.map((repository) => ({ label: repository.name, value: repository.id.toString() }))
   );
   protected readonly folderGitIcon = FolderGit2Icon;
   protected readonly visibilityOptions = [
@@ -106,15 +85,47 @@ export class RepositorySettings implements SettingsFormTab {
   protected readonly nameHelpMessage = createHelpMessageSignal(this.form.controls.name, this.formValue);
   protected readonly aboutHelpMessage = createHelpMessageSignal(this.form.controls.about, this.formValue);
 
-  private readonly activatedRoute = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly settingsService = inject(SettingsService);
   private readonly alertDialogService = inject(ZardAlertDialogService);
 
   public constructor() {
-    this.onRepositoryChange(this.repositories[0].id.toString());
+    setTimeout(() => {
+      this.repositories.set([
+        {
+          id: 12,
+          name: 'design-system',
+          about: 'Reusable UI components, themes, and accessibility primitives for all frontend apps.',
+          torrent: {} as TorrentDto,
+          visibility: 'public',
+        },
+        {
+          id: 22,
+          name: 'ml-experiments',
+          about: 'Model training notebooks, evaluation scripts, and experiment tracking for recommendation research.',
+          torrent: {} as TorrentDto,
+          visibility: 'private',
+        },
+        {
+          id: 32,
+          name: 'infra-terraform',
+          about: 'Infrastructure-as-code for cloud networking, Kubernetes clusters, and deployment pipelines.',
+          torrent: {} as TorrentDto,
+          visibility: 'private',
+        },
+        {
+          id: 42,
+          name: 'mobile_app_flutter',
+          about: 'Cross-platform mobile client with offline sync, push notifications, and biometric login support.',
+          torrent: {} as TorrentDto,
+          visibility: 'public',
+        },
+      ]);
+      this.onRepositoryChange(this.repository().id?.toString());
+    }, 100);
+
     effect(() => {
-      const id = this.repository()?.id.toString() ?? this.repositories[0].id.toString();
+      const id = this.repository().id?.toString();
       this.router.navigate([], {
         relativeTo: this.activatedRoute,
         queryParams: { id: id },

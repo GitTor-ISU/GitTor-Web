@@ -1,10 +1,11 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, Signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { ZardAlertDialogService } from '@shared/components/z-alert-dialog/alert-dialog.service';
 import { firstValueFrom } from 'rxjs';
 
 export interface SettingsFormTab {
   form: FormGroup;
+  showFooter: Signal<boolean>;
   onSubmit(): void;
   onReset(): void;
 }

@@ -14,7 +14,7 @@ import { EmptyToNullDirective } from '@shared/empty-to-null';
 import { formDiffValidator } from '@shared/form-diff-validator';
 import { createFormValueSignal, createHelpMessageSignal } from '@shared/form-utils';
 import { LucideIconData, UploadIcon } from 'lucide-angular';
-import { map } from 'rxjs';
+import { finalize, map } from 'rxjs';
 import { SettingsFormTab } from '../settings-service';
 import { ChangePassword } from './change-password';
 
@@ -55,6 +55,7 @@ export class ProfileSettings implements SettingsFormTab {
       nonNullable: false,
     }),
   });
+  public readonly showFooter = signal(true);
 
   protected sessionService = inject(SessionService);
   protected readonly user = computed(() => this.sessionService.user());
@@ -67,22 +68,33 @@ export class ProfileSettings implements SettingsFormTab {
 
   protected readonly avatarUrl = toSignal(
     this.form.controls.avatar.valueChanges.pipe(
-      map((file) => (file ? URL.createObjectURL(file) : ProfileSettings.DEFAULT_AVATAR_URL))
+      map((file) => this.mapAvatarUrl(file)),
+      finalize(() => {
+        if (this.avatarObjectUrl) {
+          URL.revokeObjectURL(this.avatarObjectUrl);
+          this.avatarObjectUrl = null;
+        }
+      })
     ),
     { initialValue: ProfileSettings.DEFAULT_AVATAR_URL }
   );
   protected readonly uploadIcon: LucideIconData = UploadIcon;
 
+  private avatarObjectUrl: string | null = null;
   private readonly alertDialogService = inject(ZardAlertDialogService);
   private readonly dialogService = inject(ZardDialogService);
 
   public constructor() {
-    effect(() => {
-      this.form.addValidators(formDiffValidator(this.form.getRawValue()));
-      this.form.controls.username.addValidators(controlMatchValidator(this.user()?.username ?? ''));
-      this.form.controls.firstName.addValidators(controlMatchValidator(this.user()?.firstname ?? ''));
-      this.form.controls.lastName.addValidators(controlMatchValidator(this.user()?.lastname ?? ''));
-    });
+    const effectRef = effect(
+      () => {
+        this.form.addValidators(formDiffValidator(this.form.getRawValue()));
+        this.form.controls.username.addValidators(controlMatchValidator(this.user()?.username ?? ''));
+        this.form.controls.firstName.addValidators(controlMatchValidator(this.user()?.firstname ?? ''));
+        this.form.controls.lastName.addValidators(controlMatchValidator(this.user()?.lastname ?? ''));
+        effectRef.destroy();
+      },
+      { manualCleanup: true }
+    );
   }
 
   public onSubmit(): void {
@@ -133,5 +145,19 @@ export class ProfileSettings implements SettingsFormTab {
         console.log('Form submitted:', instance.form.value);
       },
     });
+  }
+
+  private mapAvatarUrl(file: File | null): string {
+    if (this.avatarObjectUrl) {
+      URL.revokeObjectURL(this.avatarObjectUrl);
+      this.avatarObjectUrl = null;
+    }
+
+    if (!file) {
+      return ProfileSettings.DEFAULT_AVATAR_URL;
+    }
+
+    this.avatarObjectUrl = URL.createObjectURL(file);
+    return this.avatarObjectUrl;
   }
 }

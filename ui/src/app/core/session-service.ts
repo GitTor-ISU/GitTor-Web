@@ -101,7 +101,7 @@ export default class SessionService {
       await firstValueFrom(this.authService.logout(''));
       this.accessToken.set(null);
       this.user.set(null);
-      window.location.reload();
+      this.router.navigateByUrl('');
     } catch (error) {
       this.accessToken.set(null);
       this.user.set(null);

@@ -1,21 +1,29 @@
-<z-card class="m-6 mx-auto flex h-[calc(100vh-3rem)] max-w-4xl flex-col">
-  <z-tab-group
-    class="min-h-0 flex-1"
-    [zActivePosition]="tabsPosition() === 'top' ? 'bottom' : 'left'"
-    [zTabsPosition]="tabsPosition()"
-    [(zActiveTabIndex)]="activeTabIndex"
-    (zTabChange)="onTabChange($event.component)"
-  >
-    @for (label of tabLabels; track label; let index = $index) {
-      <z-tab [label]="label" [routerLink]="`settings/${label.toLowerCase()}`" />
-    }
-  </z-tab-group>
-  @if (activeTab() && activeForm()) {
-    <div class="mt-5 flex items-center justify-end gap-2">
-      <button z-button zType="secondary" [zDisabled]="activeForm()?.pristine" (click)="activeTab()?.onReset()">
-        Reset
-      </button>
-      <button z-button [zDisabled]="activeForm()?.invalid" (click)="activeTab()?.onSubmit()">Save</button>
+<div class="flex min-h-screen flex-col items-center justify-center">
+  <div class="flex w-full max-w-5xl flex-col gap-4 p-6">
+    <label class="flex items-center gap-2 text-2xl">
+      <z-icon class="h-6 w-6 font-semibold" [zType]="settingsIcon" />
+      <span class="font-semibold">Settings</span>
+    </label>
+    <div class="flex h-[calc(100vh-7rem)] w-full flex-col">
+      <z-tab-group
+        class="min-h-0 flex-1"
+        zTabsPosition="top"
+        zActivePosition="bottom"
+        [(zActiveTabIndex)]="activeTabIndex"
+        (zTabChange)="onTabChange($event.component)"
+      >
+        @for (label of tabLabels; track label; let index = $index) {
+          <z-tab [label]="label" [routerLink]="`settings/${label.toLowerCase()}`" />
+        }
+      </z-tab-group>
+      @if (activeTab()?.showFooter()) {
+        <div class="mt-5 flex items-center justify-end gap-2">
+          <button z-button zType="secondary" [zDisabled]="activeForm()?.pristine" (click)="activeTab()?.onReset()">
+            Reset
+          </button>
+          <button z-button [zDisabled]="activeForm()?.invalid" (click)="activeTab()?.onSubmit()">Save</button>
+        </div>
+      }
     </div>
-  }
-</z-card>
+  </div>
+</div>

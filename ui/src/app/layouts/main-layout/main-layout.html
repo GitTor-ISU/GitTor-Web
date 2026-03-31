@@ -73,7 +73,7 @@
         @if (user()) {
           <div
             data-test="sidebar-user-button"
-            routerLink="/settings"
+            routerLink="/settings/profile"
             [class]="`cursor-pointer gap-2 rounded-md ${sidebarCollapsed() ? 'mt-3 -ml-1 w-max' : 'hover:bg-muted flex items-center p-1'}`"
           >
             <z-avatar
@@ -88,11 +88,6 @@
               >
                 <span class="block truncate font-medium">{{ user()?.username }}</span>
               </div>
-              <z-icon
-                zType="chevrons-up-down"
-                class="ml-auto h-4 w-4 shrink-0"
-                [class]="sidebarCollapsed() ? 'opacity-0' : 'opacity-100'"
-              />
             }
           </div>
         }

@@ -10,7 +10,7 @@ const VALIDATION_MESSAGES = {
   maxLength: (requiredLength: number) => `Maximum ${requiredLength} characters.`,
 } as const;
 
-const USERNAME_PATTERN = '/^[a-zA-Z0-9_-]*$/';
+const USERNAME_PATTERN = /^[a-zA-Z0-9_-]*$/.toString();
 
 export const getErrorMessage = (control: AbstractControl): string => {
   if (!control?.errors) return '';

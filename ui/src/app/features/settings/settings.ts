@@ -1,12 +1,10 @@
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { FormGroup } from '@angular/forms';
 import SessionService from '@core/session-service';
 import { ZardButtonComponent } from '@shared/components/z-button';
-import { ZardCardComponent } from '@shared/components/z-card';
-import { ZardTabComponent, ZardTabGroupComponent, zPosition } from '@shared/components/z-tabs';
-import { map } from 'rxjs';
+import { ZardIconComponent } from '@shared/components/z-icon';
+import { ZardTabComponent, ZardTabGroupComponent } from '@shared/components/z-tabs';
+import { Settings2Icon } from 'lucide-angular';
 import { SettingsFormTab, SettingsService } from './settings-service';
 
 enum SettingsEnum {
@@ -20,7 +18,7 @@ enum SettingsEnum {
  */
 @Component({
   selector: 'app-settings',
-  imports: [ZardTabComponent, ZardTabGroupComponent, ZardButtonComponent, ZardCardComponent],
+  imports: [ZardTabComponent, ZardTabGroupComponent, ZardButtonComponent, ZardIconComponent],
   templateUrl: './settings.html',
   providers: [SettingsService],
 })
@@ -28,17 +26,11 @@ export class Settings {
   public readonly page = input.required<keyof typeof SettingsEnum>();
 
   protected readonly sessionService = inject(SessionService);
-  protected readonly breakpointObserver = inject(BreakpointObserver);
   protected readonly tabLabels = Object.values(SettingsEnum);
   protected readonly activeTabIndex = signal(0);
-  protected readonly tabsPosition = toSignal(
-    this.breakpointObserver
-      .observe([Breakpoints.Medium, Breakpoints.Large, Breakpoints.XLarge])
-      .pipe(map(({ matches }): zPosition => (matches ? 'left' : 'top'))),
-    { initialValue: 'top' as zPosition }
-  );
   protected readonly activeTab = signal<SettingsFormTab | null>(null);
   protected readonly activeForm = computed<FormGroup | null>(() => this.activeTab()?.form ?? null);
+  protected readonly settingsIcon = Settings2Icon;
 
   private readonly settingsService = inject(SettingsService);
 
