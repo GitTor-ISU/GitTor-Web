@@ -32,11 +32,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import api.dtos.AuthorityDto;
 import api.dtos.ErrorDto;
+import api.dtos.TorrentDto;
 import api.dtos.UserDto;
 import api.entities.Authority;
 import api.entities.User;
 import api.mapper.AuthorityMapper;
+import api.mapper.TorrentMapper;
 import api.mapper.UserMapper;
+import api.services.TorrentService;
 import api.services.UserService;
 
 /**
@@ -49,7 +52,11 @@ public class UserController {
     @Autowired
     private UserService userService;
     @Autowired
+    private TorrentService torrentService;
+    @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private TorrentMapper torrentMapper;
     @Autowired
     private PasswordEncoder encoder;
     @Autowired
@@ -91,6 +98,33 @@ public class UserController {
     @GetMapping("/me/authorities")
     public List<AuthorityDto> getMyAuthorities(@AuthenticationPrincipal User user) {
         return user.getAuthorities().stream().map((GrantedAuthority a) -> authorityMapper.toDto((Authority) a))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * Get my torrents.
+     *
+     * @param user User
+     * @param page Page index
+     * @param size Page size
+     * @return {@link List} of {@link TorrentDto}
+     */
+    // region
+    @Operation(summary = "Get My Torrents",
+        description = "Get a paginated list of torrents uploaded by the current user." + "<ul>"
+            + "<li>If <em>size</em> excedes limit, response will contain up to limit.</li>" + "</ul>")
+    @ApiResponses({@ApiResponse(responseCode = "200",
+        content = @Content(array = @ArraySchema(schema = @Schema(implementation = TorrentDto.class)),
+            mediaType = "application/json"))})
+    // endregion
+    @GetMapping("/me/torrents")
+    public List<TorrentDto> getMyTorrents(@AuthenticationPrincipal User user,
+        @RequestParam(defaultValue = "0") int page, @RequestParam(required = false) Integer size) {
+        int requestedSize = size != null ? size : defaultPageSize;
+        int safeSize = Math.min(requestedSize, maxPageSize);
+
+        Pageable pageable = PageRequest.of(page, safeSize, Sort.by("id").ascending());
+        return torrentService.getAllByUploader(user, pageable).stream().map(torrentMapper::toDto)
             .collect(Collectors.toList());
     }
 
@@ -207,6 +241,42 @@ public class UserController {
         User user = userService.get(id);
         Hibernate.initialize(user);
         return userMapper.toDto(user);
+    }
+
+    /**
+     * Get user torrents.
+     *
+     * @param id User id
+     * @param page Page index
+     * @param size Page size
+     * @return {@link List} of {@link TorrentDto}
+     */
+    // region
+    @Operation(summary = "Get User Torrents",
+        description = "Get a paginated list of torrents uploaded by a specific user." + "<ul>"
+            + "<li>If <em>size</em> excedes limit, response will contain up to limit.</li>" + "</ul>")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = TorrentDto.class)),
+                mediaType = "application/json")),
+        @ApiResponse(responseCode = "403",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "404",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
+    // endregion
+    @GetMapping("/{id}/torrents")
+    @PreAuthorize("hasAuthority(@DbSetup.USER_READ)")
+    public List<TorrentDto> getUserTorrents(@PathVariable int id, @RequestParam(defaultValue = "0") int page,
+        @RequestParam(required = false) Integer size) {
+        int requestedSize = size != null ? size : defaultPageSize;
+        int safeSize = Math.min(requestedSize, maxPageSize);
+        Pageable pageable = PageRequest.of(page, safeSize, Sort.by("id").ascending());
+
+        User user = userService.get(id);
+        Hibernate.initialize(user);
+
+        return torrentService.getAllByUploader(user, pageable).stream().map(torrentMapper::toDto)
+            .collect(Collectors.toList());
     }
 
     /**

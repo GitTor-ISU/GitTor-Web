@@ -51,8 +51,6 @@ public class TorrentControllerTest extends BasicContext {
     @Value("${pagination.max-page-size:100}")
     private int maxPageSize;
 
-    private static final String TORRENT_MIME_TYPE = "application/x-bittorrent";
-
     /**
      * {@link TorrentController#uploadTorrent} test.
      */
@@ -558,7 +556,7 @@ public class TorrentControllerTest extends BasicContext {
             // THEN: Returns correct media type
             assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getHeaders().getContentType()),
-                () -> assertEquals(MediaType.parseMediaType(TORRENT_MIME_TYPE),
+                () -> assertEquals(MediaType.parseMediaType(TorrentController.TORRENT_MIME_TYPE),
                     responseEntity.getHeaders().getContentType()));
         }
 
@@ -727,7 +725,8 @@ public class TorrentControllerTest extends BasicContext {
         User user = authenticationService.register(register);
 
         TorrentDto metadata = fixtureMonkey.giveMeOne(TorrentDto.class);
-        MockMultipartFile file = new MockMultipartFile("file", "test.torrent", TORRENT_MIME_TYPE, content);
+        MockMultipartFile file =
+            new MockMultipartFile("file", "test.torrent", TorrentController.TORRENT_MIME_TYPE, content);
 
         try {
             return torrentController.uploadTorrent(user, metadata, file);
