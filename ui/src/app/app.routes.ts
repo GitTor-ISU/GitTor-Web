@@ -8,13 +8,13 @@ import { Repository } from '@features/repository/repository';
 import { SettingsRoutes } from '@features/settings/settings-routes';
 import { usernameGuard } from '@shared/username-guard';
 import { MainLayout } from './layouts/main-layout/main-layout';
-import { userResolver } from './shared/user-resolver';
+import { currentUserResolver } from './shared/current-user-resolver';
 
 export const routes: Routes = [
   {
     path: '',
     component: MainLayout,
-    resolve: { user: userResolver },
+    resolve: { user: currentUserResolver },
     children: [
       { path: '', component: Home },
       { path: 'about', component: About, title: 'About' },
