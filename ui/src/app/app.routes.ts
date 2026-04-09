@@ -8,7 +8,7 @@ import { Repository } from '@features/repository/repository';
 import { SettingsRoutes } from '@features/settings/settings-routes';
 import { validUserPathGuard } from '@shared/user-path-guards';
 import { MainLayout } from './layouts/main-layout/main-layout';
-import { currentUserResolver } from './shared/current-user-resolver';
+import { currentUserResolver, profileResolver } from './shared/user-resolvers';
 
 export const routes: Routes = [
   {
@@ -21,12 +21,14 @@ export const routes: Routes = [
       {
         path: ':owner',
         canMatch: [validUserPathGuard],
+        resolve: { profile: profileResolver },
         component: RepositoryList,
         title: (route) => `${route.params['owner']}`,
       },
       {
         path: ':owner/:name',
         canMatch: [validUserPathGuard],
+        resolve: { profile: profileResolver },
         component: Repository,
         title: (route) => `${route.params['owner']}/${route.params['name']}`,
       },
