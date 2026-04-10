@@ -1,6 +1,6 @@
 import { CanMatchFn } from '@angular/router';
 
-const reservedPaths = ['login', 'register', 'about', 'help', 'contact'];
+const reservedPaths = ['login', 'register', 'about', 'help', 'contact', 'settings'];
 
 export const usernameGuard: CanMatchFn = (route, segments) => {
   if (reservedPaths.includes(segments[0].path)) {

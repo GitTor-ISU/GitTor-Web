@@ -1,9 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import SessionService from '@core/session-service';
+import { Component, computed, inject, OnInit } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
 import ThemeService from '@core/theme-service';
 import { HeartbeatService } from '@generated/openapi/services/heartbeat';
-import { UsersService } from '@generated/openapi/services/users';
+import { ZardLoaderComponent } from '@shared/components/z-loader/loader.component';
 import { ZardToastComponent } from '@shared/components/z-toast/toast.component';
 import { toast } from 'ngx-sonner';
 import { firstValueFrom } from 'rxjs';
@@ -13,25 +12,21 @@ import { firstValueFrom } from 'rxjs';
  */
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ZardToastComponent],
+  imports: [RouterOutlet, ZardToastComponent, ZardLoaderComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss',
   providers: [],
 })
 export class App implements OnInit {
+  protected readonly router = inject(Router);
+  protected readonly isLoading = computed(() => !!this.router.currentNavigation());
+
   protected readonly themeService = inject(ThemeService);
-  private readonly sessionService = inject(SessionService);
   private readonly heartbeatService = inject(HeartbeatService);
-  private readonly usersService = inject(UsersService);
 
   public ngOnInit(): void {
     firstValueFrom(this.heartbeatService.heartbeat())
       .then(() => toast.success('API: Connected'))
       .catch(() => toast.error('API: Failed to connect'));
-
-    this.sessionService
-      .setMe()
-      .then(() => toast.success('Authorized'))
-      .catch(() => toast.error('Unauthorized'));
   }
 }

@@ -1,0 +1,82 @@
+<div class="flex flex-col gap-6 px-4">
+  <label class="text-lg font-semibold">Profile</label>
+  <form
+    class="flex flex-col gap-6 text-sm md:flex-row md:items-start md:gap-16"
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()"
+  >
+    <div class="flex min-w-0 flex-1 flex-col gap-6 md:max-w-3xl">
+      <z-form-field class="w-full">
+        <label z-form-label>Username</label>
+        <z-form-control [helpText]="this.form.controls.username.value ? usernameHelpMessage() : ''">
+          <input
+            z-input
+            type="text"
+            formControlName="username"
+            data-test="settings-profile-username"
+            appEmptyToNull
+            [placeholder]="user()?.username"
+          />
+        </z-form-control>
+      </z-form-field>
+      <z-form-field class="w-full">
+        <label z-form-label>First Name</label>
+        <z-form-control [helpText]="this.form.controls.firstName.value ? firstNameHelpMessage() : ''">
+          <input
+            z-input
+            type="text"
+            formControlName="firstName"
+            data-test="settings-profile-first-name"
+            appEmptyToNull
+            [placeholder]="user()?.firstname ?? 'Enter your first name'"
+          />
+        </z-form-control>
+      </z-form-field>
+      <z-form-field class="w-full">
+        <label z-form-label>Last Name</label>
+        <z-form-control [helpText]="this.form.controls.lastName.value ? lastNameHelpMessage() : ''">
+          <input
+            z-input
+            type="text"
+            formControlName="lastName"
+            data-test="settings-profile-last-name"
+            appEmptyToNull
+            [placeholder]="user()?.lastname ?? 'Enter your last name'"
+          />
+        </z-form-control>
+      </z-form-field>
+    </div>
+    <div class="md:shrink-0">
+      <z-form-field class="w-full">
+        <label z-form-label>Profile picture</label>
+        <z-form-control [errorMessage]="avatarHelpMessage()">
+          <div class="m-2 flex items-center gap-4">
+            <z-avatar
+              zAlt="User Avatar"
+              class="h-45 w-45 shrink-0 cursor-pointer"
+              [zSrc]="avatarUrl()"
+              (click)="fileUpload.click()"
+            />
+            <button z-button type="button" zType="secondary" (click)="fileUpload.click()">
+              <z-icon [zType]="uploadIcon" />
+              Upload
+            </button>
+          </div>
+          <input
+            #fileUpload
+            type="file"
+            class="hidden"
+            accept="image/*"
+            data-test="settings-profile-avatar-input"
+            (change)="onFileSelected($event)"
+          />
+          <input type="hidden" formControlName="avatar" />
+        </z-form-control>
+      </z-form-field>
+    </div>
+  </form>
+  <div class="my-3">
+    <z-button class="mr-2" zType="secondary" (click)="onChangePassword()">Change Password</z-button>
+    <z-button zType="destructive" (click)="onDeleteAccount()">Delete Account</z-button>
+  </div>
+</div>

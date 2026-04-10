@@ -1,0 +1,83 @@
+<div class="flex h-full min-h-0 flex-col gap-6 px-4">
+  @if (!repositories()) {
+    <label class="text-lg font-semibold">Repository</label>
+    <z-loader />
+  } @else if (repositories()?.length === 0) {
+    <label class="text-lg font-semibold">Repository</label>
+    <div class="mt-12">
+      <z-empty
+        zTitle="No Repos Yet"
+        zDescription="You haven't created any repositories. Get started by creating your first!"
+        [zIcon]="folderGitIcon"
+        [zActions]="[actionPrimary]"
+      >
+        <ng-template #actionPrimary>
+          <button type="button" z-button>Create Repo</button>
+        </ng-template>
+      </z-empty>
+    </div>
+  } @else {
+    <div class="flex justify-between">
+      <div class="flex w-xl flex-col gap-6">
+        <label class="text-lg font-semibold">Repository</label>
+        <div class="flex flex-col gap-1 md:hidden">
+          <ng-container *ngTemplateOutlet="combobox" />
+        </div>
+        <form
+          class="flex flex-col text-sm md:flex-row md:items-start md:gap-16"
+          [formGroup]="form"
+          (ngSubmit)="onSubmit()"
+        >
+          <div class="flex min-w-0 flex-1 flex-col gap-6 md:w-full">
+            <z-form-field class="w-full">
+              <label z-form-label>Name</label>
+              <z-form-control [helpText]="this.form.controls.name.value ? nameHelpMessage() : ''">
+                <input
+                  z-input
+                  type="text"
+                  formControlName="name"
+                  data-test="settings-repository-name"
+                  appEmptyToNull
+                  [placeholder]="repository().name"
+                />
+              </z-form-control>
+            </z-form-field>
+            <z-form-field class="w-full">
+              <label z-form-label>About</label>
+              <z-form-control [helpText]="this.form.controls.about.value ? aboutHelpMessage() : ''">
+                <textarea
+                  z-input
+                  type="text"
+                  formControlName="about"
+                  data-test="settings-repository-about"
+                  appEmptyToNull
+                  [placeholder]="repository().about"
+                ></textarea>
+              </z-form-control>
+            </z-form-field>
+          </div>
+        </form>
+        <z-segmented
+          [zOptions]="visibilityOptions"
+          [(selectedValue)]="visibility"
+          (zChange)="updateVisibility($event)"
+        />
+        <z-button zType="destructive" class="mt-1 max-w-[145px]" (click)="onDeleteRepo()">Delete Repository</z-button>
+      </div>
+      <div class="flex hidden flex-col gap-1 md:block">
+        <ng-container *ngTemplateOutlet="combobox" />
+      </div>
+      <ng-template #combobox>
+        <label z-form-label class="text-muted-foreground text-xs">Selected:</label>
+        <z-combobox
+          placeholder="Select repository..."
+          searchPlaceholder="Search"
+          emptyText="No repository found."
+          [options]="repositoryOptions() ?? []"
+          [(value)]="selectedValue"
+          (zComboSelected)="onRepositoryChange($event.value)"
+        />
+      </ng-template>
+    </div>
+  }
+</div>
