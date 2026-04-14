@@ -31,6 +31,7 @@ public interface TorrentMapper {
      * @param updateDto Update information
      */
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "repoId", ignore = true)
     @Mapping(target = "file", ignore = true)
     @Mapping(target = "uploader", ignore = true)
     @Mapping(target = "createdAt", ignore = true)

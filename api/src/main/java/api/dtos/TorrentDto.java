@@ -31,6 +31,11 @@ public class TorrentDto {
     @Size(min = 3, max = 255)
     private String description;
 
+    @Nullable
+    @Size(min = 40, max = 40)
+    @Pattern(regexp = "^[a-fA-F0-9]{40}$")
+    private String repoId;
+
     private Long fileSize;
     private Integer uploaderId;
     private String uploaderUsername;

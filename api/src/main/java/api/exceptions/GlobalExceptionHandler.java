@@ -1,5 +1,6 @@
 package api.exceptions;
 
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -113,5 +114,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorDto> handleBadCredentialsException(BadCredentialsException ex) {
         return new ResponseEntity<>(errorService.error(ex.getMessage()), HttpStatus.UNAUTHORIZED);
+    }
+
+    /**
+     * Handle {@link ConstraintViolationException}.
+     *
+     * @param ex Exception
+     * @return {@link ResponseEntity}
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorDto> handleConstraintViolationException(ConstraintViolationException ex) {
+        return new ResponseEntity<>(errorService.error(ex.getMessage()), HttpStatus.BAD_REQUEST);
     }
 }

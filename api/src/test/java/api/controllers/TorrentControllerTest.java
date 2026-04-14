@@ -337,6 +337,87 @@ public class TorrentControllerTest extends BasicContext {
     }
 
     /**
+     * {@link TorrentController#getTorrentByRepoId} test.
+     */
+    @Nested
+    public class GetTorrentByRepoId {
+        private static final String ENDPOINT = "/torrents/repository/{repoId}";
+
+        @Test
+        public void shouldGetTorrentByRepoId() {
+            // GIVEN: Torrent uploaded
+            TorrentDto uploaded = uploadTestTorrent();
+
+            // GIVEN: JWT authentication
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+
+            var request = new HttpEntity<>(headers);
+
+            // WHEN: Get torrent by repo id
+            ResponseEntity<TorrentDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET,
+                request, new ParameterizedTypeReference<TorrentDto>() {}, uploaded.getRepoId());
+
+            // THEN: Responds with the uploaded torrent
+            assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
+                () -> assertNotNull(responseEntity.getBody()),
+                () -> assertEquals(uploaded.getName(), responseEntity.getBody().getName()),
+                () -> assertEquals(uploaded.getDescription(), responseEntity.getBody().getDescription()));
+        }
+
+        @Test
+        public void should400_whenRepoIdLengthInvalid() {
+            // GIVEN: JWT authentication
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+
+            var request = new HttpEntity<>(headers);
+
+            // WHEN: Get torrent by invalid repo id
+            ResponseEntity<TorrentDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET,
+                request, new ParameterizedTypeReference<TorrentDto>() {}, "0123456789ABCDEF");
+
+            // THEN: Responds with 400
+            assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        }
+
+        @Test
+        public void should400_whenRepoIdInvalid() {
+            // GIVEN: JWT authentication
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+
+            var request = new HttpEntity<>(headers);
+
+            // WHEN: Get torrent by invalid repo id
+            ResponseEntity<TorrentDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET,
+                request, new ParameterizedTypeReference<TorrentDto>() {}, "invalidRepoId");
+
+            // THEN: Responds with 400
+            assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+        }
+
+        @Test
+        public void should404_whenNonexistent() {
+            // GIVEN: Nonexistent torrent id
+            String nonexistentId = "AAAAAAAAAA0000000000BBBBBBBBBB1111111111";
+
+            // GIVEN: JWT authentication
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(adminAuth.getAccessToken());
+
+            var request = new HttpEntity<>(headers);
+
+            // WHEN: Get torrent by id
+            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET, request,
+                new ParameterizedTypeReference<ErrorDto>() {}, nonexistentId);
+
+            // THEN: Responds not found
+            assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+        }
+    }
+
+    /**
      * {@link TorrentController#updateTorrent} test.
      */
     @Nested

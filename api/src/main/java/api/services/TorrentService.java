@@ -62,8 +62,19 @@ public class TorrentService {
      * @return {@link Optional} {@link Torrent}
      */
     @Transactional(readOnly = true)
-    public Optional<Torrent> find(String name) {
+    public Optional<Torrent> findByName(String name) {
         return torrentRepository.findByName(name);
+    }
+
+    /**
+     * Find torrent by root commit hash.
+     *
+     * @param repoId 40-character hex repository root commit hash
+     * @return {@link Optional} {@link Torrent}
+     */
+    @Transactional(readOnly = true)
+    public Optional<Torrent> findByRepoId(String repoId) {
+        return torrentRepository.findByRepoId(repoId);
     }
 
     /**
@@ -99,8 +110,20 @@ public class TorrentService {
      * @throws EntityNotFoundException if torrent not found
      */
     @Transactional(readOnly = true)
-    public Torrent get(String name) {
-        return find(name).orElseThrow(() -> EntityNotFoundException.fromTorrent(name));
+    public Torrent getByName(String name) {
+        return findByName(name).orElseThrow(() -> EntityNotFoundException.fromTorrent(name));
+    }
+
+    /**
+     * Get torrent by repository id (first commit hash).
+     *
+     * @param repoId 40-character hex repository root commit hash
+     * @return {@link Torrent}
+     * @throws EntityNotFoundException if torrent not found
+     */
+    @Transactional(readOnly = true)
+    public Torrent getByRepoId(String repoId) {
+        return findByRepoId(repoId).orElseThrow(() -> EntityNotFoundException.fromTorrentByrepoId(repoId));
     }
 
     /**
@@ -169,11 +192,13 @@ public class TorrentService {
      * @param description Torrent description
      * @param uploader Uploader
      * @param file Torrent file
+     * @param repoId Repository root commit hash
      * @return {@link Torrent}
      * @throws IOException if file cannot be read
      */
     @Transactional
-    public Torrent create(String name, String description, User uploader, MultipartFile file) throws IOException {
+    public Torrent create(String name, String description, User uploader, MultipartFile file, String repoId)
+        throws IOException {
         validateTorrentFile(file);
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("Name must not be empty.");
@@ -185,8 +210,8 @@ public class TorrentService {
 
         s3ObjectService.save(s3Object, file.getInputStream());
 
-        Torrent torrent =
-            Torrent.builder().name(name).description(description).file(s3Object).uploader(uploader).build();
+        Torrent torrent = Torrent.builder().name(name).description(description).repoId(repoId).file(s3Object)
+            .uploader(uploader).build();
 
         return save(torrent);
     }

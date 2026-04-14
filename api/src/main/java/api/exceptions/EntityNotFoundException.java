@@ -117,4 +117,14 @@ public class EntityNotFoundException extends RuntimeException {
     public static EntityNotFoundException fromTorrent(String name) {
         return new EntityNotFoundException("Torrent '" + name + "' not found.");
     }
+
+    /**
+     * Generate exception from torrent repository id.
+     *
+     * @param repoId 40-character hex repository root commit hash
+     * @return {@link EntityNotFoundException}
+     */
+    public static EntityNotFoundException fromTorrentByrepoId(String repoId) {
+        return new EntityNotFoundException("Torrent with repository ID '" + repoId + "' not found.");
+    }
 }

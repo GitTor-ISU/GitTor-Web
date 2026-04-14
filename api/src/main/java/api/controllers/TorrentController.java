@@ -10,6 +10,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
@@ -21,6 +23,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,6 +45,7 @@ import api.services.TorrentService;
 /**
  * {@link TorrentController}.
  */
+@Validated
 @RestController
 @RequestMapping("/torrents")
 @Tag(name = "Torrents", description = "Torrents represent a repository stored in the system.")
@@ -80,9 +84,11 @@ public class TorrentController {
             content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public TorrentDto uploadTorrent(@AuthenticationPrincipal User user, @RequestPart("metadata") TorrentDto metadata,
-        @RequestPart("file") MultipartFile file) throws IOException {
-        Torrent torrent = torrentService.create(metadata.getName(), metadata.getDescription(), user, file);
+    public TorrentDto uploadTorrent(@AuthenticationPrincipal User user,
+        @RequestPart("metadata") @Valid TorrentDto metadata, @RequestPart("file") MultipartFile file)
+        throws IOException {
+        Torrent torrent =
+            torrentService.create(metadata.getName(), metadata.getDescription(), user, file, metadata.getRepoId());
         return torrentMapper.toDto(torrent);
     }
 
@@ -126,6 +132,29 @@ public class TorrentController {
     @GetMapping("/{id}")
     public TorrentDto getTorrent(@PathVariable Long id) {
         Torrent torrent = torrentService.get(id);
+        return torrentMapper.toDto(torrent);
+    }
+
+    /**
+     * Get torrent by repository ID (root commit hash).
+     *
+     * @param repoId 40-character hex repository root commit hash
+     * @return {@link TorrentDto}
+     */
+    // region
+    @Operation(summary = "Get Torrent by Repository ID",
+        description = "Get torrent metadata by the repository's root commit hash.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200",
+            content = @Content(schema = @Schema(implementation = TorrentDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "400",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "404",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
+    // endregion
+    @GetMapping("/repository/{repoId}")
+    public TorrentDto getTorrentByRepoId(@PathVariable @Pattern(regexp = "[0-9a-fA-F]{40}") String repoId) {
+        Torrent torrent = torrentService.getByRepoId(repoId);
         return torrentMapper.toDto(torrent);
     }
 
