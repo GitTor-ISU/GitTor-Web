@@ -3,7 +3,7 @@
     <div class="bg-background px-6">
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold">{{ owner() }}</h1>
+          <h1 class="text-2xl font-bold">{{ profile().username }}</h1>
           <p class="text-muted-foreground">{{ ownerBio() }}</p>
         </div>
         <button z-button zType="default" zSize="sm" class="gap-1">
@@ -80,7 +80,7 @@
                   <lucide-angular class="text-muted-foreground size-4" [img]="bookIcon" />
                   <a
                     class="text-lg font-semibold text-blue-500 hover:underline"
-                    [routerLink]="`/${owner()}/${repo.name}`"
+                    [routerLink]="`/${profile().username}/${repo.name}`"
                     >{{ repo.name }}
                   </a>
                   <span class="text-muted-foreground rounded-full border px-2 py-0.5 text-xs">

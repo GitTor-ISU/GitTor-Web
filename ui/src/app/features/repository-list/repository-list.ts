@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ZardButtonComponent } from '@shared/components/z-button/button.component';
 import { ZardCardComponent } from '@shared/components/z-card/card.component';
 import { ZardDividerComponent } from '@shared/components/z-divider/divider.component';
@@ -14,6 +15,7 @@ import {
   SearchIcon,
   StarIcon,
 } from 'lucide-angular';
+import { UserDto } from '@generated/openapi/models/user-dto';
 
 /**
  * Repository summary for listing.
@@ -53,7 +55,7 @@ export class RepositoryList implements OnInit {
   protected readonly searchIcon = SearchIcon;
   protected readonly plusIcon = PlusIcon;
   protected readonly chevronDownIcon = ChevronDownIcon;
-  protected readonly owner = signal<string>('john-doe');
+
   protected readonly ownerDisplayName = signal<string>('John Doe');
   protected readonly ownerBio = signal<string>('Full-stack developer passionate about open source');
   protected readonly searchQuery = signal<string>('');
@@ -126,14 +128,11 @@ export class RepositoryList implements OnInit {
   protected readonly filteredRepositories = signal<RepositorySummary[]>([]);
 
   private readonly route = inject(ActivatedRoute);
+  private readonly data = toSignal(this.route.data);
+  protected readonly profile = computed(() => this.data()?.['profile'] as UserDto);
+  protected readonly displayName = computed(() => `${this.profile()?.firstname} ${this.profile()?.lastname}`);
 
   public ngOnInit(): void {
-    const owner = this.route.snapshot.paramMap.get('owner');
-
-    if (owner) {
-      this.owner.set(owner);
-    }
-
     this.updateFilteredRepositories();
   }
 
