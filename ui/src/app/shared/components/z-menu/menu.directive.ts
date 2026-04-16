@@ -1,18 +1,33 @@
-import { BooleanInput } from '@angular/cdk/coercion';
+import type { BooleanInput } from '@angular/cdk/coercion';
 import { CdkMenuTrigger } from '@angular/cdk/menu';
+import type { ConnectedPosition } from '@angular/cdk/overlay';
 import { isPlatformBrowser } from '@angular/common';
-import { booleanAttribute, Directive, ElementRef, inject, input, OnDestroy, OnInit, PLATFORM_ID } from '@angular/core';
+import {
+  booleanAttribute,
+  computed,
+  Directive,
+  DOCUMENT,
+  effect,
+  ElementRef,
+  inject,
+  input,
+  type OnDestroy,
+  type OnInit,
+  PLATFORM_ID,
+  type TemplateRef,
+  untracked,
+} from '@angular/core';
 
 import { ZardMenuManagerService } from './menu-manager.service';
+import { MENU_POSITIONS_MAP, type ZardMenuPlacement } from './menu-positions';
 
-export type ZardMenuPlacement = 'bottomLeft' | 'bottomCenter' | 'bottomRight' | 'topLeft' | 'topCenter' | 'topRight';
 export type ZardMenuTrigger = 'click' | 'hover';
 
 @Directive({
   selector: '[z-menu]',
-  standalone: true,
   host: {
     role: 'button',
+    '[attr.tabindex]': "'0'",
     '[attr.aria-haspopup]': "'menu'",
     '[attr.aria-expanded]': 'cdkTrigger.isOpen()',
     '[attr.data-state]': "cdkTrigger.isOpen() ? 'open': 'closed'",
@@ -27,21 +42,37 @@ export type ZardMenuTrigger = 'click' | 'hover';
   ],
 })
 export class ZardMenuDirective implements OnInit, OnDestroy {
-  private static readonly MENU_OVERLAY_SELECTOR = '.cdk-overlay-container .cdk-overlay-pane:last-child';
   private static readonly MENU_CONTENT_SELECTOR = '.cdk-overlay-pane [z-menu-content]';
 
   protected readonly cdkTrigger = inject(CdkMenuTrigger, { host: true });
-  private readonly elementRef = inject(ElementRef);
+  private readonly document = inject(DOCUMENT);
+  private readonly elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly menuManager = inject(ZardMenuManagerService);
   private readonly platformId = inject(PLATFORM_ID);
 
   private closeTimeout: ReturnType<typeof setTimeout> | null = null;
-  private readonly cleanupFunctions: (() => void)[] = [];
+  private readonly cleanupFunctions: Array<() => void> = [];
 
-  readonly zMenuTriggerFor = input.required();
+  readonly zMenuTriggerFor = input.required<TemplateRef<void>>();
   readonly zDisabled = input<boolean, BooleanInput>(false, { transform: booleanAttribute });
   readonly zTrigger = input<ZardMenuTrigger>('click');
   readonly zHoverDelay = input<number>(100);
+  readonly zPlacement = input<ZardMenuPlacement>('bottomLeft');
+
+  private readonly menuPositions = computed(() => this.getPositionsByPlacement(this.zPlacement()));
+
+  constructor() {
+    effect(() => {
+      const positions = this.menuPositions();
+      untracked(() => {
+        this.cdkTrigger.menuPosition = positions;
+      });
+    });
+  }
+
+  private getPositionsByPlacement(placement: ZardMenuPlacement): ConnectedPosition[] {
+    return MENU_POSITIONS_MAP[placement] || MENU_POSITIONS_MAP['bottomLeft'];
+  }
 
   ngOnInit(): void {
     const isMobile = this.isMobileDevice();
@@ -56,7 +87,7 @@ export class ZardMenuDirective implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.cancelScheduledClose();
     this.menuManager.unregisterHoverMenu(this);
-    this.cleanupFunctions.forEach((cleanup) => cleanup());
+    this.cleanupFunctions.forEach(cleanup => cleanup());
     this.cleanupFunctions.length = 0;
   }
 
@@ -74,14 +105,17 @@ export class ZardMenuDirective implements OnInit, OnDestroy {
     const element = this.elementRef.nativeElement;
 
     this.addEventListenerWithCleanup(element, 'mouseenter', () => {
-      if (this.zDisabled()) return;
+      if (this.zDisabled()) {
+        return;
+      }
 
+      element.focus({ preventScroll: true });
       this.cancelScheduledClose();
       this.menuManager.registerHoverMenu(this);
       this.cdkTrigger.open();
     });
 
-    this.addEventListenerWithCleanup(element, 'mouseleave', (event) => this.scheduleCloseIfNeeded(event as MouseEvent));
+    this.addEventListenerWithCleanup(element, 'mouseleave', event => this.scheduleCloseIfNeeded(event as MouseEvent));
   }
 
   private setupMenuOpenListener(): void {
@@ -95,16 +129,20 @@ export class ZardMenuDirective implements OnInit, OnDestroy {
 
     this.cleanupFunctions.push(
       () => openSubscription.unsubscribe(),
-      () => closeSubscription.unsubscribe()
+      () => closeSubscription.unsubscribe(),
     );
   }
 
   private setupMenuContentListeners(): void {
-    const overlay = document.querySelector(ZardMenuDirective.MENU_OVERLAY_SELECTOR);
-    if (!overlay) return;
+    const menuContent = this.document.querySelector(ZardMenuDirective.MENU_CONTENT_SELECTOR);
+    if (!menuContent) {
+      return;
+    }
 
-    this.addEventListenerWithCleanup(overlay, 'mouseenter', () => this.cancelScheduledClose());
-    this.addEventListenerWithCleanup(overlay, 'mouseleave', (event) => this.scheduleCloseIfNeeded(event as MouseEvent));
+    this.addEventListenerWithCleanup(menuContent, 'mouseenter', () => this.cancelScheduledClose());
+    this.addEventListenerWithCleanup(menuContent, 'mouseleave', event =>
+      this.scheduleCloseIfNeeded(event as MouseEvent),
+    );
   }
 
   private cancelScheduledClose(): void {
@@ -123,7 +161,9 @@ export class ZardMenuDirective implements OnInit, OnDestroy {
   }
 
   private shouldKeepMenuOpen(relatedTarget: Element | null): boolean {
-    if (!relatedTarget) return false;
+    if (!relatedTarget) {
+      return false;
+    }
 
     const isMovingToTrigger = this.elementRef.nativeElement.contains(relatedTarget);
     const isMovingToMenu = relatedTarget.closest(ZardMenuDirective.MENU_CONTENT_SELECTOR);
@@ -147,7 +187,7 @@ export class ZardMenuDirective implements OnInit, OnDestroy {
     element: Element,
     eventType: string,
     handler: (event: MouseEvent | Event) => void,
-    options?: AddEventListenerOptions
+    options?: AddEventListenerOptions,
   ): void {
     if (isPlatformBrowser(this.platformId)) {
       element.addEventListener(eventType, handler, options);
@@ -160,7 +200,12 @@ export class ZardMenuDirective implements OnInit, OnDestroy {
       return false; // Default to desktop behavior on server
     }
 
-    // Check for touch support
+    const window = this.document.defaultView;
+    if (!window) {
+      return false;
+    }
+
+    const { navigator } = window;
     const hasTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
     // Check for mobile user agent
