@@ -24,6 +24,14 @@ public interface TorrentRepository extends JpaRepository<Torrent, Long> {
     Optional<Torrent> findByName(String name);
 
     /**
+     * Find torrent by repo id (first commit hash).
+     *
+     * @param repoId Torrent repo id
+     * @return {@link Optional} {@link Torrent}
+     */
+    Optional<Torrent> findByRepoId(String repoId);
+
+    /**
      * Find all torrents by uploader.
      *
      * @param uploader Uploader

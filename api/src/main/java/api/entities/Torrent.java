@@ -41,6 +41,9 @@ public class Torrent {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "repo_id", unique = true)
+    private String repoId;
+
     @OneToOne
     @JoinColumn(name = "file_id", nullable = false)
     private S3Object file;
