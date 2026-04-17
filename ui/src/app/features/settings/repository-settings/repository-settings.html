@@ -38,30 +38,25 @@
                   formControlName="name"
                   data-test="settings-repository-name"
                   appEmptyToNull
-                  [placeholder]="repository().name"
+                  [placeholder]="repository()?.name"
                 />
               </z-form-control>
             </z-form-field>
             <z-form-field class="w-full">
-              <label z-form-label>About</label>
-              <z-form-control [helpText]="this.form.controls.about.value ? aboutHelpMessage() : ''">
+              <label z-form-label>Description</label>
+              <z-form-control [helpText]="this.form.controls.description.value ? descriptionHelpMessage() : ''">
                 <textarea
                   z-input
                   type="text"
-                  formControlName="about"
-                  data-test="settings-repository-about"
+                  formControlName="description"
+                  data-test="settings-repository-description"
                   appEmptyToNull
-                  [placeholder]="repository().about"
+                  [placeholder]="repository()?.description"
                 ></textarea>
               </z-form-control>
             </z-form-field>
           </div>
         </form>
-        <z-segmented
-          [zOptions]="visibilityOptions"
-          [(selectedValue)]="visibility"
-          (zChange)="updateVisibility($event)"
-        />
         <z-button zType="destructive" class="mt-1 max-w-[145px]" (click)="onDeleteRepo()">Delete Repository</z-button>
       </div>
       <div class="flex hidden flex-col gap-1 md:block">

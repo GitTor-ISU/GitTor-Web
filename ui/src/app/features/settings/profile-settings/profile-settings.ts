@@ -2,19 +2,22 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import SessionService from '@core/session-service';
+import { UserAvatarsService } from '@generated/openapi/services/user-avatars';
+import { UsersService } from '@generated/openapi/services/users';
 import { ZardAlertDialogService } from '@shared/components/z-alert-dialog/alert-dialog.service';
 import { ZardAvatarComponent } from '@shared/components/z-avatar';
 import { ZardButtonComponent } from '@shared/components/z-button';
 import { ZardDialogService } from '@shared/components/z-dialog';
 import { ZardFormModule } from '@shared/components/z-form/form.module';
 import { ZardIconComponent } from '@shared/components/z-icon';
+import { ZardInputGroupComponent } from '@shared/components/z-input-group';
 import { ZardInputDirective } from '@shared/components/z-input/input.directive';
 import { controlMatchValidator } from '@shared/control-match-validator';
 import { EmptyToNullDirective } from '@shared/empty-to-null';
 import { formDiffValidator } from '@shared/form-diff-validator';
 import { createFormValueSignal, createHelpMessageSignal } from '@shared/form-utils';
-import { LucideIconData, UploadIcon } from 'lucide-angular';
-import { finalize, map } from 'rxjs';
+import { LucideIconData, UploadIcon, XIcon } from 'lucide-angular';
+import { finalize, firstValueFrom, map } from 'rxjs';
 import { SettingsFormTab } from '../settings-service';
 import { ChangePassword } from './change-password';
 
@@ -31,6 +34,7 @@ import { ChangePassword } from './change-password';
     ZardButtonComponent,
     ZardAvatarComponent,
     ZardIconComponent,
+    ZardInputGroupComponent,
   ],
   templateUrl: './profile-settings.html',
 })
@@ -79,26 +83,52 @@ export class ProfileSettings implements SettingsFormTab {
     { initialValue: ProfileSettings.DEFAULT_AVATAR_URL }
   );
   protected readonly uploadIcon: LucideIconData = UploadIcon;
+  protected readonly xIcon: LucideIconData = XIcon;
 
   private avatarObjectUrl: string | null = null;
   private readonly alertDialogService = inject(ZardAlertDialogService);
   private readonly dialogService = inject(ZardDialogService);
+  private readonly usersService = inject(UsersService);
+  private readonly avatarsService = inject(UserAvatarsService);
 
   public constructor() {
     const effectRef = effect(
       () => {
         this.form.addValidators(formDiffValidator(this.form.getRawValue()));
-        this.form.controls.username.addValidators(controlMatchValidator(this.user()?.username ?? ''));
-        this.form.controls.firstName.addValidators(controlMatchValidator(this.user()?.firstname ?? ''));
-        this.form.controls.lastName.addValidators(controlMatchValidator(this.user()?.lastname ?? ''));
+        this.form.controls.username.addValidators(controlMatchValidator(this.user()?.username));
+        this.form.controls.firstName.addValidators(controlMatchValidator(this.user()?.firstname));
+        this.form.controls.lastName.addValidators(controlMatchValidator(this.user()?.lastname));
         effectRef.destroy();
       },
       { manualCleanup: true }
     );
   }
 
-  public onSubmit(): void {
-    console.log('Profile form submitted:', this.form.value);
+  public async onSubmit(): Promise<void> {
+    const { avatar, username, firstName, lastName } = this.form.getRawValue();
+    const requests: Promise<unknown>[] = [];
+
+    if (username || firstName || lastName) {
+      requests.push(
+        firstValueFrom(
+          this.usersService.updateMe({
+            username: username ?? undefined,
+            firstname: firstName ?? undefined,
+            lastname: lastName ?? undefined,
+          })
+        )
+      );
+    }
+
+    if (avatar) {
+      requests.push(firstValueFrom(this.avatarsService.updateMyAvatar({ file: avatar })));
+    }
+
+    if (requests.length > 0) {
+      await Promise.all(requests);
+      await firstValueFrom(this.sessionService.fetchMe$());
+      this.onReset();
+    }
   }
 
   public onReset(): void {

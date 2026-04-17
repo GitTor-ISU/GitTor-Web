@@ -59,8 +59,7 @@
             [attr.data-test]="sessionService.hasToken() ? 'sidebar-logout-button' : 'sidebar-login-button'"
             [class.w-full]="sidebarCollapsed()"
             [zTooltip]="sidebarCollapsed() ? (sessionService.hasToken() ? 'Log Out' : 'Log In') : ''"
-            [routerLink]="!sessionService.hasToken() ? '/login' : ''"
-            (click)="sessionService.hasToken() && sessionService.logout()"
+            [routerLink]="!sessionService.hasToken() ? '/login' : '/logout'"
           >
             <z-icon class="-ml-[3px]" [zType]="sessionService.hasToken() ? 'log-out' : logInIcon" />
             <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{
