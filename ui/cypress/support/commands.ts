@@ -59,7 +59,7 @@ Cypress.Commands.add('verifyLogin', () => {
     expect(hasAuthControl).to.equal(true);
   });
 
-  return cy.get('body').then(($body) => {
-    return $body.find('[data-test="sidebar-logout-button"]').length > 0;
+  return cy.window().then((win) => {
+    return win.localStorage.getItem('accessToken') !== null;
   });
 });

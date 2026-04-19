@@ -11,12 +11,12 @@ import { MainLayout } from './layouts/main-layout/main-layout';
 import { currentUserResolver } from './shared/current-user-resolver';
 
 export const routes: Routes = [
+  { path: '', component: Home },
   {
     path: '',
     component: MainLayout,
     resolve: { user: currentUserResolver },
     children: [
-      { path: '', component: Home },
       { path: 'about', component: About, title: 'About' },
       {
         path: ':owner',
