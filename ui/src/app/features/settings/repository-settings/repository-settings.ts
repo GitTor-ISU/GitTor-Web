@@ -3,7 +3,7 @@ import { Component, computed, effect, inject, signal, untracked } from '@angular
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TorrentDto } from '@generated/openapi/models/torrent-dto';
+import { TorrentsService } from '@generated/openapi/services/torrents';
 import { UsersService } from '@generated/openapi/services/users';
 import { ZardAlertDialogService } from '@shared/components/z-alert-dialog/alert-dialog.service';
 import { ZardButtonComponent } from '@shared/components/z-button';
@@ -17,7 +17,7 @@ import { EmptyToNullDirective } from '@shared/empty-to-null';
 import { formDiffValidator } from '@shared/form-diff-validator';
 import { createFormValueSignal, createHelpMessageSignal } from '@shared/form-utils';
 import { FolderGit2Icon } from 'lucide-angular';
-import { map } from 'rxjs';
+import { catchError, distinctUntilChanged, firstValueFrom, map, of, startWith, Subject, switchMap } from 'rxjs';
 import { SettingsFormTab, SettingsService } from '../settings-service';
 
 /**
@@ -52,22 +52,40 @@ export class RepositorySettings implements SettingsFormTab {
     }),
   });
 
+  private readonly refetchRepositories$ = new Subject<void>();
   protected readonly repositories = toSignal(
-    this.usersService.getMyTorrents().pipe(map((repos) => repos.map((repo) => repo as Required<TorrentDto>)))
+    this.refetchRepositories$.pipe(
+      startWith(undefined),
+      switchMap(() => this.usersService.getMyTorrents().pipe(catchError(() => of([]))))
+    )
   );
+
   public readonly showFooter = computed(() => this.repositories() !== undefined && this.repositories()!.length > 0);
+  public readonly isInvalid = toSignal(this.form.statusChanges.pipe(map(() => this.form.invalid)), {
+    initialValue: this.form.invalid,
+  });
+  public readonly isPristine = toSignal(this.form.valueChanges.pipe(map(() => this.form.pristine)), {
+    initialValue: this.form.pristine,
+  });
 
   private readonly activatedRoute = inject(ActivatedRoute);
-  protected readonly selectedValue = signal<string>(this.activatedRoute.snapshot.queryParamMap.get('id') ?? '');
+  private readonly selectedQueryParam = toSignal(
+    this.activatedRoute.queryParamMap.pipe(
+      map((params) => params.get('id') ?? ''),
+      distinctUntilChanged()
+    ),
+    { initialValue: this.activatedRoute.snapshot.queryParamMap.get('id') ?? '' }
+  );
+  protected readonly selectedValue = signal<string>(this.selectedQueryParam());
   protected readonly repository = computed(
     () =>
-      this.repositories()?.find((repo) => repo.id.toString() === this.selectedValue()) ??
+      this.repositories()?.find((repo) => repo.id?.toString() === this.selectedValue()) ??
       this.repositories()?.[0] ??
       undefined
   );
   protected readonly visibility = signal<string>('');
-  protected readonly repositoryOptions = computed(() =>
-    this.repositories()?.map((repo) => ({ label: repo.name, value: repo.id.toString() }))
+  protected readonly repositoryOptions = computed(
+    () => this.repositories()?.map((repo) => ({ label: repo.name ?? '', value: repo.id?.toString() ?? '' })) ?? []
   );
   protected readonly folderGitIcon = FolderGit2Icon;
   protected readonly visibilityOptions = [
@@ -80,35 +98,67 @@ export class RepositorySettings implements SettingsFormTab {
 
   private readonly router = inject(Router);
   private readonly settingsService = inject(SettingsService);
+  private readonly torrentsService = inject(TorrentsService);
   private readonly alertDialogService = inject(ZardAlertDialogService);
 
   public constructor() {
     effect(() => {
-      const id = this.repository()?.id.toString();
+      const queryId = this.selectedQueryParam();
+      if (queryId !== this.selectedValue()) {
+        this.selectedValue.set(queryId);
+      }
+    });
+
+    effect(() => {
+      const id = this.repository()?.id?.toString();
+      if (!id || id === this.selectedQueryParam()) {
+        untracked(() => this.onReset());
+        return;
+      }
+
       this.router.navigate([], {
         relativeTo: this.activatedRoute,
         queryParams: { id: id },
         queryParamsHandling: 'merge',
         replaceUrl: true,
       });
+
       untracked(() => this.onReset());
     });
   }
 
-  public onSubmit(): void {
-    console.log('Form submitted with value:', this.form.getRawValue());
+  public async onSubmit(): Promise<void> {
+    if (!this.repository()?.id) {
+      return;
+    }
+
+    await firstValueFrom(
+      this.torrentsService.updateTorrent(this.repository()!.id!, {
+        metadata: {
+          name: this.form.controls.name.value ?? undefined,
+          description: this.form.controls.description.value ?? undefined,
+        },
+      })
+    ).then(() => {
+      this.refetchRepos();
+    });
   }
 
   public onReset(): void {
     this.form.reset();
     this.form.addValidators(formDiffValidator(this.form.getRawValue()));
-    this.form.controls.name.addValidators(controlMatchValidator(this.repository()?.name));
+    this.form.controls.name.addValidators(controlMatchValidator(() => this.repository()?.name));
     this.form.updateValueAndValidity();
   }
 
   protected async onRepositoryChange(repo: string): Promise<void> {
     if (await this.settingsService.confirmDiscardChanges(this.form)) {
-      this.selectedValue.set(repo);
+      await this.router.navigate([], {
+        relativeTo: this.activatedRoute,
+        queryParams: { id: repo },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      });
     }
   }
 
@@ -118,7 +168,17 @@ export class RepositorySettings implements SettingsFormTab {
       zDescription: 'This action cannot be undone.',
       zOkText: 'Continue',
       zOkDestructive: true,
+      zOnOk: async () => {
+        if (this.repository()?.id) {
+          await firstValueFrom(this.torrentsService.deleteTorrent(this.repository()!.id!));
+          this.refetchRepos();
+        }
+      },
       zCancelText: 'Cancel',
     });
+  }
+
+  protected refetchRepos(): void {
+    this.refetchRepositories$.next();
   }
 }

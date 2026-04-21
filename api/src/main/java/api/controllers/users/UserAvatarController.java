@@ -56,12 +56,14 @@ public class UserAvatarController {
     @Operation(summary = "Get My Avatar", description = "Gets the current user's avatar.")
     @ApiResponses({
         @ApiResponse(responseCode = "200",
-            content = {@Content(mediaType = "image/png"), @Content(mediaType = "image/jpeg"),
-                @Content(mediaType = "image/gif"), @Content(mediaType = "image/svg+xml")}),
-        @ApiResponse(responseCode = "404",
-            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
+            content = {@Content(mediaType = "image/png", schema = @Schema(type = "string", format = "binary")),
+                @Content(mediaType = "image/jpeg", schema = @Schema(type = "string", format = "binary")),
+                @Content(mediaType = "image/gif", schema = @Schema(type = "string", format = "binary")),
+                @Content(mediaType = "image/svg+xml", schema = @Schema(type = "string", format = "binary"))}),
+        @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(implementation = ErrorDto.class)))})
     // endregion
-    @GetMapping("/me/avatar")
+    @GetMapping(path = "/me/avatar", produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE,
+        MediaType.IMAGE_GIF_VALUE, "image/svg+xml", MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Resource> getMyAvatar(@AuthenticationPrincipal User user) throws IOException {
         S3Object s3Object = user.getAvatar();
         if (s3Object == null) {
@@ -92,7 +94,7 @@ public class UserAvatarController {
         @ApiResponse(responseCode = "400",
             content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
-    @PutMapping("/me/avatar")
+    @PutMapping(path = "/me/avatar", consumes = "multipart/form-data")
     public void updateMyAvatar(@AuthenticationPrincipal User user, @RequestParam("file") MultipartFile file)
         throws IOException {
         userService.updateAvatar(user, file);
@@ -128,12 +130,15 @@ public class UserAvatarController {
     @Operation(summary = "Get User's Avatar", description = "Gets specified user's avatar.")
     @ApiResponses({
         @ApiResponse(responseCode = "200",
-            content = {@Content(mediaType = "image/png"), @Content(mediaType = "image/jpeg"),
-                @Content(mediaType = "image/gif"), @Content(mediaType = "image/svg+xml")}),
-        @ApiResponse(responseCode = "404",
-            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
+            content = {@Content(mediaType = "image/png", schema = @Schema(type = "string", format = "binary")),
+                @Content(mediaType = "image/jpeg", schema = @Schema(type = "string", format = "binary")),
+                @Content(mediaType = "image/gif", schema = @Schema(type = "string", format = "binary")),
+                @Content(mediaType = "image/svg+xml", schema = @Schema(type = "string", format = "binary"))}),
+        @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(implementation = ErrorDto.class)))})
     // endregion
-    @GetMapping("/{userId}/avatar")
+    @GetMapping(path = "/{userId}/avatar",
+        produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_GIF_VALUE, "image/svg+xml",
+            MediaType.APPLICATION_JSON_VALUE})
     @PreAuthorize("hasAuthority(@DbSetup.USER_READ)")
     public ResponseEntity<Resource> getUserAvatar(@PathVariable int userId) throws IOException {
         User user = userService.get(userId);
@@ -168,7 +173,7 @@ public class UserAvatarController {
         @ApiResponse(responseCode = "404",
             content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
-    @PutMapping("/{userId}/avatar")
+    @PutMapping(path = "/{userId}/avatar", consumes = "multipart/form-data")
     @PreAuthorize("hasAuthority(@DbSetup.USER_WRITE)")
     public void updateUserAvatar(@PathVariable int userId, @RequestParam("file") MultipartFile file)
         throws IOException {

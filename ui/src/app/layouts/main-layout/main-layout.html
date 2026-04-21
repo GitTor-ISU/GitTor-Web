@@ -76,9 +76,9 @@
             [class]="`cursor-pointer gap-2 rounded-md ${sidebarCollapsed() ? 'mt-3 -ml-1 w-max' : 'hover:bg-muted flex items-center p-1'}`"
           >
             <z-avatar
-              zSrc="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDKRD3JXx695EOaMjnRWvaIH0bifN8UqjmBQ&s"
               zAlt="User Avatar"
               class="h-11 w-11 shrink-0 cursor-pointer"
+              [zSrc]="avatarsService.myAvatarUrl()"
             />
             @if (!sidebarCollapsed()) {
               <div

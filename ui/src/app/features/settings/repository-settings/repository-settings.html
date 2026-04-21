@@ -68,7 +68,7 @@
           placeholder="Select repository..."
           searchPlaceholder="Search"
           emptyText="No repository found."
-          [options]="repositoryOptions() ?? []"
+          [options]="repositoryOptions()"
           [(value)]="selectedValue"
           (zComboSelected)="onRepositoryChange($event.value)"
         />

@@ -4,8 +4,10 @@ import { ZardAlertDialogService } from '@shared/components/z-alert-dialog/alert-
 import { firstValueFrom } from 'rxjs';
 
 export interface SettingsFormTab {
-  form: FormGroup;
-  showFooter: Signal<boolean>;
+  readonly form: FormGroup;
+  readonly isInvalid: Signal<boolean>;
+  readonly isPristine: Signal<boolean>;
+  readonly showFooter: Signal<boolean>;
   onSubmit(): void;
   onReset(): void;
 }
