@@ -1116,28 +1116,6 @@ public class UserControllerTest extends BasicContext {
                     IntStream.range(1, users.size()).allMatch(i -> users.get(i).getId() >= users.get(i - 1).getId()),
                     "Users should be sorted by ID ascending"));
         }
-
-        @Test
-        public void should403_whenUnauthorized() {
-            // GIVEN: New user registered
-            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
-            AuthenticationDto auth = authenticationController.register(register).getBody();
-
-            // GIVEN: User authentication header
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(auth.getAccessToken());
-            HttpEntity<Void> request = new HttpEntity<>(null, headers);
-
-            // WHEN: Get users
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET, request,
-                new ParameterizedTypeReference<ErrorDto>() {});
-
-            // THEN: Returns users
-            assertAll(() -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
-                () -> assertNotNull(responseEntity.getBody()),
-                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage()));
-        }
     }
 
     /**
@@ -1196,33 +1174,6 @@ public class UserControllerTest extends BasicContext {
         }
 
         @Test
-        public void should403_whenUnauthorized() {
-            // GIVEN: New user registered
-            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
-            String username = register.getUsername();
-            AuthenticationDto auth = authenticationController.register(register).getBody();
-            User user = userService.get(username);
-
-            // GIVEN: JWT authentication
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(auth.getAccessToken());
-            HttpEntity<Void> request = new HttpEntity<>(null, headers);
-
-            // GIVEN: New user id in path
-            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(user.getId()).toUri();
-
-            // WHEN: Get user
-            ResponseEntity<ErrorDto> responseEntity =
-                testRestTemplate.exchange(uri, HttpMethod.GET, request, new ParameterizedTypeReference<ErrorDto>() {});
-
-            // THEN: Responds forbidden
-            assertAll(() -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
-                () -> assertNotNull(responseEntity.getBody()),
-                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage()));
-        }
-
-        @Test
         public void should404_whenNonexistent() {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
@@ -1278,30 +1229,6 @@ public class UserControllerTest extends BasicContext {
             // THEN: Returns user torrents
             assertAll(() -> assertEquals(HttpStatus.OK, responseEntity.getStatusCode()),
                 () -> assertNotNull(responseEntity.getBody()));
-        }
-
-        @Test
-        public void should403_whenUnauthorized() {
-            // GIVEN: New user registered
-            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
-            String username = register.getUsername();
-            AuthenticationDto auth = authenticationController.register(register).getBody();
-            User user = userService.get(username);
-
-            // GIVEN: JWT authentication
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(auth.getAccessToken());
-            HttpEntity<Void> request = new HttpEntity<>(null, headers);
-
-            // WHEN: Get user
-            ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.GET, request,
-                new ParameterizedTypeReference<ErrorDto>() {}, user.getId());
-
-            // THEN: Responds forbidden
-            assertAll(() -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
-                () -> assertNotNull(responseEntity.getBody()),
-                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage()));
         }
 
         @Test

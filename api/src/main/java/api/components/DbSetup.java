@@ -64,9 +64,8 @@ public class DbSetup {
         // Setup Roles
         Role adminRole = roleService.find(RoleService.ADMIN_ROLE_NAME).orElseGet(
             () -> roleService.save(Role.builder().name(RoleService.ADMIN_ROLE_NAME).authorities(authorities).build()));
-        Set<Authority> userAuthorities = Set.of(authorityService.get(USER_READ));
-        Role userRole = roleService.find(RoleService.USER_ROLE_NAME).orElseGet(() -> roleService
-            .save(Role.builder().name(RoleService.USER_ROLE_NAME).authorities(userAuthorities).build()));
+        Role userRole = roleService.find(RoleService.USER_ROLE_NAME)
+            .orElseGet(() -> roleService.save(Role.builder().name(RoleService.USER_ROLE_NAME).build()));
 
         // Setup Admin
         userService.find("admin")

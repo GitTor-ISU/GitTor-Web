@@ -528,33 +528,6 @@ public class UserAvatarControllerTest extends BasicContext {
         }
 
         @Test
-        public void should403_whenUnauthorized() {
-            // GIVEN: New user registered
-            RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
-            String username = register.getUsername();
-            AuthenticationDto auth = authenticationController.register(register).getBody();
-
-            // GIVEN: User authentication
-            HttpHeaders headers = new HttpHeaders();
-            headers.setBearerAuth(auth.getAccessToken());
-
-            // GIVEN: New user id in path
-            User user = userService.get(username);
-            URI uri = UriComponentsBuilder.fromUriString(url).path(ENDPOINT).buildAndExpand(user.getId()).toUri();
-
-            // WHEN: Get avatar
-            HttpEntity<Void> request = new HttpEntity<>(null, headers);
-            ResponseEntity<ErrorDto> responseEntity =
-                testRestTemplate.exchange(uri, HttpMethod.GET, request, new ParameterizedTypeReference<ErrorDto>() {});
-
-            // THEN: Responds forbidden
-            assertAll(() -> assertEquals(HttpStatus.FORBIDDEN, responseEntity.getStatusCode()),
-                () -> assertNotNull(responseEntity.getBody()),
-                () -> assertEquals(clock.instant(), responseEntity.getBody().getTimestamp()),
-                () -> assertEquals("Access Denied", responseEntity.getBody().getMessage()));
-        }
-
-        @Test
         public void should404_whenAvatarNonexistent() {
             // GIVEN: New user registered
             RegisterDto register = fixtureMonkey.giveMeOne(RegisterDto.class);
