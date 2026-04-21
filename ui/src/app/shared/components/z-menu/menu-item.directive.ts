@@ -1,16 +1,15 @@
-import type { ClassValue } from 'clsx';
-
-import { BooleanInput } from '@angular/cdk/coercion';
+import type { BooleanInput } from '@angular/cdk/coercion';
 import { CdkMenuItem } from '@angular/cdk/menu';
 import { booleanAttribute, computed, Directive, effect, inject, input, signal, untracked } from '@angular/core';
 
+import type { ClassValue } from 'clsx';
+
 import { mergeClasses } from '@shared/utils/merge-classes';
-import { LucideIconData } from 'lucide-angular';
-import { menuItemVariants, ZardMenuItemVariants } from './menu.variants';
+
+import { menuItemVariants, type ZardMenuItemTypeVariants } from './menu.variants';
 
 @Directive({
   selector: 'button[z-menu-item], [z-menu-item]',
-  standalone: true,
   host: {
     '[class]': 'classes()',
     '[attr.data-orientation]': "'horizontal'",
@@ -18,10 +17,12 @@ import { menuItemVariants, ZardMenuItemVariants } from './menu.variants';
     '[attr.aria-disabled]': "disabledState() ? '' : undefined",
     '[attr.data-disabled]': "disabledState() ? '' : undefined",
     '[attr.data-highlighted]': "highlightedState() ? '' : undefined",
-
     '(focus)': 'onFocus()',
     '(blur)': 'onBlur()',
     '(pointermove)': 'onPointerMove($event)',
+    '(click)': 'onClick($event)',
+    '(keydown.enter)': 'onClick($event)',
+    '(keydown.space)': 'onClick($event)',
   },
   hostDirectives: [
     {
@@ -34,7 +35,8 @@ export class ZardMenuItemDirective {
   private readonly cdkMenuItem = inject(CdkMenuItem, { host: true });
 
   readonly zDisabled = input<boolean, BooleanInput>(false, { transform: booleanAttribute });
-  readonly zInset = input<ZardMenuItemVariants['inset']>(false);
+  readonly zInset = input<boolean, BooleanInput>(false, { transform: booleanAttribute });
+  readonly zType = input<ZardMenuItemTypeVariants>('default');
   readonly class = input<ClassValue>('');
 
   private readonly isFocused = signal(false);
@@ -49,9 +51,10 @@ export class ZardMenuItemDirective {
     mergeClasses(
       menuItemVariants({
         inset: this.zInset(),
+        zType: this.zType(),
       }),
-      this.class()
-    )
+      this.class(),
+    ),
   );
 
   constructor() {
@@ -74,20 +77,20 @@ export class ZardMenuItemDirective {
   }
 
   onPointerMove(event: PointerEvent) {
-    if (event.defaultPrevented) return;
-
-    if (!(event.pointerType === 'mouse')) return;
+    if (event.defaultPrevented || !(event.pointerType === 'mouse')) {
+      return;
+    }
 
     if (!this.zDisabled()) {
       const item = event.currentTarget;
       (item as HTMLElement)?.focus({ preventScroll: true });
     }
   }
-}
 
-export interface MenuItem {
-  label: string;
-  icon?: LucideIconData;
-  route?: string;
-  submenu?: MenuItem[];
+  onClick(event: Event) {
+    if (this.disabledState()) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }
 }

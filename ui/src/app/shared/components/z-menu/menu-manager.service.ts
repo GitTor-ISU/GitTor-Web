@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 
-import { ZardMenuDirective } from './menu.directive';
+import type { ZardMenuDirective } from './menu.directive';
 
 @Injectable({
-  providedIn: 'any',
+  providedIn: 'root',
 })
 export class ZardMenuManagerService {
   private activeHoverMenu: ZardMenuDirective | null = null;
