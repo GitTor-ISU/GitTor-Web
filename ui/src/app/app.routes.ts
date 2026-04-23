@@ -6,12 +6,17 @@ import { NotFound } from '@features/not-found/not-found';
 import { RepositoryList } from '@features/repository-list/repository-list';
 import { Repository } from '@features/repository/repository';
 import { SettingsRoutes } from '@features/settings/settings-routes';
+import { guestOnlyGuard } from '@shared/auth-guards';
 import { usernameGuard } from '@shared/username-guard';
 import { MainLayout } from './layouts/main-layout/main-layout';
 import { currentUserResolver } from './shared/current-user-resolver';
 
 export const routes: Routes = [
-  { path: '', component: Home },
+  {
+    path: '',
+    component: Home,
+    canActivate: [guestOnlyGuard],
+  },
   {
     path: '',
     component: MainLayout,

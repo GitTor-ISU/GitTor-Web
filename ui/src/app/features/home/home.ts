@@ -1,6 +1,5 @@
-import { Component, effect, inject } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
-import SessionService from '@core/session-service';
+import { Component, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import ThemeService from '@core/theme-service';
 import { NgxGridpatternComponent } from '@omnedia/ngx-gridpattern';
 import { ZardButtonComponent } from '@shared/components/z-button/button.component';
@@ -34,9 +33,7 @@ interface Feature {
   templateUrl: './home.html',
 })
 export class Home {
-  protected readonly sessionService = inject(SessionService);
   protected readonly themeService = inject(ThemeService);
-  protected readonly router: Router = inject(Router);
 
   protected readonly arrowRightIcon = ArrowRightIcon;
   protected readonly terminalIcon = TerminalIcon;
@@ -63,12 +60,4 @@ export class Home {
         'Your data stays yours. GitTor never shares your repositories with third parties, and self-hosting is always one Docker command away.',
     },
   ];
-  public constructor() {
-    effect(() => {
-      const user = this.sessionService.user();
-      if (user) {
-        this.router.navigateByUrl(`/${user.username}`);
-      }
-    });
-  }
 }
