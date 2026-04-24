@@ -4,7 +4,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ZardButtonComponent } from '@shared/components/z-button/button.component';
 import { ZardCardComponent } from '@shared/components/z-card/card.component';
 import { ZardDividerComponent } from '@shared/components/z-divider/divider.component';
-import { ZardMenuModule } from '@shared/components/z-menu/menu.module';
+import { ZardMenuImports } from '@shared/components/z-menu';
 import {
   BookOpenIcon,
   ChevronDownIcon,
@@ -39,7 +39,7 @@ interface RepositorySummary {
     RouterLink,
     LucideAngularModule,
     ZardButtonComponent,
-    ZardMenuModule,
+    ZardMenuImports,
     ZardCardComponent,
     ZardDividerComponent,
   ],
