@@ -1,7 +1,7 @@
 <z-toaster data-test="toast" [richColors]="true" [expand]="true" [theme]="themeService.theme()" [closeButton]="true" />
 @if (isLoading()) {
   <div class="bg-background/40 fixed inset-0 z-50 flex items-center justify-center">
-    <z-loader zSize="lg" />
+    <z-loader zSize="lg" data-test="loader" />
   </div>
 }
 <router-outlet />

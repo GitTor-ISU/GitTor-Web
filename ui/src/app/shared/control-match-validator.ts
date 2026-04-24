@@ -12,10 +12,16 @@ const VALIDATION_MESSAGES = {
  * @param message An optional custom error message to return when the validation fails. If not provided, a default message will be used.
  * @returns A ValidatorFn that can be used in Angular forms to validate that the control's value matches the specified criteria.
  */
-export const controlMisMatchValidator = (compare: string, message?: string): ValidatorFn => {
+export const controlMisMatchValidator = (
+  compare: string | (() => string | undefined),
+  message?: string
+): ValidatorFn => {
   return (control: AbstractControl): ValidationErrors | null => {
     const first = control?.value;
-    const second = control.parent?.get(compare)?.value ?? compare;
+    const second = typeof compare === 'function' ? compare() : (control.parent?.get(compare)?.value ?? compare);
+
+    if (first === undefined || first === null || first === '') return null;
+    if (second === undefined || second === null || second === '') return null;
 
     return first !== second ? { controlMismatch: { message: message ?? VALIDATION_MESSAGES.valueMismatch } } : null;
   };
@@ -28,10 +34,15 @@ export const controlMisMatchValidator = (compare: string, message?: string): Val
  * @param message An optional custom error message to return when the validation fails. If not provided, a default message will be used.
  * @returns A ValidatorFn that can be used in Angular forms to validate that the control's value doesn't match the specified criteria.
  */
-export const controlMatchValidator = (compare: string | null, message?: string): ValidatorFn => {
+export const controlMatchValidator = (compare: string | (() => string | undefined), message?: string): ValidatorFn => {
   return (control: AbstractControl): ValidationErrors | null => {
+    if (compare === undefined || compare === null) return null;
+
     const first = control?.value;
-    const second = compare !== null ? (control.parent?.get(compare)?.value ?? compare) : null;
+    const second = typeof compare === 'function' ? compare() : (control.parent?.get(compare)?.value ?? compare);
+
+    if (first === undefined || first === null || first === '') return null;
+    if (second === undefined || second === null || second === '') return null;
 
     return first === second ? { controlMatch: { message: message ?? VALIDATION_MESSAGES.valueMatch } } : null;
   };

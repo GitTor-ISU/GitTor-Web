@@ -7,14 +7,14 @@ const adminPassword = Cypress.env('ADMIN_PASSWORD') || 'password';
 describe('Login', function () {
   it('should redirect to home page after admin login', () => {
     cy.login(adminUsername, adminPassword);
-    cy.location('pathname').should('equal', '/');
+    cy.location('pathname').should('equal', `/${adminUsername}`);
     cy.verifyLogin().should('be.true');
   });
 
   it('should redirect off of login page if logged in', () => {
     cy.login(adminUsername, adminPassword);
     cy.visit('/login');
-    cy.location('pathname').should('equal', '/');
+    cy.location('pathname').should('equal', `/${adminUsername}`);
   });
 
   [
@@ -53,7 +53,7 @@ describe('Register', function () {
     const password = faker.string.alphanumeric(8);
 
     cy.register(username, email, password);
-    cy.location('pathname').should('equal', '/');
+    cy.location('pathname').should('equal', `/${username}`);
     cy.verifyLogin().should('be.true');
   });
 
@@ -64,7 +64,7 @@ describe('Register', function () {
 
     cy.register(username, email, password);
     cy.visit('/register');
-    cy.location('pathname').should('equal', '/');
+    cy.location('pathname').should('equal', `/${username}`);
   });
 
   [

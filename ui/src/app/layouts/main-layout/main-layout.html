@@ -1,6 +1,52 @@
-<z-layout class="min-h-dvh overflow-hidden">
+<z-layout class="flex min-h-dvh flex-col overflow-hidden">
+  <!-- Navbar -->
+  <z-header class="w-full md:hidden">
+    <div class="flex w-full items-center justify-between">
+      <div class="flex items-center text-lg font-semibold">
+        <app-logo class="mb-1 w-8" mode="icon" [link]="true" />
+      </div>
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          z-button
+          zType="ghost"
+          zPosition="right"
+          [zTooltip]="sessionService.hasToken() ? 'Log Out' : 'Log In'"
+          [routerLink]="!sessionService.hasToken() ? '/login' : ''"
+          (click)="sessionService.hasToken() && sessionService.logout()"
+        >
+          <z-icon [zType]="sessionService.hasToken() ? 'log-out' : logInIcon" />
+        </button>
+        <app-theme-toggle />
+        <button type="button" z-button zType="ghost" z-menu [zMenuTriggerFor]="navbarMenu">
+          <z-icon zSize="lg" [zType]="menuIcon" />
+        </button>
+        <ng-template #navbarMenu>
+          <div z-menu-content class="mr-5 w-50">
+            @for (item of mainMenuItems; track item.label) {
+              <button type="button" z-menu-item zPosition="left" [routerLink]="item.route">
+                <z-icon class="mr-1" [zType]="item.icon" />
+                {{ item.label }}
+              </button>
+            }
+            @if (user()) {
+              <z-divider zSpacing="sm" />
+              @for (item of workspaceMenuItems; track item.label) {
+                <button type="button" z-menu-item zPosition="left" [routerLink]="item.route">
+                  <z-icon class="mr-1" [zType]="item.icon" />
+                  {{ item.label }}
+                </button>
+              }
+            }
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </z-header>
+
+  <!-- Sidebar -->
   <z-sidebar
-    class="fixed top-0 left-0 z-10 h-dvh p-0!"
+    class="fixed top-0 left-0 z-10 hidden h-dvh p-0! md:flex"
     [zWidth]="205"
     [zCollapsible]="true"
     [zCollapsed]="sidebarCollapsed()"
@@ -11,7 +57,6 @@
       <z-sidebar-group>
         <app-logo class="mb-3 w-8" mode="icon" [link]="true" [class.hidden]="!sidebarCollapsed()" />
         <app-logo class="mb-3 h-8 w-max" mode="full" [link]="true" [class.hidden]="sidebarCollapsed()" />
-
         @for (item of mainMenuItems; track item.label) {
           <button
             type="button"
@@ -59,8 +104,7 @@
             [attr.data-test]="sessionService.hasToken() ? 'sidebar-logout-button' : 'sidebar-login-button'"
             [class.w-full]="sidebarCollapsed()"
             [zTooltip]="sidebarCollapsed() ? (sessionService.hasToken() ? 'Log Out' : 'Log In') : ''"
-            [routerLink]="!sessionService.hasToken() ? '/login' : ''"
-            (click)="sessionService.hasToken() && sessionService.logout()"
+            [routerLink]="!sessionService.hasToken() ? '/login' : '/logout'"
           >
             <z-icon class="-ml-[3px]" [zType]="sessionService.hasToken() ? 'log-out' : logInIcon" />
             <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{
@@ -77,9 +121,9 @@
             [class]="`cursor-pointer gap-2 rounded-md ${sidebarCollapsed() ? 'mt-3 -ml-1 w-max' : 'hover:bg-muted flex items-center p-1'}`"
           >
             <z-avatar
-              zSrc="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDKRD3JXx695EOaMjnRWvaIH0bifN8UqjmBQ&s"
               zAlt="User Avatar"
               class="h-11 w-11 shrink-0 cursor-pointer"
+              [zSrc]="avatarsService.myAvatarUrl()"
             />
             @if (!sidebarCollapsed()) {
               <div
@@ -95,10 +139,12 @@
     </nav>
   </z-sidebar>
 
-  <z-content
-    class="min-h-50 transition-[margin] duration-300 ease-in-out"
-    [style.marginLeft.px]="sidebarCollapsed() ? 70 : 205"
-  >
+  <z-content class="min-h-50 md:ml-[70px] md:transition-[margin] md:duration-300 md:ease-in-out">
     <router-outlet />
+    <div
+      class="pointer-events-none absolute inset-0 hidden bg-black/50 transition-opacity duration-300 ease-in-out md:block"
+      [class.opacity-100]="!sidebarCollapsed()"
+      [class.opacity-0]="sidebarCollapsed()"
+    ></div>
   </z-content>
 </z-layout>

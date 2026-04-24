@@ -7,16 +7,21 @@ import { RepositoryList } from '@features/repository-list/repository-list';
 import { Repository } from '@features/repository/repository';
 import { SettingsRoutes } from '@features/settings/settings-routes';
 import { validUserPathGuard } from '@shared/user-path-guards';
+import { guestOnlyGuard } from '@shared/auth-guards';
 import { MainLayout } from './layouts/main-layout/main-layout';
 import { currentUserResolver, profileResolver } from './shared/user-resolvers';
 
 export const routes: Routes = [
   {
     path: '',
+    component: Home,
+    canActivate: [guestOnlyGuard],
+  },
+  {
+    path: '',
     component: MainLayout,
     resolve: { user: currentUserResolver },
     children: [
-      { path: '', component: Home },
       { path: 'about', component: About, title: 'About' },
       {
         path: ':owner',

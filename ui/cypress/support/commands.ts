@@ -18,6 +18,7 @@ Cypress.Commands.add('login', (username, password) => {
     cy.wait('@login').then((interception) => {
       if (interception.response?.statusCode === 200) {
         cy.wait('@me');
+        cy.get('body').find('[data-test="loader"]').should('not.exist');
       }
     });
   });
@@ -41,6 +42,7 @@ Cypress.Commands.add('register', (username, email, password, confirmPassword?) =
     cy.wait('@register').then((interception) => {
       if (interception.response?.statusCode === 200) {
         cy.wait('@me');
+        cy.get('body').find('[data-test="loader"]').should('not.exist');
       }
     });
   });
@@ -51,15 +53,6 @@ Cypress.Commands.add('verifyLogin', () => {
   cy.visit('/');
 
   cy.wait('@me');
-  cy.get('body').should(($body) => {
-    const hasAuthControl =
-      $body.find('[data-test="sidebar-logout-button"]').length > 0 ||
-      $body.find('[data-test="sidebar-login-button"]').length > 0;
-
-    expect(hasAuthControl).to.equal(true);
-  });
-
-  return cy.get('body').then(($body) => {
-    return $body.find('[data-test="sidebar-logout-button"]').length > 0;
-  });
+  cy.get('body').find('[data-test="loader"]').should('not.exist');
+  return cy.get('body').then(($body) => $body.find('[data-test="sidebar-logout-button"]').length > 0);
 });

@@ -435,11 +435,9 @@ public class TorrentControllerTest extends BasicContext {
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(adminAuth.getAccessToken());
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            headers.setContentType(MediaType.APPLICATION_JSON);
 
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("metadata", updateDto);
-            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+            HttpEntity<TorrentDto> request = new HttpEntity<>(updateDto, headers);
 
             // WHEN: Update torrent
             ResponseEntity<TorrentDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.PUT,
@@ -464,11 +462,9 @@ public class TorrentControllerTest extends BasicContext {
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(adminAuth.getAccessToken());
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            headers.setContentType(MediaType.APPLICATION_JSON);
 
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("metadata", updateDto);
-            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+            HttpEntity<TorrentDto> request = new HttpEntity<>(updateDto, headers);
 
             // WHEN: Update torrent
             ResponseEntity<TorrentDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.PUT,
@@ -493,11 +489,9 @@ public class TorrentControllerTest extends BasicContext {
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(adminAuth.getAccessToken());
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            headers.setContentType(MediaType.APPLICATION_JSON);
 
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("metadata", updateDto);
-            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+            HttpEntity<TorrentDto> request = new HttpEntity<>(updateDto, headers);
 
             // WHEN: Update torrent
             ResponseEntity<TorrentDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.PUT,
@@ -522,11 +516,9 @@ public class TorrentControllerTest extends BasicContext {
             // GIVEN: JWT authentication
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(adminAuth.getAccessToken());
-            headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+            headers.setContentType(MediaType.APPLICATION_JSON);
 
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            body.add("metadata", updateDto);
-            HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(body, headers);
+            HttpEntity<TorrentDto> request = new HttpEntity<>(updateDto, headers);
 
             // WHEN: Update torrent
             ResponseEntity<ErrorDto> responseEntity = testRestTemplate.exchange(url + ENDPOINT, HttpMethod.PUT, request,

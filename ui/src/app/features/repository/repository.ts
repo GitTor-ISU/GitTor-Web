@@ -3,7 +3,6 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ZardButtonComponent } from '@shared/components/z-button/button.component';
 import { ZardCardComponent } from '@shared/components/z-card/card.component';
-import { ZardMenuModule } from '@shared/components/z-menu/menu.module';
 import {
   BookOpenIcon,
   ChevronDownIcon,
@@ -60,7 +59,7 @@ interface Language {
  */
 @Component({
   selector: 'app-repository',
-  imports: [CommonModule, LucideAngularModule, ZardButtonComponent, ZardCardComponent, ZardMenuModule],
+  imports: [CommonModule, LucideAngularModule, ZardButtonComponent, ZardCardComponent],
   standalone: true,
   templateUrl: './repository.html',
 })
