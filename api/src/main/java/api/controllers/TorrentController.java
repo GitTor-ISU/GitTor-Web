@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -174,7 +175,7 @@ public class TorrentController {
             content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @PutMapping("/{id}")
-    public TorrentDto updateTorrent(@PathVariable Long id, @RequestPart("metadata") TorrentDto updateDto) {
+    public TorrentDto updateTorrent(@PathVariable Long id, @RequestBody TorrentDto updateDto) {
         Torrent torrent = torrentService.updateMetadata(id, updateDto.getName(), updateDto.getDescription());
         return torrentMapper.toDto(torrent);
     }

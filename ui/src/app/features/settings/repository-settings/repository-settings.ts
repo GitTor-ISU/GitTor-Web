@@ -134,10 +134,8 @@ export class RepositorySettings implements SettingsFormTab {
 
     await firstValueFrom(
       this.torrentsService.updateTorrent(this.repository()!.id!, {
-        metadata: {
-          name: this.form.controls.name.value ?? undefined,
-          description: this.form.controls.description.value ?? undefined,
-        },
+        name: this.form.controls.name.value ?? undefined,
+        description: this.form.controls.description.value ?? undefined,
       })
     ).then(() => {
       this.refetchRepos();
