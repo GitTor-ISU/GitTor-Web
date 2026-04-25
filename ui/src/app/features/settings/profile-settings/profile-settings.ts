@@ -1,7 +1,10 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AvatarsService } from '@core/avatars-service';
 import SessionService from '@core/session-service';
+import { UserAvatarsService } from '@generated/openapi/services/user-avatars';
+import { UsersService } from '@generated/openapi/services/users';
 import { ZardAlertDialogService } from '@shared/components/z-alert-dialog/alert-dialog.service';
 import { ZardAvatarComponent } from '@shared/components/z-avatar';
 import { ZardButtonComponent } from '@shared/components/z-button';
@@ -13,8 +16,8 @@ import { controlMatchValidator } from '@shared/control-match-validator';
 import { EmptyToNullDirective } from '@shared/empty-to-null';
 import { formDiffValidator } from '@shared/form-diff-validator';
 import { createFormValueSignal, createHelpMessageSignal } from '@shared/form-utils';
-import { LucideIconData, UploadIcon } from 'lucide-angular';
-import { finalize, map } from 'rxjs';
+import { LucideIconData, Trash2Icon, UploadIcon } from 'lucide-angular';
+import { finalize, firstValueFrom, map } from 'rxjs';
 import { SettingsFormTab } from '../settings-service';
 import { ChangePassword } from './change-password';
 
@@ -35,11 +38,8 @@ import { ChangePassword } from './change-password';
   templateUrl: './profile-settings.html',
 })
 export class ProfileSettings implements SettingsFormTab {
-  private static readonly DEFAULT_AVATAR_URL =
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDKRD3JXx695EOaMjnRWvaIH0bifN8UqjmBQ&s';
-
   public readonly form = new FormGroup({
-    avatar: new FormControl<File | null>(null, {
+    avatar: new FormControl<Blob | null>(null, {
       nonNullable: false,
     }),
     username: new FormControl<string | null>(null, {
@@ -56,9 +56,17 @@ export class ProfileSettings implements SettingsFormTab {
     }),
   });
   public readonly showFooter = signal(true);
+  public readonly isInvalid = toSignal(this.form.statusChanges.pipe(map(() => this.form.invalid)), {
+    initialValue: this.form.invalid,
+  });
+  public readonly isPristine = toSignal(this.form.valueChanges.pipe(map(() => this.form.pristine)), {
+    initialValue: this.form.pristine,
+  });
 
-  protected sessionService = inject(SessionService);
-  protected readonly user = computed(() => this.sessionService.user());
+  protected readonly sessionService = inject(SessionService);
+  protected readonly avatarsService = inject(AvatarsService);
+  private readonly userAvatarsService = inject(UserAvatarsService);
+  protected readonly user = this.sessionService.user;
 
   protected readonly formValue = createFormValueSignal(this.form);
   protected readonly avatarHelpMessage = signal('');
@@ -66,7 +74,7 @@ export class ProfileSettings implements SettingsFormTab {
   protected readonly firstNameHelpMessage = createHelpMessageSignal(this.form.controls.firstName, this.formValue);
   protected readonly lastNameHelpMessage = createHelpMessageSignal(this.form.controls.lastName, this.formValue);
 
-  protected readonly avatarUrl = toSignal(
+  protected readonly avatarDisplay = toSignal(
     this.form.controls.avatar.valueChanges.pipe(
       map((file) => this.mapAvatarUrl(file)),
       finalize(() => {
@@ -76,29 +84,56 @@ export class ProfileSettings implements SettingsFormTab {
         }
       })
     ),
-    { initialValue: ProfileSettings.DEFAULT_AVATAR_URL }
+    { initialValue: null }
   );
   protected readonly uploadIcon: LucideIconData = UploadIcon;
+  protected readonly trashIcon: LucideIconData = Trash2Icon;
 
   private avatarObjectUrl: string | null = null;
   private readonly alertDialogService = inject(ZardAlertDialogService);
   private readonly dialogService = inject(ZardDialogService);
+  private readonly usersService = inject(UsersService);
 
   public constructor() {
-    const effectRef = effect(
-      () => {
-        this.form.addValidators(formDiffValidator(this.form.getRawValue()));
-        this.form.controls.username.addValidators(controlMatchValidator(this.user()?.username ?? ''));
-        this.form.controls.firstName.addValidators(controlMatchValidator(this.user()?.firstname ?? ''));
-        this.form.controls.lastName.addValidators(controlMatchValidator(this.user()?.lastname ?? ''));
-        effectRef.destroy();
-      },
-      { manualCleanup: true }
-    );
+    effect(() => {
+      this.form.addValidators(formDiffValidator(this.form.getRawValue()));
+      this.form.controls.username.addValidators(controlMatchValidator(() => this.user()?.username));
+      this.form.controls.firstName.addValidators(controlMatchValidator(() => this.user()?.firstname));
+      this.form.controls.lastName.addValidators(controlMatchValidator(() => this.user()?.lastname));
+      this.form.updateValueAndValidity();
+    });
   }
 
-  public onSubmit(): void {
-    console.log('Profile form submitted:', this.form.value);
+  public async onSubmit(): Promise<void> {
+    const { avatar, username, firstName, lastName } = this.form.getRawValue();
+    const requests: Promise<unknown>[] = [];
+
+    if (username || firstName || lastName) {
+      requests.push(
+        firstValueFrom(
+          this.usersService.updateMe({
+            username: username ?? undefined,
+            firstname: firstName ?? undefined,
+            lastname: lastName ?? undefined,
+          })
+        ).then(() => {
+          return firstValueFrom(this.sessionService.fetchMe$());
+        })
+      );
+    }
+
+    if (avatar) {
+      requests.push(
+        firstValueFrom(this.userAvatarsService.updateMyAvatar(avatar)).then(() => {
+          this.avatarsService.refetchAvatar();
+        })
+      );
+    }
+
+    if (requests.length > 0) {
+      await Promise.all(requests);
+      this.onReset();
+    }
   }
 
   public onReset(): void {
@@ -112,6 +147,7 @@ export class ProfileSettings implements SettingsFormTab {
     if (file?.type.startsWith('image/')) {
       this.form.controls.avatar.patchValue(file);
       this.form.controls.avatar.markAsDirty();
+      this.form.updateValueAndValidity();
       this.avatarHelpMessage.set('');
     }
 
@@ -125,10 +161,14 @@ export class ProfileSettings implements SettingsFormTab {
   protected onDeleteAccount(): void {
     this.alertDialogService.confirm({
       zTitle: 'Are you sure?',
-      zDescription: 'This action cannot be undone.',
+      zDescription: 'Your account will be deleted.',
       zOkText: 'Continue',
       zOkDestructive: true,
       zCancelText: 'Cancel',
+      zOnOk: async () => {
+        await firstValueFrom(this.usersService.deleteMe());
+        await this.sessionService.logout();
+      },
     });
   }
 
@@ -141,20 +181,35 @@ export class ProfileSettings implements SettingsFormTab {
       zData: { disabled },
       zOkText: 'Update',
       zOkDisabled: disabled,
-      zOnOk: (instance) => {
-        console.log('Form submitted:', instance.form.value);
+      zOnOk: async (instance) => {
+        await firstValueFrom(this.usersService.updateMyPassword(instance.form.controls.password.value));
       },
     });
   }
 
-  private mapAvatarUrl(file: File | null): string {
+  protected onDeleteAvatar(): void {
+    this.alertDialogService.confirm({
+      zTitle: 'Are you sure?',
+      zDescription: 'Your avatar will be deleted.',
+      zOkText: 'Continue',
+      zOkDestructive: true,
+      zCancelText: 'Cancel',
+      zOnOk: async () => {
+        await firstValueFrom(this.userAvatarsService.deleteMyAvatar());
+        this.avatarsService.refetchAvatar();
+        this.form.controls.avatar.reset(null);
+      },
+    });
+  }
+
+  private mapAvatarUrl(file: Blob | null): string | null {
     if (this.avatarObjectUrl) {
       URL.revokeObjectURL(this.avatarObjectUrl);
       this.avatarObjectUrl = null;
     }
 
     if (!file) {
-      return ProfileSettings.DEFAULT_AVATAR_URL;
+      return null;
     }
 
     this.avatarObjectUrl = URL.createObjectURL(file);

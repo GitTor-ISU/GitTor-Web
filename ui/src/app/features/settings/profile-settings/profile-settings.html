@@ -20,6 +20,10 @@
         </z-form-control>
       </z-form-field>
       <z-form-field class="w-full">
+        <label z-form-label>Email</label>
+        <input z-input type="text" disabled data-test="settings-profile-email" [placeholder]="user()?.email" />
+      </z-form-field>
+      <z-form-field class="w-full">
         <label z-form-label>First Name</label>
         <z-form-control [helpText]="this.form.controls.firstName.value ? firstNameHelpMessage() : ''">
           <input
@@ -54,13 +58,25 @@
             <z-avatar
               zAlt="User Avatar"
               class="h-45 w-45 shrink-0 cursor-pointer"
-              [zSrc]="avatarUrl()"
+              [zSrc]="avatarDisplay() ?? avatarsService.myAvatarUrl()"
               (click)="fileUpload.click()"
             />
-            <button z-button type="button" zType="secondary" (click)="fileUpload.click()">
-              <z-icon [zType]="uploadIcon" />
-              Upload
-            </button>
+            <div class="flex items-center gap-2">
+              <button z-button type="button" zType="secondary" (click)="fileUpload.click()">
+                <z-icon [zType]="uploadIcon" />
+                Upload
+              </button>
+              <button
+                z-button
+                type="button"
+                zShape="circle"
+                zType="destructive"
+                [zDisabled]="avatarsService.isDefaultAvatar()"
+                (click)="onDeleteAvatar()"
+              >
+                <z-icon [zType]="trashIcon" />
+              </button>
+            </div>
           </div>
           <input
             #fileUpload

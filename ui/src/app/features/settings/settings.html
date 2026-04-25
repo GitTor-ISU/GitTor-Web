@@ -18,10 +18,10 @@
       </z-tab-group>
       @if (activeTab()?.showFooter()) {
         <div class="mt-5 flex items-center justify-end gap-2">
-          <button z-button zType="secondary" [zDisabled]="activeForm()?.pristine" (click)="activeTab()?.onReset()">
+          <button z-button zType="secondary" [zDisabled]="activeTab()?.isPristine()" (click)="activeTab()?.onReset()">
             Reset
           </button>
-          <button z-button [zDisabled]="activeForm()?.invalid" (click)="activeTab()?.onSubmit()">Save</button>
+          <button z-button [zDisabled]="activeTab()?.isInvalid()" (click)="activeTab()?.onSubmit()">Save</button>
         </div>
       }
     </div>

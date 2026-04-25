@@ -104,8 +104,7 @@
             [attr.data-test]="sessionService.hasToken() ? 'sidebar-logout-button' : 'sidebar-login-button'"
             [class.w-full]="sidebarCollapsed()"
             [zTooltip]="sidebarCollapsed() ? (sessionService.hasToken() ? 'Log Out' : 'Log In') : ''"
-            [routerLink]="!sessionService.hasToken() ? '/login' : ''"
-            (click)="sessionService.hasToken() && sessionService.logout()"
+            [routerLink]="!sessionService.hasToken() ? '/login' : '/logout'"
           >
             <z-icon class="-ml-[3px]" [zType]="sessionService.hasToken() ? 'log-out' : logInIcon" />
             <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{
@@ -122,9 +121,9 @@
             [class]="`cursor-pointer gap-2 rounded-md ${sidebarCollapsed() ? 'mt-3 -ml-1 w-max' : 'hover:bg-muted flex items-center p-1'}`"
           >
             <z-avatar
-              zSrc="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDKRD3JXx695EOaMjnRWvaIH0bifN8UqjmBQ&s"
               zAlt="User Avatar"
               class="h-11 w-11 shrink-0 cursor-pointer"
+              [zSrc]="avatarsService.myAvatarUrl()"
             />
             @if (!sidebarCollapsed()) {
               <div

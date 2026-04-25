@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, effect, inject, input, signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import SessionService from '@core/session-service';
 import { ZardButtonComponent } from '@shared/components/z-button';
@@ -29,7 +29,6 @@ export class Settings {
   protected readonly tabLabels = Object.values(SettingsEnum);
   protected readonly activeTabIndex = signal(0);
   protected readonly activeTab = signal<SettingsFormTab | null>(null);
-  protected readonly activeForm = computed<FormGroup | null>(() => this.activeTab()?.form ?? null);
   protected readonly settingsIcon = Settings2Icon;
 
   private readonly settingsService = inject(SettingsService);
@@ -42,7 +41,7 @@ export class Settings {
   }
 
   public readonly onDeselected = async (): Promise<boolean> => {
-    return this.settingsService.confirmDiscardChanges(this.activeForm());
+    return this.settingsService.confirmDiscardChanges(this.activeTab()?.form);
   };
 
   protected onTabChange(component: unknown): void {

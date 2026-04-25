@@ -1,5 +1,6 @@
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
+import { AvatarsService } from '@core/avatars-service';
 import SessionService from '@core/session-service';
 import { Logo } from '@shared/components/logo/logo';
 import { ThemeToggle } from '@shared/components/theme-toggle/theme-toggle';
@@ -61,6 +62,7 @@ interface MenuItem {
 })
 export class MainLayout {
   protected readonly sessionService = inject(SessionService);
+  protected readonly avatarsService = inject(AvatarsService);
   protected readonly user = computed(() => this.sessionService.user());
   protected readonly sidebarCollapsed = signal(true);
   protected logInIcon = LogInIcon;

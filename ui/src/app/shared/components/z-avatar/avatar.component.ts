@@ -25,7 +25,7 @@ export type ZardAvatarStatus = 'online' | 'offline' | 'doNotDisturb' | 'away';
       <span class="absolute z-0 m-auto text-base">{{ zFallback() }}</span>
     }
 
-    @if (zSrc() && !imageError()) {
+    @if (zSrc() && !imageError() && !isDirectSrc()) {
       <img
         fill
         sizes="100%"
@@ -36,6 +36,10 @@ export type ZardAvatarStatus = 'online' | 'offline' | 'doNotDisturb' | 'away';
         (error)="onImageError()"
         (load)="onImageLoad()"
       />
+    }
+
+    @if (zSrc() && !imageError() && isDirectSrc()) {
+      <img [alt]="zAlt()" [class]="imgClasses()" [src]="zSrc()" (error)="onImageError()" (load)="onImageLoad()" />
     }
 
     @if (zStatus()) {
@@ -154,6 +158,10 @@ export class ZardAvatarComponent {
   });
 
   protected readonly imgClasses = computed(() => mergeClasses(imageVariants({ zShape: this.zShape() })));
+  protected readonly isDirectSrc = computed(() => {
+    const src = this.zSrc();
+    return typeof src === 'string' && (src.startsWith('blob:') || src.startsWith('data:'));
+  });
 
   protected onImageLoad(): void {
     this.imageLoaded.set(true);
