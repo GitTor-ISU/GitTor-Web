@@ -9,7 +9,7 @@ import { SettingsRoutes } from '@features/settings/settings-routes';
 import { validUserPathGuard } from '@shared/user-path-guards';
 import { guestOnlyGuard } from '@shared/auth-guards';
 import { MainLayout } from './layouts/main-layout/main-layout';
-import { currentUserResolver, profileResolver } from './shared/user-resolvers';
+import { currentUserResolver, profileResolver, profileTorrentsResolver } from './shared/user-resolvers';
 
 export const routes: Routes = [
   {
@@ -26,7 +26,7 @@ export const routes: Routes = [
       {
         path: ':owner',
         canMatch: [validUserPathGuard],
-        resolve: { profile: profileResolver },
+        resolve: { profile: profileResolver, torrents: profileTorrentsResolver },
         component: RepositoryList,
         title: (route) => `${route.params['owner']}`,
       },

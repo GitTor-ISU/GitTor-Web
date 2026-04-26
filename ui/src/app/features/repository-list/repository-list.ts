@@ -16,6 +16,7 @@ import {
   StarIcon,
 } from 'lucide-angular';
 import { UserDto } from '@generated/openapi/models/user-dto';
+import { TorrentDto } from '@generated/openapi/models/torrent-dto';
 
 /**
  * Repository summary for listing.
@@ -56,8 +57,6 @@ export class RepositoryList implements OnInit {
   protected readonly plusIcon = PlusIcon;
   protected readonly chevronDownIcon = ChevronDownIcon;
 
-  protected readonly ownerDisplayName = signal<string>('John Doe');
-  protected readonly ownerBio = signal<string>('Full-stack developer passionate about open source');
   protected readonly searchQuery = signal<string>('');
   protected readonly typeFilter = signal<string>('All');
   protected readonly languageFilter = signal<string>('All');
@@ -129,8 +128,15 @@ export class RepositoryList implements OnInit {
 
   private readonly route = inject(ActivatedRoute);
   private readonly data = toSignal(this.route.data);
+
   protected readonly profile = computed(() => this.data()?.['profile'] as UserDto);
-  protected readonly displayName = computed(() => `${this.profile()?.firstname} ${this.profile()?.lastname}`);
+  protected readonly displayName = computed(() => {
+    const firstname = this.profile()?.firstname ?? '';
+    const lastname = this.profile()?.lastname ?? '';
+    return `${firstname} ${lastname}`;
+  });
+
+  protected readonly torrents = computed(() => this.data()?.['torrents'] as TorrentDto[]);
 
   public ngOnInit(): void {
     this.updateFilteredRepositories();
