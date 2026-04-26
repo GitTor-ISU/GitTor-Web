@@ -137,6 +137,18 @@ export class RepositoryList implements OnInit {
   });
 
   protected readonly torrents = computed(() => this.data()?.['torrents'] as TorrentDto[]);
+  protected readonly listedTorrents = computed<RepositorySummary[]>(() => {
+    return this.torrents().map((torrent) => ({
+      name: torrent.name ?? '',
+      description: torrent.description ?? '',
+      visibility: 'Public',
+      language: 'Rust',
+      languageColor: 'bg-gray-500',
+      stars: 0,
+      forks: 0,
+      updatedAt: torrent.updatedAt ?? '',
+    }));
+  });
 
   public ngOnInit(): void {
     this.updateFilteredRepositories();
