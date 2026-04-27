@@ -3,9 +3,8 @@ import { About } from '@features/about/about';
 import { AuthRoutes } from '@features/auth/auth-routes';
 import { Home } from '@features/home/home';
 import { NotFound } from '@features/not-found/not-found';
-import { RepositoryList } from '@features/repository-list/repository-list';
-import { RepositoryUpload } from '@features/repository-list/repository-upload/repository-upload';
-import { Repository } from '@features/repository/repository';
+import { RepositoryList } from '@features/repositories/list/repository-list';
+import { RepositoryUpload } from '@features/repositories/upload/repository-upload';
 import { SettingsRoutes } from '@features/settings/settings-routes';
 import { validUserPathGuard } from '@shared/user-path-guards';
 import { guestOnlyGuard, requireAuthGuard } from '@shared/auth-guards';
@@ -31,13 +30,6 @@ export const routes: Routes = [
         resolve: { profile: profileResolver, torrents: profileTorrentsResolver },
         component: RepositoryList,
         title: (route) => `${route.params['owner']}`,
-      },
-      {
-        path: ':owner/:name',
-        canMatch: [validUserPathGuard],
-        resolve: { profile: profileResolver },
-        component: Repository,
-        title: (route) => `${route.params['owner']}/${route.params['name']}`,
       },
       ...SettingsRoutes,
     ],
