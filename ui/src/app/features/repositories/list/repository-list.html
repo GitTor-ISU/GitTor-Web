@@ -6,10 +6,12 @@
           <h1 class="text-2xl font-bold">{{ displayName() }}</h1>
           <p class="text-muted-foreground">{{ profile().username }}</p>
         </div>
-        <a z-button zType="default" zSize="sm" class="gap-1" routerLink="/new">
-          <lucide-angular class="size-4" [img]="plusIcon" />
-          New repository
-        </a>
+        @if (profile().isCurrentUser) {
+          <a z-button zType="default" zSize="sm" class="gap-1" routerLink="/new">
+            <lucide-angular class="size-4" [img]="plusIcon" />
+            New repository
+          </a>
+        }
       </div>
     </div>
 
@@ -49,19 +51,23 @@
       <div class="space-y-4">
         @for (repo of listedTorrents(); track repo.name) {
           <z-card class="transition-shadow hover:shadow-lg">
-            <div class="flex items-start justify-between px-2">
+            <div class="flex items-start justify-between gap-2 px-2">
               <div class="flex-1">
                 <div class="mb-1 flex items-center gap-2">
                   <lucide-angular class="text-muted-foreground size-4" [img]="bookIcon" />
                   <h3 class="text-lg font-semibold">{{ repo.name }}</h3>
                   <span class="text-muted-foreground max-w-[15em] rounded-full border px-2 py-0.5 text-xs">
-                    {{ repo.repoId }}
+                    {{ `RepoID:${repo.repoId}` }}
                   </span>
                 </div>
               </div>
               <button z-button zType="outline" zSize="sm" class="gap-1" (click)="downloadTorrent(repo.id, repo.name)">
                 <lucide-angular class="size-4" [img]="downloadIcon" />
                 Download
+              </button>
+              <button z-button zType="default" zSize="sm" class="gap-1" (click)="copyLeechCmd(repo.repoId)">
+                <lucide-angular class="size-4" [img]="terminalIcon" />
+                Leech
               </button>
             </div>
 
@@ -71,6 +77,18 @@
               <div class="flex items-center gap-4 text-xs">
                 <p class="text-faint mr-auto text-sm">{{ repo.description }}</p>
                 <span class="text-muted-foreground">Updated {{ repo.updatedAt }}</span>
+                @if (profile().isCurrentUser) {
+                  <a
+                    z-button
+                    zType="ghost"
+                    zSize="sm"
+                    class="gap-1"
+                    routerLink="/settings/repository"
+                    [queryParams]="{ id: repo.id }"
+                  >
+                    <lucide-angular class="size-4" [img]="settingsIcon" />
+                  </a>
+                }
               </div>
             </div>
           </z-card>

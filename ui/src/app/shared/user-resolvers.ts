@@ -15,10 +15,14 @@ export const currentUserResolver: ResolveFn<UserDto | null> = () => {
 
 export const profileResolver: ResolveFn<UserDto | null> = async (route) => {
   const usersService = inject(UsersService);
+  const sessionService = inject(SessionService);
   const userId = route.paramMap.get('owner');
   if (userId) {
     const user = await firstValueFrom(usersService.getUser(userId));
-    return user;
+    return {
+      ...user,
+      isCurrentUser: sessionService.hasToken() && sessionService.user()?.id === user.id,
+    };
   }
   return null;
 };

@@ -2,7 +2,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TorrentsService } from '@generated/openapi/services/torrents';
 import { UsersService } from '@generated/openapi/services/users';
 import { ZardAlertDialogService } from '@shared/components/z-alert-dialog/alert-dialog.service';
@@ -35,6 +35,7 @@ import { SettingsFormTab, SettingsService } from '../settings-service';
     ZardComboboxComponent,
     ZardLoaderComponent,
     NgTemplateOutlet,
+    RouterLink,
   ],
   templateUrl: './repository-settings.html',
   providers: [SettingsService],
