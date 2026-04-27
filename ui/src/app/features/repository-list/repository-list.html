@@ -32,39 +32,14 @@
           />
         </div>
 
-        <button z-button z-menu zType="outline" zSize="sm" class="gap-1" [zMenuTriggerFor]="typeMenu">
-          Type: {{ typeFilter() }}
-          <lucide-angular class="size-4" [img]="chevronDownIcon" />
-        </button>
-        <ng-template #typeMenu>
-          <div z-menu-content>
-            <button z-menu-item (click)="setTypeFilter('All')">All</button>
-            <button z-menu-item (click)="setTypeFilter('Public')">Public</button>
-            <button z-menu-item (click)="setTypeFilter('Private')">Private</button>
-          </div>
-        </ng-template>
-
-        <button z-button z-menu zType="outline" zSize="sm" class="gap-1" [zMenuTriggerFor]="languageMenu">
-          Language: {{ languageFilter() }}
-          <lucide-angular class="size-4" [img]="chevronDownIcon" />
-        </button>
-        <ng-template #languageMenu>
-          <div z-menu-content class="w-32">
-            @for (lang of getLanguages(); track lang) {
-              <button z-menu-item (click)="setLanguageFilter(lang)">{{ lang }}</button>
-            }
-          </div>
-        </ng-template>
-
         <button z-button z-menu zType="outline" zSize="sm" class="gap-1" [zMenuTriggerFor]="sortMenu">
           Sort: {{ sortBy() }}
           <lucide-angular class="size-4" [img]="chevronDownIcon" />
         </button>
         <ng-template #sortMenu>
           <div z-menu-content class="w-36">
-            <button z-menu-item (click)="setSortBy('Last updated')">Last updated</button>
-            <button z-menu-item (click)="setSortBy('Name')">Name</button>
-            <button z-menu-item (click)="setSortBy('Stars')">Stars</button>
+            <button z-menu-item (click)="sortBy.set('Last updated')">Last updated</button>
+            <button z-menu-item (click)="sortBy.set('Name')">Name</button>
           </div>
         </ng-template>
       </div>
@@ -74,17 +49,16 @@
       <div class="space-y-4">
         @for (repo of listedTorrents(); track repo.name) {
           <z-card class="transition-shadow hover:shadow-lg">
-            <div class="flex items-start justify-between px-4">
+            <div class="flex items-start justify-between px-2">
               <div class="flex-1">
                 <div class="mb-1 flex items-center gap-2">
                   <lucide-angular class="text-muted-foreground size-4" [img]="bookIcon" />
-                  <a
-                    class="text-lg font-semibold text-blue-500 hover:underline"
-                    [routerLink]="`/${profile().username}/${repo.name}`"
+                  <h3
+                    class="text-lg font-semibold"
                     >{{ repo.name }}
-                  </a>
-                  <span class="text-muted-foreground rounded-full border px-2 py-0.5 text-xs">
-                    {{ repo.visibility }}
+                  </h3>
+                  <span class="text-muted-foreground rounded-full border px-2 py-0.5 text-xs max-w-[15em]">
+                    {{ repo.repoId }}
                   </span>
                 </div>
               </div>
@@ -96,22 +70,10 @@
 
             <z-divider />
 
-            <div class="px-4 py-4">
-              <p class="text-muted-foreground mb-3 text-sm">{{ repo.description }}</p>
-              <div class="text-muted-foreground flex items-center gap-4 text-xs">
-                <div class="flex items-center gap-1">
-                  <div class="size-3 rounded-full" [class]="repo.languageColor"></div>
-                  <span>{{ repo.language }}</span>
-                </div>
-                <div class="flex items-center gap-1">
-                  <lucide-angular class="size-3" [img]="starIcon" />
-                  <span>{{ repo.stars }}</span>
-                </div>
-                <div class="flex items-center gap-1">
-                  <lucide-angular class="size-3" [img]="forkIcon" />
-                  <span>{{ repo.forks }}</span>
-                </div>
-                <span>Updated {{ repo.updatedAt }}</span>
+            <div class="p-2">
+              <div class="flex items-center gap-4 text-xs">
+                <p class="text-faint text-sm mr-auto">{{ repo.description }}</p>
+                <span class="text-muted-foreground">Updated {{ repo.updatedAt }}</span>
               </div>
             </div>
           </z-card>
