@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { About } from '@features/about/about';
+import { AboutRoutes } from '@features/about/about-routes';
 import { AuthRoutes } from '@features/auth/auth-routes';
 import { Home } from '@features/home/home';
 import { NotFound } from '@features/not-found/not-found';
@@ -35,6 +36,7 @@ export const routes: Routes = [
         component: Repository,
         title: (route) => `${route.params['owner']}/${route.params['name']}`,
       },
+      ...AboutRoutes,
       ...SettingsRoutes,
     ],
   },
