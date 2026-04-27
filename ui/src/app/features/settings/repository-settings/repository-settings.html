@@ -12,7 +12,7 @@
         [zActions]="[actionPrimary]"
       >
         <ng-template #actionPrimary>
-          <button type="button" z-button>Create Repo</button>
+          <a type="button" z-button routerLink="/new">Create Repo</a>
         </ng-template>
       </z-empty>
     </div>
@@ -51,7 +51,7 @@
                   formControlName="description"
                   data-test="settings-repository-description"
                   appEmptyToNull
-                  [placeholder]="repository()?.description"
+                  [placeholder]="repository()?.description ?? 'Enter a description.'"
                 ></textarea>
               </z-form-control>
             </z-form-field>

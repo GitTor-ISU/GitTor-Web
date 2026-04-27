@@ -3,6 +3,8 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { firstValueFrom } from 'rxjs';
+import { toast } from 'ngx-sonner';
+
 import { ZardButtonComponent } from '@shared/components/z-button/button.component';
 import { ZardCardComponent } from '@shared/components/z-card/card.component';
 import { ZardDividerComponent } from '@shared/components/z-divider/divider.component';
@@ -15,10 +17,14 @@ import {
   LucideAngularModule,
   PlusIcon,
   SearchIcon,
+  SettingsIcon,
+  TerminalIcon,
 } from 'lucide-angular';
 import { UserDto } from '@generated/openapi/models/user-dto';
 import { TorrentDto } from '@generated/openapi/models/torrent-dto';
 import { TorrentsService } from '@generated/openapi/services/torrents';
+
+type User = UserDto & { isCurrentUser: boolean };
 
 /**
  * Repository list component - displays all repositories for an owner.
@@ -44,15 +50,18 @@ export class RepositoryList {
   protected readonly plusIcon = PlusIcon;
   protected readonly chevronDownIcon = ChevronDownIcon;
   protected readonly downloadIcon = DownloadIcon;
+  protected readonly terminalIcon = TerminalIcon;
+  protected readonly settingsIcon = SettingsIcon;
 
   private readonly torrentsService = inject(TorrentsService);
   private readonly route = inject(ActivatedRoute);
   private readonly data = toSignal(this.route.data);
 
-  protected readonly profile = computed(() => this.data()?.['profile'] as UserDto);
+  protected readonly profile = computed(() => this.data()?.['profile'] as User);
   protected readonly displayName = computed(() => {
     const firstname = this.profile()?.firstname ?? '';
     const lastname = this.profile()?.lastname ?? '';
+    if (!firstname && !lastname) return undefined;
     return `${firstname} ${lastname}`;
   });
 
@@ -62,7 +71,7 @@ export class RepositoryList {
       id: torrent.id ?? 0,
       name: torrent.name ?? '',
       description: torrent.description ?? '',
-      repoId: torrent.repoId ?? 'RepoID:DEADBEEF',
+      repoId: torrent.repoId ?? 'DEADBEEF',
       updatedAt: torrent.updatedAt ?? '',
     }));
   });
@@ -101,6 +110,16 @@ export class RepositoryList {
   protected onSearchChange(event: Event): void {
     const target = event.target as HTMLInputElement;
     this.searchQuery.set(target.value);
+  }
+
+  /**
+   * Copy leech command to clipboard.
+   *
+   * @param repoId - Repository ID to leech
+   */
+  protected copyLeechCmd(repoId: string): void {
+    navigator.clipboard.writeText(`gittor leech ${repoId}`);
+    toast.success('Leech command copied to clipboard');
   }
 
   /**
