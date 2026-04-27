@@ -53,18 +53,15 @@
               <div class="flex-1">
                 <div class="mb-1 flex items-center gap-2">
                   <lucide-angular class="text-muted-foreground size-4" [img]="bookIcon" />
-                  <h3
-                    class="text-lg font-semibold"
-                    >{{ repo.name }}
-                  </h3>
-                  <span class="text-muted-foreground rounded-full border px-2 py-0.5 text-xs max-w-[15em]">
+                  <h3 class="text-lg font-semibold">{{ repo.name }}</h3>
+                  <span class="text-muted-foreground max-w-[15em] rounded-full border px-2 py-0.5 text-xs">
                     {{ repo.repoId }}
                   </span>
                 </div>
               </div>
-              <button z-button zType="outline" zSize="sm" class="gap-1">
-                <lucide-angular class="size-4" [img]="starIcon" />
-                Star
+              <button z-button zType="outline" zSize="sm" class="gap-1" (click)="downloadTorrent(repo.id, repo.name)">
+                <lucide-angular class="size-4" [img]="downloadIcon" />
+                Download
               </button>
             </div>
 
@@ -72,7 +69,7 @@
 
             <div class="p-2">
               <div class="flex items-center gap-4 text-xs">
-                <p class="text-faint text-sm mr-auto">{{ repo.description }}</p>
+                <p class="text-faint mr-auto text-sm">{{ repo.description }}</p>
                 <span class="text-muted-foreground">Updated {{ repo.updatedAt }}</span>
               </div>
             </div>

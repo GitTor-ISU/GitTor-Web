@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { firstValueFrom } from 'rxjs';
 import { ZardButtonComponent } from '@shared/components/z-button/button.component';
 import { ZardCardComponent } from '@shared/components/z-card/card.component';
 import { ZardDividerComponent } from '@shared/components/z-divider/divider.component';
@@ -9,14 +10,15 @@ import { ZardMenuImports } from '@shared/components/z-menu';
 import {
   BookOpenIcon,
   ChevronDownIcon,
+  DownloadIcon,
   GitForkIcon,
   LucideAngularModule,
   PlusIcon,
   SearchIcon,
-  StarIcon,
 } from 'lucide-angular';
 import { UserDto } from '@generated/openapi/models/user-dto';
 import { TorrentDto } from '@generated/openapi/models/torrent-dto';
+import { TorrentsService } from '@generated/openapi/services/torrents';
 
 /**
  * Repository list component - displays all repositories for an owner.
@@ -37,11 +39,13 @@ import { TorrentDto } from '@generated/openapi/models/torrent-dto';
 })
 export class RepositoryList {
   protected readonly bookIcon = BookOpenIcon;
-  protected readonly starIcon = StarIcon;
   protected readonly forkIcon = GitForkIcon;
   protected readonly searchIcon = SearchIcon;
   protected readonly plusIcon = PlusIcon;
   protected readonly chevronDownIcon = ChevronDownIcon;
+  protected readonly downloadIcon = DownloadIcon;
+
+  private readonly torrentsService = inject(TorrentsService);
   private readonly route = inject(ActivatedRoute);
   private readonly data = toSignal(this.route.data);
 
@@ -99,5 +103,22 @@ export class RepositoryList {
     this.searchQuery.set(target.value);
   }
 
+  /**
+   * Download torrent file for the repository.
+   *
+   * @param id - Torrent ID
+   * @param name - Torrent name
+   */
+  protected downloadTorrent(id: number, name: string): void {
+    firstValueFrom(
+      this.torrentsService.getTorrentFile(id, undefined, undefined, { httpHeaderAccept: 'application/x-bittorrent' })
+    ).then((file) => {
+      const blob = new Blob([file], { type: 'application/x-bittorrent' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `${name}.torrent`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    });
   }
 }
