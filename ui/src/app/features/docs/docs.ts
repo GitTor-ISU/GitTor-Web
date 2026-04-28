@@ -3,7 +3,7 @@ import { ZardIconComponent } from '@shared/components/z-icon';
 import { ZardTabComponent, ZardTabGroupComponent } from '@shared/components/z-tabs';
 import { BookOpenIcon } from 'lucide-angular';
 
-enum AboutEnum {
+enum DocsEnum {
   installation = 'Installation',
   configuration = 'Configuration',
   usage = 'Usage',
@@ -15,20 +15,20 @@ enum AboutEnum {
  * child component that owns its own content.
  */
 @Component({
-  selector: 'app-about',
+  selector: 'app-docs',
   imports: [ZardIconComponent, ZardTabComponent, ZardTabGroupComponent],
-  templateUrl: './about.html',
+  templateUrl: './docs.html',
 })
-export class About {
-  public readonly page = input.required<keyof typeof AboutEnum>();
+export class Docs {
+  public readonly page = input.required<keyof typeof DocsEnum>();
 
-  protected readonly tabLabels = Object.values(AboutEnum);
+  protected readonly tabLabels = Object.values(DocsEnum);
   protected readonly activeTabIndex = signal(0);
   protected readonly bookIcon = BookOpenIcon;
 
   public constructor() {
     effect(() => {
-      const index = Object.keys(AboutEnum).indexOf(this.page());
+      const index = Object.keys(DocsEnum).indexOf(this.page());
       this.activeTabIndex.set(index >= 0 ? index : 0);
     });
   }

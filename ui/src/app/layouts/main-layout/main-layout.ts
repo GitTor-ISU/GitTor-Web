@@ -70,7 +70,7 @@ export class MainLayout {
 
   protected mainMenuItems: MenuItem[] = [
     { icon: HouseIcon, label: 'Home', route: '/' },
-    { icon: InfoIcon, label: 'About', route: '/about' },
+    { icon: InfoIcon, label: 'Docs', route: '/docs' },
     { icon: SearchIcon, label: 'Search' },
   ];
 

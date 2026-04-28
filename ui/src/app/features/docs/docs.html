@@ -11,7 +11,7 @@
 
     <z-tab-group zTabsPosition="top" zActivePosition="bottom" [(zActiveTabIndex)]="activeTabIndex">
       @for (label of tabLabels; track label) {
-        <z-tab [label]="label" [routerLink]="`about/${label.toLowerCase()}`" />
+        <z-tab [label]="label" [routerLink]="`docs/${label.toLowerCase()}`" />
       }
     </z-tab-group>
   </div>

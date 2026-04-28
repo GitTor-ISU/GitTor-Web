@@ -1,13 +1,13 @@
 import { ActivatedRouteSnapshot, Route } from '@angular/router';
 
-export const AboutRoutes: Route[] = [
+export const DocsRoutes: Route[] = [
   {
-    path: 'about',
+    path: 'docs',
     runGuardsAndResolvers: 'always',
     resolve: {
       page: (route: ActivatedRouteSnapshot) => route.firstChild?.routeConfig?.path || 'installation',
     },
-    loadComponent: () => import('./about').then((m) => m.About),
+    loadComponent: () => import('./docs').then((m) => m.Docs),
     children: [
       {
         path: '',
