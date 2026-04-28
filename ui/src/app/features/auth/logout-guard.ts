@@ -10,5 +10,5 @@ export const logoutGuard: CanActivateFn = async () => {
     await sessionService.logout();
   }
 
-  return router.parseUrl('/');
+  return router.navigateByUrl(router.url, { onSameUrlNavigation: 'reload' });
 };

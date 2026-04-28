@@ -160,6 +160,28 @@ public class TorrentController {
     }
 
     /**
+     * Get torrent by name.
+     *
+     * @param name Torrent name
+     * @return {@link TorrentDto}
+     */
+    // region
+    @Operation(summary = "Get Torrent by Name", description = "Get torrent metadata by name.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200",
+            content = @Content(schema = @Schema(implementation = TorrentDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "400",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
+        @ApiResponse(responseCode = "404",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
+    // endregion
+    @GetMapping("/name/{name}")
+    public TorrentDto getTorrentByName(@PathVariable String name) {
+        Torrent torrent = torrentService.getByName(name);
+        return torrentMapper.toDto(torrent);
+    }
+
+    /**
      * Update torrent metadata.
      *
      * @param id Torrent id

@@ -1,10 +1,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { firstValueFrom } from 'rxjs';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { toast } from 'ngx-sonner';
+import { firstValueFrom, map } from 'rxjs';
 
+import { AvatarsService } from '@core/avatars-service';
+import { TorrentDto } from '@generated/openapi/models/torrent-dto';
+import { UserDto } from '@generated/openapi/models/user-dto';
+import { TorrentsService } from '@generated/openapi/services/torrents';
+import { ZardAvatarComponent } from '@shared/components/z-avatar';
 import { ZardButtonComponent } from '@shared/components/z-button/button.component';
 import { ZardCardComponent } from '@shared/components/z-card/card.component';
 import { ZardDividerComponent } from '@shared/components/z-divider/divider.component';
@@ -20,9 +25,6 @@ import {
   SettingsIcon,
   TerminalIcon,
 } from 'lucide-angular';
-import { UserDto } from '@generated/openapi/models/user-dto';
-import { TorrentDto } from '@generated/openapi/models/torrent-dto';
-import { TorrentsService } from '@generated/openapi/services/torrents';
 
 type User = UserDto & { isCurrentUser: boolean };
 
@@ -39,6 +41,7 @@ type User = UserDto & { isCurrentUser: boolean };
     ZardMenuImports,
     ZardCardComponent,
     ZardDividerComponent,
+    ZardAvatarComponent,
   ],
   standalone: true,
   templateUrl: './repository-list.html',
@@ -53,11 +56,14 @@ export class RepositoryList {
   protected readonly terminalIcon = TerminalIcon;
   protected readonly settingsIcon = SettingsIcon;
 
+  protected readonly avatarsService = inject(AvatarsService);
   private readonly torrentsService = inject(TorrentsService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly data = toSignal(this.route.data);
 
   protected readonly profile = computed(() => this.data()?.['profile'] as User);
+  protected readonly avatarUrl$ = computed(() => this.avatarsService.getAvatarUrl$(this.profile().id!));
   protected readonly displayName = computed(() => {
     const firstname = this.profile()?.firstname ?? '';
     const lastname = this.profile()?.lastname ?? '';
@@ -75,7 +81,9 @@ export class RepositoryList {
     }));
   });
 
-  protected readonly searchQuery = signal<string>('');
+  protected readonly searchQuery = toSignal(this.route.queryParamMap.pipe(map((p) => p.get('search') ?? '')), {
+    initialValue: '',
+  });
   protected readonly sortBy = signal<string>('Last updated');
 
   protected readonly listedTorrents = computed(() => {
@@ -108,7 +116,13 @@ export class RepositoryList {
    */
   protected onSearchChange(event: Event): void {
     const target = event.target as HTMLInputElement;
-    this.searchQuery.set(target.value);
+
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { search: target.value || null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
   }
 
   /**

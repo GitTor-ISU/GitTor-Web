@@ -6,8 +6,8 @@ import { NotFound } from '@features/not-found/not-found';
 import { RepositoryList } from '@features/repositories/list/repository-list';
 import { RepositoryUpload } from '@features/repositories/upload/repository-upload';
 import { SettingsRoutes } from '@features/settings/settings-routes';
-import { validUserPathGuard } from '@shared/user-path-guards';
 import { guestOnlyGuard, requireAuthGuard } from '@shared/auth-guards';
+import { validUserPathGuard } from '@shared/user-path-guards';
 import { MainLayout } from './layouts/main-layout/main-layout';
 import { currentUserResolver, profileResolver, profileTorrentsResolver } from './shared/user-resolvers';
 
@@ -28,6 +28,7 @@ export const routes: Routes = [
         path: ':owner',
         canMatch: [validUserPathGuard],
         resolve: { profile: profileResolver, torrents: profileTorrentsResolver },
+        runGuardsAndResolvers: 'always',
         component: RepositoryList,
         title: (route) => `${route.params['owner']}`,
       },
