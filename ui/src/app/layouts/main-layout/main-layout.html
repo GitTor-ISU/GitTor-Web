@@ -24,16 +24,20 @@
         <ng-template #navbarMenu>
           <div z-menu-content class="mr-5 w-50">
             @for (item of mainMenuItems; track item.label) {
-              <button type="button" z-menu-item zPosition="left" [routerLink]="item.route">
-                <z-icon class="mr-1" [zType]="item.icon" />
-                {{ item.label }}
-              </button>
+              @if (item.label === 'Search') {
+                <ng-container *ngTemplateOutlet="searchTemplate" />
+              } @else {
+                <button type="button" z-menu-item zPosition="left" [routerLink]="item.route">
+                  <z-icon class="mr-2 ml-[1px]" [zType]="item.icon" />
+                  {{ item.label }}
+                </button>
+              }
             }
             @if (user()) {
               <z-divider zSpacing="sm" />
               @for (item of workspaceMenuItems; track item.label) {
                 <button type="button" z-menu-item zPosition="left" [routerLink]="item.route">
-                  <z-icon class="mr-1" [zType]="item.icon" />
+                  <z-icon class="mr-2 ml-[1px]" [zType]="item.icon" />
                   {{ item.label }}
                 </button>
               }
@@ -58,18 +62,36 @@
         <app-logo class="mb-3 w-8" mode="icon" [link]="true" [class.hidden]="!sidebarCollapsed()" />
         <app-logo class="mb-3 h-8 w-max" mode="full" [link]="true" [class.hidden]="sidebarCollapsed()" />
         @for (item of mainMenuItems; track item.label) {
-          <button
-            type="button"
-            z-button
-            zType="ghost"
-            zPosition="right"
-            class="justify-start"
-            [zTooltip]="sidebarCollapsed() ? item.label : ''"
-            [routerLink]="item.route"
-          >
-            <z-icon class="mr-1 -ml-[3px]" [zType]="item.icon!" />
-            <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{ item.label }}</span>
-          </button>
+          @if (item.label === 'Search') {
+            @if (sidebarCollapsed()) {
+              <button
+                type="button"
+                z-button
+                zType="ghost"
+                zPosition="right"
+                class="justify-start"
+                [zTooltip]="item.label"
+                (click)="focusSearch()"
+              >
+                <z-icon class="mr-1 ml-[5px]" [zType]="item.icon!" />
+              </button>
+            } @else {
+              <ng-container *ngTemplateOutlet="searchTemplate" />
+            }
+          } @else {
+            <button
+              type="button"
+              z-button
+              zType="ghost"
+              zPosition="right"
+              class="justify-start"
+              [zTooltip]="sidebarCollapsed() ? item.label : ''"
+              [routerLink]="item.route"
+            >
+              <z-icon class="mr-1 -ml-[3px]" [zType]="item.icon!" />
+              <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{ item.label }}</span>
+            </button>
+          }
         }
       </z-sidebar-group>
 
@@ -148,3 +170,24 @@
     ></div>
   </z-content>
 </z-layout>
+<ng-template #searchTemplate>
+  <z-input-group class="my-[3px]" [zAddonBefore]="searchIconTemplate" [zAddonAfter]="submitSearchTemplate">
+    <input #searchInput z-input type="text" placeholder="Search..." (keydown.enter)="submitSearch()" />
+  </z-input-group>
+  <ng-template #searchIconTemplate>
+    <z-icon class="mr-[5px] ml-[1px]" [zType]="searchIcon" />
+  </ng-template>
+  <ng-template #submitSearchTemplate>
+    <button
+      type="button"
+      z-button
+      zType="secondary"
+      zSize="sm"
+      zShape="circle"
+      class="mr-1 !h-6 !w-6 !p-0"
+      (click)="submitSearch()"
+    >
+      <z-icon class="size-3" [zType]="arrowRightIcon" />
+    </button>
+  </ng-template>
+</ng-template>

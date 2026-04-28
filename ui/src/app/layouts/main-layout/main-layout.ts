@@ -1,4 +1,5 @@
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
+import { Component, ElementRef, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { RouterLink, RouterOutlet } from '@angular/router';
 import { AvatarsService } from '@core/avatars-service';
 import SessionService from '@core/session-service';
@@ -8,6 +9,8 @@ import { ZardAvatarComponent } from '@shared/components/z-avatar';
 import { ZardButtonComponent } from '@shared/components/z-button';
 import { ZardDividerComponent } from '@shared/components/z-divider/divider.component';
 import { ZardIconComponent } from '@shared/components/z-icon';
+import { ZardInputGroupComponent } from '@shared/components/z-input-group';
+import { ZardInputDirective } from '@shared/components/z-input/input.directive';
 import {
   ContentComponent,
   HeaderComponent,
@@ -19,6 +22,7 @@ import {
 import { ZardMenuImports } from '@shared/components/z-menu';
 import { ZardTooltipImports } from '@shared/components/z-tooltip';
 import {
+  ArrowRightIcon,
   FolderIcon,
   HouseIcon,
   InfoIcon,
@@ -57,21 +61,27 @@ interface MenuItem {
     HeaderComponent,
     ZardMenuImports,
     ZardDividerComponent,
+    ZardInputDirective,
+    ZardInputGroupComponent,
+    NgTemplateOutlet,
   ],
   templateUrl: './main-layout.html',
 })
 export class MainLayout {
+  protected readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
   protected readonly sessionService = inject(SessionService);
   protected readonly avatarsService = inject(AvatarsService);
   protected readonly user = computed(() => this.sessionService.user());
   protected readonly sidebarCollapsed = signal(true);
   protected logInIcon = LogInIcon;
   protected menuIcon = MenuIcon;
+  protected arrowRightIcon = ArrowRightIcon;
+  protected searchIcon = SearchIcon;
 
   protected mainMenuItems: MenuItem[] = [
+    { icon: SearchIcon, label: 'Search' },
     { icon: HouseIcon, label: 'Home', route: '/' },
     { icon: InfoIcon, label: 'About', route: '/about' },
-    { icon: SearchIcon, label: 'Search' },
   ];
 
   protected workspaceMenuItems: MenuItem[] = [];
@@ -95,6 +105,20 @@ export class MainLayout {
 
   protected toggleSidebar(): void {
     this.sidebarCollapsed.update((collapsed) => !collapsed);
+  }
+
+  protected focusSearch(): void {
+    this.sidebarCollapsed.set(false);
+    setTimeout(() => this.searchInput()?.nativeElement.focus());
+  }
+
+  protected submitSearch(): void {
+    const input = this.searchInput()?.nativeElement;
+    if (!input || input.value.trim() === '') return;
+
+    console.log(input.value);
+    this.sidebarCollapsed.set(true);
+    input.value = '';
   }
 
   protected onCollapsedChange(collapsed: boolean): void {
