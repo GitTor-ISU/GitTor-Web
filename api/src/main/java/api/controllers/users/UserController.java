@@ -215,7 +215,7 @@ public class UserController {
         int safeSize = Math.min(requestedSize, maxPageSize);
 
         Pageable pageable = PageRequest.of(page, safeSize, Sort.by("id").ascending());
-        return userService.getAll(pageable).map(userMapper::toDto).getContent();
+        return userService.getAll(pageable).map(userMapper::toPublicDto).getContent();
     }
 
     /**
@@ -238,7 +238,7 @@ public class UserController {
     public UserDto getUser(@PathVariable String id) {
         User user = id.matches("\\d+") ? userService.get(Integer.parseInt(id)) : userService.get(id);
         Hibernate.initialize(user);
-        return userMapper.toDto(user);
+        return userMapper.toPublicDto(user);
     }
 
     /**
