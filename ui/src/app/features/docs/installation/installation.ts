@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ZardButtonComponent } from '@shared/components/z-button';
 import { ZardCardComponent } from '@shared/components/z-card';
 import { ZardIconComponent } from '@shared/components/z-icon';
-import { CopyIcon, ExternalLinkIcon } from 'lucide-angular';
+import { CopyIcon, DownloadIcon, ExternalLinkIcon } from 'lucide-angular';
 import { toast } from 'ngx-sonner';
 
 /**
@@ -31,6 +31,9 @@ sudo apt install -y build-essential \\
 cd GitTor-Cli
 make
 make install`;
+
+  protected readonly downloadIcon = DownloadIcon;
+  protected readonly windowsDownloadUrl = 'https://gittor-isu.github.io/GitTor-Cli/gittor-exe.zip';
 
   /**
    * Copy text to the clipboard and show a toast on success or failure.
