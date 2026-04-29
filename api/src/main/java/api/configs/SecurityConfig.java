@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -41,7 +42,8 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(requests -> requests.requestMatchers("/").permitAll().requestMatchers("/v3/**")
                 .permitAll().requestMatchers("/actuator/**").permitAll().requestMatchers("/authenticate/**").permitAll()
-                .anyRequest().authenticated())
+                .requestMatchers("/users/me/**").authenticated().requestMatchers(HttpMethod.GET, "/users/**")
+                .permitAll().anyRequest().authenticated())
             .httpBasic(basic -> basic.authenticationEntryPoint((request, response, authException) -> response
                 .sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage())))
             .addFilterBefore(tokenFilter, UsernamePasswordAuthenticationFilter.class);

@@ -22,6 +22,15 @@ public interface UserMapper {
     public UserDto toDto(User user);
 
     /**
+     * Convert to public DTO without sensitive information.
+     *
+     * @param user User model
+     * @return {@link UserDto}
+     */
+    @Mapping(target = "email", ignore = true)
+    public UserDto toPublicDto(User user);
+
+    /**
      * Update {@link User} info with {@link UserDto}.
      *
      * @param user User to update

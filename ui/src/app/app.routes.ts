@@ -3,13 +3,13 @@ import { About } from '@features/about/about';
 import { AuthRoutes } from '@features/auth/auth-routes';
 import { Home } from '@features/home/home';
 import { NotFound } from '@features/not-found/not-found';
-import { RepositoryList } from '@features/repository-list/repository-list';
-import { Repository } from '@features/repository/repository';
+import { RepositoryList } from '@features/repositories/list/repository-list';
+import { RepositoryUpload } from '@features/repositories/upload/repository-upload';
 import { SettingsRoutes } from '@features/settings/settings-routes';
-import { guestOnlyGuard } from '@shared/auth-guards';
-import { usernameGuard } from '@shared/username-guard';
+import { validUserPathGuard } from '@shared/user-path-guards';
+import { guestOnlyGuard, requireAuthGuard } from '@shared/auth-guards';
 import { MainLayout } from './layouts/main-layout/main-layout';
-import { currentUserResolver } from './shared/current-user-resolver';
+import { currentUserResolver, profileResolver, profileTorrentsResolver } from './shared/user-resolvers';
 
 export const routes: Routes = [
   {
@@ -23,17 +23,13 @@ export const routes: Routes = [
     resolve: { user: currentUserResolver },
     children: [
       { path: 'about', component: About, title: 'About' },
+      { path: 'new', component: RepositoryUpload, title: 'New repository', canActivate: [requireAuthGuard] },
       {
         path: ':owner',
-        canMatch: [usernameGuard],
+        canMatch: [validUserPathGuard],
+        resolve: { profile: profileResolver, torrents: profileTorrentsResolver },
         component: RepositoryList,
         title: (route) => `${route.params['owner']}`,
-      },
-      {
-        path: ':owner/:name',
-        canMatch: [usernameGuard],
-        component: Repository,
-        title: (route) => `${route.params['owner']}/${route.params['name']}`,
       },
       ...SettingsRoutes,
     ],
