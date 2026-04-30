@@ -2,10 +2,12 @@
   <div class="min-h-screen w-full max-w-6xl">
     <div class="bg-background px-6 max-sm:px-4">
       <div class="flex items-center justify-between">
-        <z-avatar zAlt="User Avatar" class="h-20 w-20 shrink-0" [zSrc]="(avatarUrl$() | async) ?? ''" />
-        <div>
-          <h1 class="text-2xl font-bold">{{ displayName() ?? profile().username }}</h1>
-          <p class="text-muted-foreground">{{ profile().username }}</p>
+        <div class="flex items-center gap-5">
+          <z-avatar zAlt="User Avatar" class="h-20 w-20 shrink-0" [zSrc]="(avatarUrl$() | async) ?? ''" />
+          <div>
+            <h1 class="text-2xl font-bold">{{ displayName() ?? profile().username }}</h1>
+            <p class="text-muted-foreground">{{ profile().username }}</p>
+          </div>
         </div>
         @if (profile().isCurrentUser) {
           <a z-button zType="default" zSize="sm" class="gap-1" routerLink="/new">
