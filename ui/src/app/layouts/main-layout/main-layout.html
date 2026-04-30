@@ -1,165 +1,209 @@
 <z-layout class="flex min-h-dvh flex-col overflow-hidden">
   <!-- Navbar -->
-  <z-header class="w-full md:hidden">
-    <div class="flex w-full items-center justify-between">
-      <div class="flex items-center text-lg font-semibold">
-        <app-logo class="mb-1 w-8" mode="icon" [link]="true" />
+  @if (!isLargerThanMedium()) {
+    <z-header class="w-full md:hidden">
+      <div class="flex w-full items-center justify-between">
+        <div class="flex items-center gap-2 text-lg font-semibold">
+          <button
+            #navPopover
+            type="button"
+            z-button
+            zType="ghost"
+            zPopover
+            zPlacement="bottom"
+            [zContent]="navbarMenu"
+            (zVisibleChange)="torrents.set([])"
+            (click)="focusSearch()"
+          >
+            <z-icon zSize="lg" [zType]="menuIcon" />
+          </button>
+          <ng-template #navbarMenu>
+            <z-popover class="-mt-2 w-45 p-2">
+              <div class="flex flex-col">
+                @for (item of mainMenuItems; track item.label) {
+                  @if (item.label === 'Search') {
+                    <app-search
+                      #search
+                      [items]="items()"
+                      [(isSearching)]="isSearching"
+                      (itemClicked)="navigateToRepo($event)"
+                      (searchSubmit)="submitSearch($event)"
+                    />
+                  } @else {
+                    <button
+                      type="button"
+                      z-button
+                      zType="ghost"
+                      class="justify-start"
+                      [routerLink]="item.route"
+                      (click)="closeNav()"
+                    >
+                      <z-icon class="mr-1 -ml-[3px]" [zType]="item.icon" />
+                      {{ item.label }}
+                    </button>
+                  }
+                }
+                @if (user()) {
+                  <z-divider zSpacing="sm" />
+                  @for (item of workspaceMenuItems; track item.label) {
+                    <button
+                      type="button"
+                      z-button
+                      zType="ghost"
+                      class="justify-start"
+                      [routerLink]="item.route"
+                      (click)="closeNav()"
+                    >
+                      <z-icon class="mr-1 -ml-[3px]" [zType]="item.icon" />
+                      {{ item.label }}
+                    </button>
+                  }
+                }
+              </div>
+            </z-popover>
+          </ng-template>
+          <app-logo class="mb-1 w-8" mode="icon" [link]="true" />
+        </div>
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            z-button
+            zType="ghost"
+            zPosition="right"
+            [zTooltip]="sessionService.hasToken() ? 'Log Out' : 'Log In'"
+            [routerLink]="!sessionService.hasToken() ? '/login' : ''"
+            (click)="sessionService.hasToken() && sessionService.logout()"
+          >
+            <z-icon [zType]="sessionService.hasToken() ? 'log-out' : logInIcon" />
+          </button>
+          <app-theme-toggle />
+        </div>
       </div>
-      <div class="flex items-center gap-2">
-        <button
-          type="button"
-          z-button
-          zType="ghost"
-          zPosition="right"
-          [zTooltip]="sessionService.hasToken() ? 'Log Out' : 'Log In'"
-          [routerLink]="!sessionService.hasToken() ? '/login' : ''"
-          (click)="sessionService.hasToken() && sessionService.logout()"
-        >
-          <z-icon [zType]="sessionService.hasToken() ? 'log-out' : logInIcon" />
-        </button>
-        <app-theme-toggle />
-        <button type="button" z-button zType="ghost" z-menu [zMenuTriggerFor]="navbarMenu" (click)="focusSearch()">
-          <z-icon zSize="lg" [zType]="menuIcon" />
-        </button>
-        <ng-template #navbarMenu>
-          <div z-menu-content class="mr-5 w-50">
-            @for (item of mainMenuItems; track item.label) {
-              @if (item.label === 'Search') {
-                <ng-container *ngTemplateOutlet="searchTemplate" />
+    </z-header>
+  } @else {
+    <!-- Sidebar -->
+    <z-sidebar
+      class="fixed top-0 left-0 z-10 hidden h-dvh p-0! md:flex"
+      [zWidth]="205"
+      [zCollapsible]="true"
+      [zCollapsed]="sidebarCollapsed()"
+      [zCollapsedWidth]="70"
+      (zCollapsedChange)="onCollapsedChange($event)"
+    >
+      <nav
+        [class]="`flex h-full flex-col overflow-hidden ${sidebarCollapsed() ? 'gap-1 px-3 py-4' : 'gap-4 p-4 pb-3'}`"
+      >
+        <z-sidebar-group>
+          <app-logo class="mb-3 w-8" mode="icon" [link]="true" [class.hidden]="!sidebarCollapsed()" />
+          <app-logo class="mb-3 h-8 w-max" mode="full" [link]="true" [class.hidden]="sidebarCollapsed()" />
+          @for (item of mainMenuItems; track item.label) {
+            @if (item.label === 'Search') {
+              @if (sidebarCollapsed()) {
+                <button
+                  type="button"
+                  z-button
+                  zType="ghost"
+                  zPosition="right"
+                  class="justify-start"
+                  [zTooltip]="item.label"
+                  (click)="focusSearch()"
+                >
+                  <z-icon class="mr-1 ml-[5px]" [zType]="item.icon!" />
+                </button>
               } @else {
-                <button type="button" z-menu-item zPosition="left" [routerLink]="item.route">
-                  <z-icon class="mr-2 ml-[1px]" [zType]="item.icon" />
-                  {{ item.label }}
-                </button>
+                <app-search
+                  #search
+                  [items]="items()"
+                  [(isSearching)]="isSearching"
+                  (itemClicked)="navigateToRepo($event)"
+                  (searchSubmit)="submitSearch($event)"
+                />
               }
-            }
-            @if (user()) {
-              <z-divider zSpacing="sm" />
-              @for (item of workspaceMenuItems; track item.label) {
-                <button type="button" z-menu-item zPosition="left" [routerLink]="item.route">
-                  <z-icon class="mr-2 ml-[1px]" [zType]="item.icon" />
-                  {{ item.label }}
-                </button>
-              }
-            }
-          </div>
-        </ng-template>
-      </div>
-    </div>
-  </z-header>
-
-  <!-- Sidebar -->
-  <z-sidebar
-    class="fixed top-0 left-0 z-10 hidden h-dvh p-0! md:flex"
-    [zWidth]="205"
-    [zCollapsible]="true"
-    [zCollapsed]="sidebarCollapsed()"
-    [zCollapsedWidth]="70"
-    (zCollapsedChange)="onCollapsedChange($event)"
-  >
-    <nav [class]="`flex h-full flex-col overflow-hidden ${sidebarCollapsed() ? 'gap-1 px-3 py-4' : 'gap-4 p-4 pb-3'}`">
-      <z-sidebar-group>
-        <app-logo class="mb-3 w-8" mode="icon" [link]="true" [class.hidden]="!sidebarCollapsed()" />
-        <app-logo class="mb-3 h-8 w-max" mode="full" [link]="true" [class.hidden]="sidebarCollapsed()" />
-        @for (item of mainMenuItems; track item.label) {
-          @if (item.label === 'Search') {
-            @if (sidebarCollapsed()) {
+            } @else {
               <button
                 type="button"
                 z-button
                 zType="ghost"
                 zPosition="right"
                 class="justify-start"
-                [zTooltip]="item.label"
-                (click)="focusSearch()"
+                [zTooltip]="sidebarCollapsed() ? item.label : ''"
+                [routerLink]="item.route"
+                (click)="closeNav()"
               >
-                <z-icon class="mr-1 ml-[5px]" [zType]="item.icon!" />
+                <z-icon class="mr-1 -ml-[3px]" [zType]="item.icon!" />
+                <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{ item.label }}</span>
               </button>
-            } @else {
-              <ng-container *ngTemplateOutlet="searchTemplate" />
             }
-          } @else {
-            <button
-              type="button"
-              z-button
-              zType="ghost"
-              zPosition="right"
-              class="justify-start"
-              [zTooltip]="sidebarCollapsed() ? item.label : ''"
-              [routerLink]="item.route"
-            >
-              <z-icon class="mr-1 -ml-[3px]" [zType]="item.icon!" />
-              <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{ item.label }}</span>
-            </button>
-          }
-        }
-      </z-sidebar-group>
-
-      @if (user()) {
-        <z-sidebar-group>
-          <z-sidebar-group-label [class.hidden]="sidebarCollapsed()">Workspace</z-sidebar-group-label>
-          @for (item of workspaceMenuItems; track item.label) {
-            <button
-              type="button"
-              z-button
-              zType="ghost"
-              zPosition="right"
-              class="justify-start"
-              [zTooltip]="sidebarCollapsed() ? item.label : ''"
-              [routerLink]="item.route"
-            >
-              <z-icon class="mr-1 -ml-[3px]" [zType]="item.icon!" />
-              <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{ item.label }}</span>
-            </button>
           }
         </z-sidebar-group>
-      }
-
-      <div class="mt-auto">
-        <div [class]="!sidebarCollapsed() ? 'mb-1 flex justify-between gap-2' : ''">
-          <button
-            type="button"
-            z-button
-            zType="ghost"
-            zPosition="right"
-            class="mb-1 justify-start"
-            [attr.data-test]="sessionService.hasToken() ? 'sidebar-logout-button' : 'sidebar-login-button'"
-            [class.w-full]="sidebarCollapsed()"
-            [zTooltip]="sidebarCollapsed() ? (sessionService.hasToken() ? 'Log Out' : 'Log In') : ''"
-            [routerLink]="!sessionService.hasToken() ? '/login' : '/logout'"
-          >
-            <z-icon class="-ml-[3px]" [zType]="sessionService.hasToken() ? 'log-out' : logInIcon" />
-            <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{
-              sessionService.hasToken() ? 'Log Out' : 'Log In'
-            }}</span>
-          </button>
-          <app-theme-toggle />
-        </div>
 
         @if (user()) {
-          <div
-            data-test="sidebar-user-button"
-            routerLink="/settings/profile"
-            [class]="`cursor-pointer gap-2 rounded-md ${sidebarCollapsed() ? 'mt-3 -ml-1 w-max' : 'hover:bg-muted flex items-center p-1'}`"
-          >
-            <z-avatar
-              zAlt="User Avatar"
-              class="h-11 w-11 shrink-0 cursor-pointer"
-              [zSrc]="avatarsService.myAvatarUrl()"
-            />
-            @if (!sidebarCollapsed()) {
-              <div
-                class="min-w-0 overflow-hidden"
-                [class]="sidebarCollapsed() ? 'max-w-0 opacity-0' : 'max-w-[200px] opacity-100'"
+          <z-sidebar-group>
+            <z-sidebar-group-label [class.hidden]="sidebarCollapsed()">Workspace</z-sidebar-group-label>
+            @for (item of workspaceMenuItems; track item.label) {
+              <button
+                type="button"
+                z-button
+                zType="ghost"
+                zPosition="right"
+                class="justify-start"
+                [zTooltip]="sidebarCollapsed() ? item.label : ''"
+                [routerLink]="item.route"
+                (click)="closeNav()"
               >
-                <span class="block truncate font-medium">{{ user()?.username }}</span>
-              </div>
+                <z-icon class="mr-1 -ml-[3px]" [zType]="item.icon!" />
+                <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{ item.label }}</span>
+              </button>
             }
-          </div>
+          </z-sidebar-group>
         }
-      </div>
-    </nav>
-  </z-sidebar>
+
+        <div class="mt-auto">
+          <div [class]="!sidebarCollapsed() ? 'mb-1 flex justify-between gap-2' : ''">
+            <button
+              type="button"
+              z-button
+              zType="ghost"
+              zPosition="right"
+              class="mb-1 justify-start"
+              [attr.data-test]="sessionService.hasToken() ? 'sidebar-logout-button' : 'sidebar-login-button'"
+              [class.w-full]="sidebarCollapsed()"
+              [zTooltip]="sidebarCollapsed() ? (sessionService.hasToken() ? 'Log Out' : 'Log In') : ''"
+              [routerLink]="!sessionService.hasToken() ? '/login' : '/logout'"
+            >
+              <z-icon class="-ml-[3px]" [zType]="sessionService.hasToken() ? 'log-out' : logInIcon" />
+              <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{
+                sessionService.hasToken() ? 'Log Out' : 'Log In'
+              }}</span>
+            </button>
+            <app-theme-toggle />
+          </div>
+
+          @if (user()) {
+            <div
+              data-test="sidebar-user-button"
+              routerLink="/settings/profile"
+              [class]="`cursor-pointer gap-2 rounded-md ${sidebarCollapsed() ? 'mt-3 -ml-1 w-max' : 'hover:bg-muted flex items-center p-1'}`"
+            >
+              <z-avatar
+                zAlt="User Avatar"
+                class="h-11 w-11 shrink-0 cursor-pointer"
+                [zSrc]="avatarsService.myAvatarUrl()"
+              />
+              @if (!sidebarCollapsed()) {
+                <div
+                  class="min-w-0 overflow-hidden"
+                  [class]="sidebarCollapsed() ? 'max-w-0 opacity-0' : 'max-w-[200px] opacity-100'"
+                >
+                  <span class="block truncate font-medium">{{ user()?.username }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </nav>
+    </z-sidebar>
+  }
 
   <z-content class="min-h-50 md:ml-[70px] md:transition-[margin] md:duration-300 md:ease-in-out">
     <router-outlet />
@@ -171,32 +215,3 @@
     ></div>
   </z-content>
 </z-layout>
-<ng-template #searchTemplate>
-  <z-input-group class="my-[3px]" [zAddonBefore]="searchIconTemplate" [zAddonAfter]="submitSearchTemplate">
-    <input
-      #searchInput
-      z-input
-      type="text"
-      placeholder="Search"
-      [disabled]="isSearching()"
-      (keydown.enter)="submitSearch()"
-    />
-  </z-input-group>
-  <ng-template #searchIconTemplate>
-    <z-icon class="mr-[5px] ml-[1px]" [zType]="searchIcon" />
-  </ng-template>
-  <ng-template #submitSearchTemplate>
-    <button
-      type="button"
-      z-button
-      zType="secondary"
-      zSize="sm"
-      zShape="circle"
-      class="mr-1 !h-6 !w-6 !p-0"
-      [zLoading]="isSearching()"
-      (click)="submitSearch()"
-    >
-      <z-icon class="size-3" [class.hidden]="isSearching()" [zType]="arrowRightIcon" />
-    </button>
-  </ng-template>
-</ng-template>

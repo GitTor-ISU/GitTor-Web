@@ -3,8 +3,10 @@ package api.controllers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -169,16 +171,17 @@ public class TorrentController {
     @Operation(summary = "Get Torrent by Name", description = "Get torrent metadata by name.")
     @ApiResponses({
         @ApiResponse(responseCode = "200",
-            content = @Content(schema = @Schema(implementation = TorrentDto.class), mediaType = "application/json")),
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = TorrentDto.class)),
+                mediaType = "application/json")),
         @ApiResponse(responseCode = "400",
             content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json")),
         @ApiResponse(responseCode = "404",
             content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
     // endregion
     @GetMapping("/name/{name}")
-    public TorrentDto getTorrentByName(@PathVariable String name) {
-        Torrent torrent = torrentService.getByName(name);
-        return torrentMapper.toDto(torrent);
+    public List<TorrentDto> getAllTorrentsByName(@PathVariable String name) {
+        List<Torrent> torrents = torrentService.getAllByName(name);
+        return torrents.stream().map(torrentMapper::toDto).collect(Collectors.toList());
     }
 
     /**

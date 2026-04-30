@@ -1,0 +1,59 @@
+<div>
+  @defer {
+    <span
+      #popover
+      zPopover
+      zPlacement="bottom"
+      zTrigger="click"
+      [zContent]="searchMenu"
+      [zVisible]="false"
+      [zTriggerable]="triggerable()"
+      (zVisibleChange)="isVisible.set($event)"
+    >
+      <z-input-group class="my-[3px]" [zAddonBefore]="searchIconTemplate" [zAddonAfter]="submitSearchTemplate">
+        <input
+          #searchInput
+          z-input
+          type="text"
+          placeholder="Search"
+          autofocus
+          [disabled]="isSearching()"
+          [value]="query()"
+          (input)="query.set($any($event.target).value)"
+          (focus)="onFocus()"
+          (blur)="onBlur()"
+          (keydown.enter)="searchSubmit.emit(query())"
+        />
+      </z-input-group>
+    </span>
+  }
+  <ng-template #searchMenu>
+    <z-popover class="w-45 cursor-default p-1">
+      @for (item of items(); track item.label; let i = $index) {
+        @if (i === 0 || items()[i - 1].category !== item.category) {
+          <p class="text-muted-foreground pt-1 pl-2 text-xs">{{ item.category }}</p>
+        }
+        <button z-button zType="ghost" class="w-full justify-start" (click)="itemClicked.emit(item)">
+          {{ item.display }}
+        </button>
+      }
+    </z-popover>
+  </ng-template>
+  <ng-template #searchIconTemplate>
+    <z-icon class="mr-[5px] ml-[1px]" [zType]="searchIcon" />
+  </ng-template>
+  <ng-template #submitSearchTemplate>
+    <button
+      type="button"
+      z-button
+      zType="secondary"
+      zSize="sm"
+      zShape="circle"
+      class="mr-1 !h-6 !w-6 !p-0"
+      [zLoading]="isSearching()"
+      (click)="searchSubmit.emit(query())"
+    >
+      <z-icon class="size-3" [class.hidden]="isSearching()" [zType]="arrowRightIcon" />
+    </button>
+  </ng-template>
+</div>

@@ -1,19 +1,19 @@
-import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, DestroyRef, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { Component, computed, effect, inject, signal, viewChild, viewChildren } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { AvatarsService } from '@core/avatars-service';
 import SessionService from '@core/session-service';
+import { TorrentDto } from '@generated/openapi/models/torrent-dto';
 import { TorrentsService } from '@generated/openapi/services/torrents';
 import { UsersService } from '@generated/openapi/services/users';
 import { Logo } from '@shared/components/logo/logo';
+import { Search, SearchItem } from '@shared/components/search/search';
 import { ThemeToggle } from '@shared/components/theme-toggle/theme-toggle';
 import { ZardAvatarComponent } from '@shared/components/z-avatar';
 import { ZardButtonComponent } from '@shared/components/z-button';
 import { ZardDividerComponent } from '@shared/components/z-divider/divider.component';
 import { ZardIconComponent } from '@shared/components/z-icon';
-import { ZardInputGroupComponent } from '@shared/components/z-input-group';
-import { ZardInputDirective } from '@shared/components/z-input/input.directive';
 import {
   ContentComponent,
   HeaderComponent,
@@ -22,7 +22,7 @@ import {
   SidebarGroupComponent,
   SidebarGroupLabelComponent,
 } from '@shared/components/z-layout';
-import { ZardMenuDirective, ZardMenuImports } from '@shared/components/z-menu';
+import { ZardPopoverComponent, ZardPopoverDirective } from '@shared/components/z-popover';
 import { ZardTooltipImports } from '@shared/components/z-tooltip';
 import {
   ArrowRightIcon,
@@ -36,7 +36,7 @@ import {
   SettingsIcon,
 } from 'lucide-angular';
 import { toast } from 'ngx-sonner';
-import { catchError, concat, defaultIfEmpty, EMPTY, filter, firstValueFrom, map } from 'rxjs';
+import { catchError, concat, defaultIfEmpty, EMPTY, firstValueFrom, map } from 'rxjs';
 
 interface MenuItem {
   icon: LucideIconData;
@@ -64,22 +64,33 @@ interface MenuItem {
     ThemeToggle,
     RouterLink,
     HeaderComponent,
-    ZardMenuImports,
+    ZardPopoverDirective,
+    ZardPopoverComponent,
     ZardDividerComponent,
-    ZardInputDirective,
-    ZardInputGroupComponent,
-    NgTemplateOutlet,
+    Search,
   ],
   templateUrl: './main-layout.html',
 })
 export class MainLayout {
-  protected readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
-  protected readonly navbarMenuTrigger = viewChild(ZardMenuDirective);
+  protected readonly navPopover = viewChild('navPopover', { read: ZardPopoverDirective });
+  protected readonly searches = viewChildren<Search>('search');
   protected readonly sessionService = inject(SessionService);
   protected readonly avatarsService = inject(AvatarsService);
+  protected readonly breakpointObserver = inject(BreakpointObserver);
+  protected readonly isLargerThanMedium = toSignal(
+    this.breakpointObserver.observe(['(min-width: 768px)']).pipe(map((result) => result.matches))
+  );
   protected readonly user = computed(() => this.sessionService.user());
   protected readonly sidebarCollapsed = signal(true);
   protected readonly isSearching = signal(false);
+  protected readonly torrents = signal<TorrentDto[]>([]);
+  protected readonly items = computed<SearchItem[]>(() =>
+    this.torrents().map((t) => ({
+      label: t.id?.toString() ?? '',
+      category: 'Repositories',
+      display: `${t.uploaderUsername}/${t.name}`,
+    }))
+  );
   protected logInIcon = LogInIcon;
   protected menuIcon = MenuIcon;
   protected arrowRightIcon = ArrowRightIcon;
@@ -93,9 +104,8 @@ export class MainLayout {
 
   protected workspaceMenuItems: MenuItem[] = [];
 
-  private readonly torrentsService = inject(TorrentsService);
   protected readonly usersService = inject(UsersService);
-  private readonly destroyRef = inject(DestroyRef);
+  private readonly torrentsService = inject(TorrentsService);
   private readonly router = inject(Router);
 
   public constructor() {
@@ -114,14 +124,11 @@ export class MainLayout {
       ];
     });
 
-    this.router.events
-      .pipe(
-        filter((event) => event instanceof NavigationEnd),
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe(() => {
-        this.closeNav();
-      });
+    effect(() => {
+      if (this.sidebarCollapsed()) {
+        this.torrents.set([]);
+      }
+    });
   }
 
   protected toggleSidebar(): void {
@@ -130,20 +137,18 @@ export class MainLayout {
 
   protected focusSearch(): void {
     this.sidebarCollapsed.set(false);
-    setTimeout(() => this.searchInput()?.nativeElement.focus());
+    setTimeout(() => {
+      this.searches()[0]?.focus();
+    }, 50);
   }
 
   protected onCollapsedChange(collapsed: boolean): void {
     this.sidebarCollapsed.set(collapsed);
   }
 
-  protected async submitSearch(): Promise<void> {
-    const input = this.searchInput()?.nativeElement;
-    if (!input || input.value.trim() === '') return;
-
-    const query = input.value.trim();
-
+  protected async submitSearch(query: string): Promise<void> {
     this.isSearching.set(true);
+    this.torrents.set([]);
 
     const search$ = concat(
       this.usersService.getUser(query).pipe(
@@ -154,25 +159,32 @@ export class MainLayout {
         map((torrent) => ({ type: 'repoId' as const, torrent })),
         catchError(() => EMPTY)
       ),
-      this.torrentsService.getTorrentByName(query).pipe(
-        map((torrent) => ({ type: 'name' as const, torrent })),
+      this.torrentsService.getAllTorrentsByName(query).pipe(
+        map((torrents) => ({ type: 'name' as const, torrents })),
         catchError(() => EMPTY)
       )
     ).pipe(defaultIfEmpty(null));
 
     await firstValueFrom(search$)
       .then(async (result) => {
-        if (!result) {
+        if (!result || (result.type === 'name' && result.torrents.length === 0)) {
           toast.error('No results found');
           return;
         }
 
         if (result.type === 'user') {
           await this.router.navigate(['/', result.user.username]);
-        } else if (result.type === 'repoId' || result.type === 'name') {
+        } else if (result.type === 'repoId') {
           await this.router.navigate(['/', result.torrent.uploaderUsername], {
             queryParams: { search: result.torrent.name },
           });
+        } else if (result.type === 'name' && result.torrents.length === 1) {
+          await this.router.navigate(['/', result.torrents[0].uploaderUsername], {
+            queryParams: { search: result.torrents[0].name },
+          });
+        } else if (result.type === 'name' && result.torrents.length > 1) {
+          this.torrents.set(result.torrents);
+          return;
         }
 
         this.closeNav();
@@ -182,8 +194,25 @@ export class MainLayout {
       });
   }
 
-  private closeNav(): void {
+  protected async navigateToRepo(item: SearchItem): Promise<void> {
+    const torrent = this.torrents().find((t) => t.id?.toString() === item.label);
+
+    if (!torrent) {
+      await this.router.navigate(['/404']);
+      return;
+    }
+
+    this.torrents.set([]);
+    this.closeNav();
+
+    await this.router.navigate(['/', torrent.uploaderUsername], {
+      queryParams: { search: torrent.name },
+    });
+  }
+
+  protected closeNav(): void {
     this.sidebarCollapsed.set(true);
-    this.navbarMenuTrigger()?.close();
+    this.navPopover()?.hide();
+    this.torrents.set([]);
   }
 }

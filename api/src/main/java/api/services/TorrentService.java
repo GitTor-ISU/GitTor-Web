@@ -2,6 +2,7 @@ package api.services;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -62,8 +63,8 @@ public class TorrentService {
      * @return {@link Optional} {@link Torrent}
      */
     @Transactional(readOnly = true)
-    public Optional<Torrent> findByName(String name) {
-        return torrentRepository.findByName(name);
+    public Optional<List<Torrent>> findAllByName(String name) {
+        return torrentRepository.findAllByName(name);
     }
 
     /**
@@ -110,8 +111,8 @@ public class TorrentService {
      * @throws EntityNotFoundException if torrent not found
      */
     @Transactional(readOnly = true)
-    public Torrent getByName(String name) {
-        return findByName(name).orElseThrow(() -> EntityNotFoundException.fromTorrent(name));
+    public List<Torrent> getAllByName(String name) {
+        return findAllByName(name).orElseThrow(() -> EntityNotFoundException.fromTorrent(name));
     }
 
     /**

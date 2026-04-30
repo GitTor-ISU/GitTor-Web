@@ -1,5 +1,6 @@
 package api.repositories;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -21,7 +22,7 @@ public interface TorrentRepository extends JpaRepository<Torrent, Long> {
      * @param name Torrent name
      * @return {@link Optional} {@link Torrent}
      */
-    Optional<Torrent> findByName(String name);
+    Optional<List<Torrent>> findAllByName(String name);
 
     /**
      * Find torrent by repo id (first commit hash).
