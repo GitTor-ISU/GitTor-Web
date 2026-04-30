@@ -67,6 +67,7 @@ export class RepositoryList {
   protected readonly displayName = computed(() => {
     const firstname = this.profile()?.firstname ?? '';
     const lastname = this.profile()?.lastname ?? '';
+    if (!firstname && !lastname) return undefined;
     return `${firstname} ${lastname}`;
   });
 
@@ -116,7 +117,6 @@ export class RepositoryList {
    */
   protected onSearchChange(event: Event): void {
     const target = event.target as HTMLInputElement;
-
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { search: target.value || null },

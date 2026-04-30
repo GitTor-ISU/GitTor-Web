@@ -42,7 +42,7 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(requests -> requests.requestMatchers("/").permitAll().requestMatchers("/v3/**")
                 .permitAll().requestMatchers("/actuator/**").permitAll().requestMatchers("/authenticate/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/users/me").authenticated()
+                .requestMatchers(HttpMethod.GET, "/users/me/**").authenticated()
                 .requestMatchers(HttpMethod.GET, "/users/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/torrents/**").permitAll().anyRequest().authenticated())
             .httpBasic(basic -> basic.authenticationEntryPoint((request, response, authException) -> response
