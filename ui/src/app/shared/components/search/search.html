@@ -3,7 +3,6 @@
     <span
       #popover
       zPopover
-      zPlacement="bottom"
       zTrigger="click"
       [zContent]="searchMenu"
       [zVisible]="false"
@@ -28,7 +27,7 @@
     </span>
   }
   <ng-template #searchMenu>
-    <z-popover class="w-45 cursor-default p-1">
+    <z-popover class="-mt-1 w-40 cursor-default p-1">
       @for (item of items(); track item.label; let i = $index) {
         @if (i === 0 || items()[i - 1].category !== item.category) {
           <p class="text-muted-foreground pt-1 pl-2 text-xs">{{ item.category }}</p>

@@ -60,7 +60,6 @@ export class Search {
   }
 
   public focus(): void {
-    console.log('Focusing search input', this.searchInput());
     this.searchInput()?.nativeElement.focus();
   }
 
