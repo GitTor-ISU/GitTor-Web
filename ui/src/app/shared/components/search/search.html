@@ -22,7 +22,7 @@
           (input)="query.set($any($event.target).value)"
           (focus)="onFocus()"
           (blur)="onBlur()"
-          (keydown.enter)="onSubmitInput()"
+          (keydown.enter)="onSubmitInput($event)"
         />
       </z-input-group>
     </span>

@@ -84,8 +84,8 @@ export class Search {
     this.isSearching.set(false);
   }
 
-  protected onSubmitInput(): void {
-    if (this.isQuerying()) {
+  protected onSubmitInput(event?: Event): void {
+    if (this.isQuerying() || (event instanceof KeyboardEvent && event.repeat)) {
       return;
     }
     this.submitInput.emit(this.query());
