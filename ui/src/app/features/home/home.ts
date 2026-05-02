@@ -12,7 +12,7 @@ import {
   LucideAngularModule,
   NetworkIcon,
   ShieldCheckIcon,
-  TerminalIcon,
+  BookOpenIcon,
 } from 'lucide-angular';
 
 /**
@@ -36,7 +36,7 @@ export class Home {
   protected readonly themeService = inject(ThemeService);
 
   protected readonly arrowRightIcon = ArrowRightIcon;
-  protected readonly terminalIcon = TerminalIcon;
+  protected readonly bookOpenIcon = BookOpenIcon;
   protected readonly downloadIcon = DownloadIcon;
   protected readonly branchIcon = GitBranchIcon;
 
