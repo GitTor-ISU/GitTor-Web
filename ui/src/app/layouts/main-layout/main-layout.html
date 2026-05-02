@@ -176,6 +176,7 @@
               [class.w-full]="sidebarCollapsed()"
               [zTooltip]="sidebarCollapsed() ? (sessionService.hasToken() ? 'Log Out' : 'Log In') : ''"
               [routerLink]="!sessionService.hasToken() ? '/login' : '/logout'"
+              (click)="closeNav()"
             >
               <z-icon class="-ml-[2px]" [zType]="sessionService.hasToken() ? 'log-out' : logInIcon" />
               <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{
@@ -188,8 +189,9 @@
           @if (user()) {
             <div
               data-test="sidebar-user-button"
-              routerLink="/settings/profile"
+              routerLink="/settings"
               [class]="`cursor-pointer gap-2 rounded-md ${sidebarCollapsed() ? 'mt-3 -ml-1 w-max' : 'hover:bg-muted flex items-center p-1'}`"
+              (click)="closeNav()"
             >
               <z-avatar
                 zAlt="User Avatar"

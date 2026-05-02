@@ -136,7 +136,7 @@ export class MainLayout {
     effect(() => {
       if (this.sidebarCollapsed()) {
         this.clearQueriedItems();
-        this.searches()[0].reset();
+        this.searches()[0]?.reset();
         this.renderer.removeStyle(document.body, 'overflow');
       } else {
         this.renderer.setStyle(document.body, 'overflow', 'hidden');
