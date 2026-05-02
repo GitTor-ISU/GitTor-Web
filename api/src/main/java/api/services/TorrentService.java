@@ -154,6 +154,7 @@ public class TorrentService {
      * Search torrents by name containing query string.
      *
      * @param name Torrent name
+     * @param pageable {@link Pageable}
      * @return {@link Torrent}
      */
     @Transactional(readOnly = true)

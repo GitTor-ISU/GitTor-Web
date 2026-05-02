@@ -134,9 +134,10 @@ public class UserService implements UserDetailsService {
     }
 
     /**
-     * Search users by name containing query string.
+     * Search users by username containing query string.
      *
-     * @param name User name
+     * @param username Username
+     * @param pageable {@link Pageable}
      * @return {@link User}
      */
     @Transactional(readOnly = true)
