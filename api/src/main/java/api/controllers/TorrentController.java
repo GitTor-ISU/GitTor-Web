@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
@@ -182,6 +183,34 @@ public class TorrentController {
     public List<TorrentDto> getAllTorrentsByName(@PathVariable String name) {
         List<Torrent> torrents = torrentService.getAllByName(name);
         return torrents.stream().map(torrentMapper::toDto).collect(Collectors.toList());
+    }
+
+    /**
+     * Search torrents.
+     *
+     * @param query Search query.
+     * @param page Page number (0-indexed)
+     * @param size Page size
+     * @return List of {@link TorrentDto}
+     */
+    // region
+    @Operation(summary = "Search Torrents", description = "Search torrents by query.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = TorrentDto.class)),
+                mediaType = "application/json")),
+        @ApiResponse(responseCode = "400",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
+    // endregion
+    @GetMapping("search")
+    public List<TorrentDto> searchTorrents(@RequestParam @Size(min = 3) String query,
+        @RequestParam(defaultValue = "0") int page, @RequestParam(required = false) Integer size) {
+        int requestedSize = size != null ? size : defaultPageSize;
+        int safeSize = Math.min(requestedSize, maxPageSize);
+
+        Pageable pageable = PageRequest.of(page, safeSize, Sort.by("createdAt").descending());
+
+        return torrentService.searchByName(query, pageable).map(torrentMapper::toDto).getContent();
     }
 
     /**

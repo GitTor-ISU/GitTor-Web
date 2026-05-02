@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -216,6 +217,34 @@ public class UserController {
 
         Pageable pageable = PageRequest.of(page, safeSize, Sort.by("id").ascending());
         return userService.getAll(pageable).map(userMapper::toPublicDto).getContent();
+    }
+
+    /**
+     * Search users.
+     *
+     * @param query Search query.
+     * @param page Page number (0-indexed)
+     * @param size Page size
+     * @return List of {@link UserDto}
+     */
+    // region
+    @Operation(summary = "Search Users", description = "Search users by query.")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200",
+            content = @Content(array = @ArraySchema(schema = @Schema(implementation = UserDto.class)),
+                mediaType = "application/json")),
+        @ApiResponse(responseCode = "400",
+            content = @Content(schema = @Schema(implementation = ErrorDto.class), mediaType = "application/json"))})
+    // endregion
+    @GetMapping("search")
+    public List<UserDto> searchUsers(@RequestParam @Size(min = 3) String query,
+        @RequestParam(defaultValue = "0") int page, @RequestParam(required = false) Integer size) {
+        int requestedSize = size != null ? size : defaultPageSize;
+        int safeSize = Math.min(requestedSize, maxPageSize);
+
+        Pageable pageable = PageRequest.of(page, safeSize, Sort.by("id").ascending());
+
+        return userService.searchByUsername(query, pageable).map(userMapper::toDto).getContent();
     }
 
     /**

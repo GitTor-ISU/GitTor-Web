@@ -1,9 +1,12 @@
 import { Component, effect, ElementRef, input, model, output, signal, untracked, viewChild } from '@angular/core';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { ArrowRightIcon, SearchIcon } from 'lucide-angular';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { ZardButtonComponent } from '../z-button';
 import { ZardIconComponent } from '../z-icon';
 import { ZardInputGroupComponent } from '../z-input-group';
 import { ZardInputDirective } from '../z-input/input.directive';
+import { ZardLoaderComponent } from '../z-loader/loader.component';
 import { ZardPopoverComponent, ZardPopoverDirective } from '../z-popover';
 
 export interface SearchItem {
@@ -24,17 +27,21 @@ export interface SearchItem {
     ZardInputGroupComponent,
     ZardInputDirective,
     ZardPopoverDirective,
+    ZardLoaderComponent,
   ],
   templateUrl: './search.html',
 })
 export class Search {
   public readonly items = input<SearchItem[]>([]);
+  public readonly queryDebounce = input<number>(300);
 
   public readonly isSearching = model<boolean>(false);
+  public readonly isQuerying = model<boolean>(false);
   public readonly query = model<string>('');
 
   public readonly itemClicked = output<SearchItem>();
-  public readonly searchSubmit = output<string>();
+  public readonly submitInput = output<string>();
+  public readonly queryInput = output<string>();
 
   protected readonly popover = viewChild('popover', { read: ZardPopoverDirective });
   protected readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
@@ -44,12 +51,9 @@ export class Search {
   protected readonly searchIcon = SearchIcon;
   protected readonly arrowRightIcon = ArrowRightIcon;
 
-  public constructor() {
-    effect(() => {
-      void this.query();
-      untracked(() => this.popover()?.hide());
-    });
+  private readonly query$ = toObservable(this.query);
 
+  public constructor() {
     effect(() => {
       if (this.items().length > 0 && !this.isSearching()) {
         untracked(() => this.popover()?.show());
@@ -57,10 +61,28 @@ export class Search {
         untracked(() => this.popover()?.hide());
       }
     });
+
+    effect(() => {
+      void this.query();
+      this.isQuerying.set(true);
+    });
+
+    this.query$
+      .pipe(debounceTime(this.queryDebounce()), distinctUntilChanged(), takeUntilDestroyed())
+      .subscribe((value) => {
+        this.queryInput.emit(value);
+      });
   }
 
   public focus(): void {
     this.searchInput()?.nativeElement.focus();
+  }
+
+  protected onSubmitInput(): void {
+    if (this.isQuerying()) {
+      return;
+    }
+    this.submitInput.emit(this.query());
   }
 
   protected onFocus(): void {

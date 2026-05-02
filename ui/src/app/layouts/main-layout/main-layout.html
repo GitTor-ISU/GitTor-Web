@@ -12,7 +12,7 @@
             zPopover
             zPlacement="bottom"
             [zContent]="navbarMenu"
-            (zVisibleChange)="torrents.set([])"
+            (zVisibleChange)="clearQueriedItems()"
             (click)="focusSearch()"
           >
             <z-icon zSize="lg" [zType]="menuIcon" />
@@ -20,28 +20,29 @@
           <ng-template #navbarMenu>
             <z-popover class="-mt-2 w-45 p-2">
               <div class="flex flex-col">
+                <app-search
+                  #search
+                  [items]="items()"
+                  [(isSearching)]="isSearching"
+                  [(isQuerying)]="isQuerying"
+                  (itemClicked)="navigateToSearch($event)"
+                  (submitInput)="submitSearch()"
+                  (queryInput)="searchQuery($event)"
+                />
                 @for (item of mainMenuItems; track item.label) {
-                  @if (item.label === 'Search') {
-                    <app-search
-                      #search
-                      [items]="items()"
-                      [(isSearching)]="isSearching"
-                      (itemClicked)="navigateToRepo($event)"
-                      (searchSubmit)="submitSearch($event)"
-                    />
-                  } @else {
-                    <button
-                      type="button"
-                      z-button
-                      zType="ghost"
-                      class="justify-start"
-                      [routerLink]="item.route"
-                      (click)="closeNav()"
-                    >
-                      <z-icon class="mr-1 -ml-[3px]" [zType]="item.icon" />
-                      {{ item.label }}
-                    </button>
-                  }
+                  <button
+                    type="button"
+                    z-button
+                    zType="ghost"
+                    class="justify-start"
+                    routerLinkActive="bg-muted text-accent-foreground"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                    [routerLink]="item.route"
+                    (click)="closeNav()"
+                  >
+                    <z-icon class="mr-1 -ml-[3px]" [zType]="item.icon" />
+                    {{ item.label }}
+                  </button>
                 }
                 @if (user()) {
                   <z-divider zSpacing="sm" />
@@ -51,6 +52,7 @@
                       z-button
                       zType="ghost"
                       class="justify-start"
+                      routerLinkActive="bg-muted text-accent-foreground"
                       [routerLink]="item.route"
                       (click)="closeNav()"
                     >
@@ -91,49 +93,52 @@
       (zCollapsedChange)="onCollapsedChange($event)"
     >
       <nav
-        [class]="`flex h-full flex-col overflow-hidden ${sidebarCollapsed() ? 'gap-1 px-3 py-4' : 'gap-4 p-4 pb-3'}`"
+        [class]="`flex h-full flex-col overflow-hidden ${sidebarCollapsed() ? 'gap-1 px-3 py-4' : 'gap-3 p-4 pb-3'}`"
       >
         <z-sidebar-group>
           <app-logo class="mb-3 w-8" mode="icon" [link]="true" [class.hidden]="!sidebarCollapsed()" />
-          <app-logo class="mb-3 h-8 w-max" mode="full" [link]="true" [class.hidden]="sidebarCollapsed()" />
+          <app-logo class="mb-4 h-8 w-max" mode="full" [link]="true" [class.hidden]="sidebarCollapsed()" />
+          <button
+            type="button"
+            z-button
+            zType="ghost"
+            zPosition="right"
+            class="justify-start"
+            zTooltip="Search"
+            [hidden]="!sidebarCollapsed()"
+            (click)="focusSearch()"
+          >
+            <z-icon class="mr-1 ml-[5px]" [zType]="searchIcon" />
+          </button>
+          <app-search
+            #search
+            [items]="items()"
+            [hidden]="sidebarCollapsed()"
+            [(isSearching)]="isSearching"
+            [(isQuerying)]="isQuerying"
+            (itemClicked)="navigateToSearch($event)"
+            (submitInput)="submitSearch()"
+            (queryInput)="searchQuery($event)"
+          />
+        </z-sidebar-group>
+        <z-sidebar-group>
+          <z-sidebar-group-label [class.hidden]="sidebarCollapsed()">Overview</z-sidebar-group-label>
           @for (item of mainMenuItems; track item.label) {
-            @if (item.label === 'Search') {
-              @if (sidebarCollapsed()) {
-                <button
-                  type="button"
-                  z-button
-                  zType="ghost"
-                  zPosition="right"
-                  class="justify-start"
-                  [zTooltip]="item.label"
-                  (click)="focusSearch()"
-                >
-                  <z-icon class="mr-1 ml-[5px]" [zType]="item.icon!" />
-                </button>
-              } @else {
-                <app-search
-                  #search
-                  [items]="items()"
-                  [(isSearching)]="isSearching"
-                  (itemClicked)="navigateToRepo($event)"
-                  (searchSubmit)="submitSearch($event)"
-                />
-              }
-            } @else {
-              <button
-                type="button"
-                z-button
-                zType="ghost"
-                zPosition="right"
-                class="justify-start"
-                [zTooltip]="sidebarCollapsed() ? item.label : ''"
-                [routerLink]="item.route"
-                (click)="closeNav()"
-              >
-                <z-icon class="mr-1 -ml-[3px]" [zType]="item.icon!" />
-                <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{ item.label }}</span>
-              </button>
-            }
+            <button
+              type="button"
+              z-button
+              zType="ghost"
+              zPosition="right"
+              class="h-9 min-w-9 justify-start"
+              routerLinkActive="bg-muted text-accent-foreground"
+              [routerLinkActiveOptions]="{ exact: true }"
+              [zTooltip]="sidebarCollapsed() ? item.label : ''"
+              [routerLink]="item.route"
+              (click)="closeNav()"
+            >
+              <z-icon class="mr-1 -ml-[3px]" [zType]="item.icon!" />
+              <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{ item.label }}</span>
+            </button>
           }
         </z-sidebar-group>
 
@@ -146,7 +151,8 @@
                 z-button
                 zType="ghost"
                 zPosition="right"
-                class="justify-start"
+                class="h-9 min-w-9 justify-start"
+                routerLinkActive="bg-muted text-accent-foreground"
                 [zTooltip]="sidebarCollapsed() ? item.label : ''"
                 [routerLink]="item.route"
                 (click)="closeNav()"
@@ -165,13 +171,13 @@
               z-button
               zType="ghost"
               zPosition="right"
-              class="mb-1 justify-start"
+              class="mb-1 h-9 min-w-9 justify-start"
               [attr.data-test]="sessionService.hasToken() ? 'sidebar-logout-button' : 'sidebar-login-button'"
               [class.w-full]="sidebarCollapsed()"
               [zTooltip]="sidebarCollapsed() ? (sessionService.hasToken() ? 'Log Out' : 'Log In') : ''"
               [routerLink]="!sessionService.hasToken() ? '/login' : '/logout'"
             >
-              <z-icon class="-ml-[3px]" [zType]="sessionService.hasToken() ? 'log-out' : logInIcon" />
+              <z-icon class="-ml-[2px]" [zType]="sessionService.hasToken() ? 'log-out' : logInIcon" />
               <span class="text-sm" [class.hidden]="sidebarCollapsed()">{{
                 sessionService.hasToken() ? 'Log Out' : 'Log In'
               }}</span>
@@ -208,7 +214,7 @@
   <z-content class="min-h-50 md:ml-[70px] md:transition-[margin] md:duration-300 md:ease-in-out">
     <router-outlet />
     <div
-      [class]="`absolute inset-0 hidden bg-black/50 transition-opacity duration-300 ease-in-out md:block ${
+      [class]="`fixed inset-0 hidden bg-black/40 transition-opacity duration-300 ease-in-out md:block ${
         sidebarCollapsed() ? 'pointer-events-none opacity-0' : 'pointer-events-auto opacity-100'
       }`"
       (click)="onCollapsedChange(true)"

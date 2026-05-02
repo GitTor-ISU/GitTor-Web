@@ -151,6 +151,17 @@ public class TorrentService {
     }
 
     /**
+     * Search torrents by name containing query string.
+     *
+     * @param name Torrent name
+     * @return {@link Torrent}
+     */
+    @Transactional(readOnly = true)
+    public Page<Torrent> searchByName(String name, Pageable pageable) {
+        return torrentRepository.findByNameContainingIgnoreCase(name, pageable);
+    }
+
+    /**
      * Get all torrents by uploader.
      *
      * @param uploader Uploader

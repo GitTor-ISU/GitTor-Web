@@ -1,14 +1,14 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateFn } from '@angular/router';
 import SessionService from '@core/session-service';
 
 export const logoutGuard: CanActivateFn = async () => {
   const sessionService = inject(SessionService);
-  const router = inject(Router);
 
   if (sessionService.hasToken()) {
     await sessionService.logout();
+    window.location.reload();
   }
 
-  return router.navigateByUrl(router.url, { onSameUrlNavigation: 'reload' });
+  return false;
 };

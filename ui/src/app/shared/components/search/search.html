@@ -5,11 +5,12 @@
       zPopover
       zTrigger="click"
       [zContent]="searchMenu"
+      [zOrigin]="this.searchInput()"
       [zVisible]="false"
       [zTriggerable]="triggerable()"
       (zVisibleChange)="isVisible.set($event)"
     >
-      <z-input-group class="my-[3px]" [zAddonBefore]="searchIconTemplate" [zAddonAfter]="submitSearchTemplate">
+      <z-input-group [zAddonBefore]="searchIconTemplate" [zAddonAfter]="submitSearchTemplate">
         <input
           #searchInput
           z-input
@@ -21,20 +22,26 @@
           (input)="query.set($any($event.target).value)"
           (focus)="onFocus()"
           (blur)="onBlur()"
-          (keydown.enter)="searchSubmit.emit(query())"
+          (keydown.enter)="onSubmitInput()"
         />
       </z-input-group>
     </span>
   }
   <ng-template #searchMenu>
     <z-popover class="-mt-1 w-40 cursor-default p-1">
-      @for (item of items(); track item.label; let i = $index) {
-        @if (i === 0 || items()[i - 1].category !== item.category) {
-          <p class="text-muted-foreground pt-1 pl-2 text-xs">{{ item.category }}</p>
+      @if (isQuerying()) {
+        <div class="flex items-center justify-center p-2">
+          <z-loader zSize="sm" />
+        </div>
+      } @else {
+        @for (item of items(); track item.label; let i = $index) {
+          @if (i === 0 || items()[i - 1].category !== item.category) {
+            <p class="text-muted-foreground pt-1 pl-2 text-xs">{{ item.category }}</p>
+          }
+          <button z-button zType="ghost" class="w-full justify-start" (click)="itemClicked.emit(item)">
+            {{ item.display }}
+          </button>
         }
-        <button z-button zType="ghost" class="w-full justify-start" (click)="itemClicked.emit(item)">
-          {{ item.display }}
-        </button>
       }
     </z-popover>
   </ng-template>
@@ -49,10 +56,10 @@
       zSize="sm"
       zShape="circle"
       class="mr-1 !h-6 !w-6 !p-0"
-      [zLoading]="isSearching()"
-      (click)="searchSubmit.emit(query())"
+      [zLoading]="isSearching() || isQuerying()"
+      (click)="onSubmitInput()"
     >
-      <z-icon class="size-3" [class.hidden]="isSearching()" [zType]="arrowRightIcon" />
+      <z-icon class="size-3" [class.hidden]="isSearching() || isQuerying()" [zType]="arrowRightIcon" />
     </button>
   </ng-template>
 </div>

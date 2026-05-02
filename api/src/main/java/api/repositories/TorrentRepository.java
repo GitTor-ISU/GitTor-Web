@@ -40,4 +40,13 @@ public interface TorrentRepository extends JpaRepository<Torrent, Long> {
      * @return {@link Page} of {@link Torrent}
      */
     Page<Torrent> findAllByUploader(User uploader, Pageable pageable);
+
+    /**
+     * Find torrent by name containing query string.
+     *
+     * @param name Query string
+     * @param pageable {@link Pageable}
+     * @return {@link Page} of {@link Torrent}
+     */
+    Page<Torrent> findByNameContainingIgnoreCase(String name, Pageable pageable);
 }
