@@ -136,6 +136,10 @@ export class MainLayout {
     effect(() => {
       if (this.sidebarCollapsed()) {
         this.clearQueriedItems();
+        this.searches()[0].reset();
+        this.renderer.removeStyle(document.body, 'overflow');
+      } else {
+        this.renderer.setStyle(document.body, 'overflow', 'hidden');
       }
     });
   }
@@ -153,11 +157,6 @@ export class MainLayout {
 
   protected onCollapsedChange(collapsed: boolean): void {
     this.sidebarCollapsed.set(collapsed);
-    if (collapsed) {
-      this.renderer.removeStyle(document.body, 'overflow');
-    } else {
-      this.renderer.setStyle(document.body, 'overflow', 'hidden');
-    }
   }
 
   protected async submitSearch(): Promise<void> {

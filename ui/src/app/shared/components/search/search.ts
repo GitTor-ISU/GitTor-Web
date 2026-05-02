@@ -78,6 +78,12 @@ export class Search {
     this.searchInput()?.nativeElement.focus();
   }
 
+  public reset(): void {
+    this.query.set('');
+    this.isQuerying.set(false);
+    this.isSearching.set(false);
+  }
+
   protected onSubmitInput(): void {
     if (this.isQuerying()) {
       return;
