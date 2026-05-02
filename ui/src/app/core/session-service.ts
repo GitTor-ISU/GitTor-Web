@@ -119,7 +119,7 @@ export default class SessionService {
         this.user.set(user);
       }),
       catchError(() => {
-        void this.logout();
+        this.user.set(null);
         return of(null);
       })
     );
