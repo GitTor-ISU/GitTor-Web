@@ -49,23 +49,28 @@
           />
         </z-form-control>
       </z-form-field>
+      <div class="flex flex-col gap-2 md:flex-row">
+        <z-button zType="secondary" (click)="onChangePassword()">Change Password</z-button>
+        <z-button zType="destructive" (click)="onDeleteAccount()">Delete Account</z-button>
+      </div>
     </div>
     <div class="md:shrink-0">
       <z-form-field class="w-full">
         <label z-form-label>Profile picture</label>
         <z-form-control [errorMessage]="avatarHelpMessage()">
-          <div class="m-2 flex items-center gap-4">
+          <div class="flex items-center gap-4">
             <z-avatar
               zAlt="User Avatar"
-              class="h-45 w-45 shrink-0 cursor-pointer"
+              class="h-45 w-45 shrink-0 cursor-pointer md:h-60 md:w-60"
               [zSrc]="avatarDisplay() ?? avatarsService.myAvatarUrl()"
               (click)="fileUpload.click()"
             />
-            <div class="flex items-center gap-2">
+            <div class="flex flex-col items-center gap-2 md:flex-row">
               <button z-button type="button" zType="secondary" (click)="fileUpload.click()">
                 <z-icon [zType]="uploadIcon" />
                 Upload
               </button>
+
               <button
                 z-button
                 type="button"
@@ -91,8 +96,4 @@
       </z-form-field>
     </div>
   </form>
-  <div class="my-3">
-    <z-button class="mr-2" zType="secondary" (click)="onChangePassword()">Change Password</z-button>
-    <z-button zType="destructive" (click)="onDeleteAccount()">Delete Account</z-button>
-  </div>
 </div>
