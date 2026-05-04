@@ -1,0 +1,85 @@
+<div class="flex flex-col gap-4">
+  <z-card zTitle="Linux (Debian/Ubuntu)">
+    <p class="mb-2 text-sm font-medium">1. Install dependencies</p>
+    <p class="text-muted-foreground mb-2 text-sm">
+      GitTor depends on <code class="font-mono text-xs">build-essential</code>,
+      <code class="font-mono text-xs">libtorrent-rasterbar-dev</code>,
+      <code class="font-mono text-xs">libglib2.0-dev</code>, <code class="font-mono text-xs">libgit2-dev</code>,
+      <code class="font-mono text-xs">libcurl4-openssl-dev</code>, and
+      <code class="font-mono text-xs">libjson-glib-dev</code>.
+    </p>
+    <div class="relative mb-4">
+      <pre
+        class="bg-muted text-foreground overflow-x-auto rounded-md p-3 pr-12 font-mono text-xs whitespace-pre"
+      ><code>{{ debianDepsCommand }}</code></pre>
+      <button
+        type="button"
+        z-button
+        zType="ghost"
+        zSize="sm"
+        class="absolute top-1 right-1"
+        (click)="copy(debianDepsCommand, 'Command copied')"
+      >
+        <z-icon [zType]="copyIcon" />
+      </button>
+    </div>
+
+    <p class="mb-2 text-sm font-medium">2. Build from source</p>
+    <p class="text-muted-foreground mb-2 text-sm">No prebuilt binaries are published yet, so clone and build:</p>
+    <div class="relative mb-3">
+      <pre
+        class="bg-muted text-foreground overflow-x-auto rounded-md p-3 pr-12 font-mono text-xs whitespace-pre"
+      ><code>{{ buildFromSourceCommand }}</code></pre>
+      <button
+        type="button"
+        z-button
+        zType="ghost"
+        zSize="sm"
+        class="absolute top-1 right-1"
+        (click)="copy(buildFromSourceCommand, 'Command copied')"
+      >
+        <z-icon [zType]="copyIcon" />
+      </button>
+    </div>
+    <p class="text-muted-foreground text-sm">
+      The installer may prompt you to add GitTor to your <code class="font-mono text-xs">PATH</code>. Once that's done,
+      verify with <code class="font-mono text-xs">gittor --help</code>. If you hit issues, the
+      <a
+        class="text-blue-500 hover:underline"
+        target="_blank"
+        rel="noopener"
+        [href]="`${cliRepoUrl}/tree/main/.devcontainer`"
+      >
+        devcontainer config
+      </a>
+      is a good reference for what a known-good environment looks like.
+    </p>
+  </z-card>
+
+  <z-card zTitle="Windows">
+    <p class="text-muted-foreground mb-3 text-sm">
+      Download the latest binary, extract the archive somewhere you won't accidentally delete (e.g.
+      <code class="font-mono text-xs">C:\Program Files\GitTor</code>), and add that folder to your
+      <code class="font-mono text-xs">PATH</code> environment variable. Once that's done, verify with
+      <code class="font-mono text-xs">gittor --help</code> from a new terminal.
+    </p>
+    <p class="text-muted-foreground mb-3 text-sm">
+      If you haven't edited environment variables on Windows before, search "edit the system environment variables" from
+      the Start menu, then click <em>Environment Variables…</em> at the bottom of the dialog.
+    </p>
+    <a z-button zType="outline" class="gap-2" target="_blank" rel="noopener" [href]="windowsDownloadUrl">
+      <z-icon [zType]="downloadIcon" />
+      Download gittor-exe.zip
+    </a>
+  </z-card>
+
+  <z-card zTitle="Source code & releases">
+    <p class="text-muted-foreground mb-3 text-sm">
+      GitTor CLI is open source. File issues, browse releases, or read the full README on GitHub.
+    </p>
+    <a z-button zType="outline" class="gap-2" target="_blank" rel="noopener" [href]="cliRepoUrl">
+      <z-icon [zType]="externalLinkIcon" />
+      View GitTor-Cli on GitHub
+    </a>
+  </z-card>
+</div>

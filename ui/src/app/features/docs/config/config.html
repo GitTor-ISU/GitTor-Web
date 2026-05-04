@@ -1,0 +1,42 @@
+<div class="flex flex-col gap-4">
+  <z-card zTitle=".gittorconfig" zDescription="Create this file in your home directory before you start using GitTor.">
+    <p class="text-muted-foreground mb-3 text-sm">
+      The format mirrors <code class="font-mono text-xs">.gitconfig</code> on purpose, so it should feel familiar:
+    </p>
+    <div class="relative mb-3">
+      <pre
+        class="bg-muted text-foreground overflow-x-auto rounded-md p-3 pr-12 font-mono text-xs whitespace-pre"
+      ><code>{{ configFileExample }}</code></pre>
+      <button
+        type="button"
+        z-button
+        zType="ghost"
+        zSize="sm"
+        class="absolute top-1 right-1"
+        (click)="copy(configFileExample, 'Config copied')"
+      >
+        <z-icon [zType]="copyIcon" />
+      </button>
+    </div>
+    <ul class="text-muted-foreground list-inside list-disc space-y-2 text-sm">
+      <li>
+        <span class="text-foreground font-mono text-xs">port</span> — the port the seeder listens on. Public
+        port-forwarding isn't required, but it makes seeding much more effective for other users.
+      </li>
+      <li>
+        <span class="text-foreground font-mono text-xs">api_url</span> — which GitTor web instance the CLI talks to.
+        Point this at your own deployment if you self-host.
+      </li>
+      <li>
+        <span class="text-foreground font-mono text-xs">tracker1</span>...
+        <span class="text-foreground font-mono text-xs">trackerN</span> — public BitTorrent trackers used when creating
+        new torrents. Anywhere from one to a hundred is fine; the example list is what the GitTor team used during
+        development.
+      </li>
+    </ul>
+    <p class="text-muted-foreground mt-3 text-sm">
+      After editing <code class="font-mono text-xs">.gittorconfig</code>, restart the seeder service:
+      <code class="font-mono text-xs">gittor service restart</code>.
+    </p>
+  </z-card>
+</div>
