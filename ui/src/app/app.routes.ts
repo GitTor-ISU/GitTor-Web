@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import { About } from '@features/about/about';
 import { AuthRoutes } from '@features/auth/auth-routes';
+import { DocsRoutes } from '@features/docs/docs-routes';
 import { Home } from '@features/home/home';
 import { NotFound } from '@features/not-found/not-found';
 import { RepositoryList } from '@features/repositories/list/repository-list';
@@ -22,7 +22,6 @@ export const routes: Routes = [
     component: MainLayout,
     resolve: { user: currentUserResolver },
     children: [
-      { path: 'about', component: About, title: 'About' },
       { path: 'new', component: RepositoryUpload, title: 'New repository', canActivate: [requireAuthGuard] },
       {
         path: ':owner',
@@ -31,6 +30,7 @@ export const routes: Routes = [
         component: RepositoryList,
         title: (route) => `${route.params['owner']}`,
       },
+      ...DocsRoutes,
       ...SettingsRoutes,
     ],
   },

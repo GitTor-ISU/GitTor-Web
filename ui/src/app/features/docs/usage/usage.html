@@ -1,0 +1,69 @@
+<div class="flex flex-col gap-4">
+  <z-card zTitle="Typical workflow">
+    <ol class="list-inside list-decimal space-y-2 text-sm">
+      <li><code class="font-mono text-xs">gittor init project</code> creates a new repository.</li>
+      <li>
+        Make changes and commit them with the usual <code class="font-mono text-xs">git add</code> and
+        <code class="font-mono text-xs">git commit</code>.
+      </li>
+      <li>
+        <code class="font-mono text-xs">gittor seed</code> publishes the repo. On first seed, you'll be prompted for a
+        name and description. The output gives you a repository ID, torrent file, and magnet link.
+      </li>
+      <li>
+        Share the repository ID with collaborators. They run
+        <code class="font-mono text-xs">gittor leech &lt;repo-id&gt; project</code> to clone it.
+      </li>
+      <li>
+        Inside an already-leeched repo, <code class="font-mono text-xs">gittor leech</code> with no arguments pulls the
+        latest state.
+      </li>
+    </ol>
+  </z-card>
+
+  <z-card zTitle="Command reference" zDescription="The commands you'll reach for most often.">
+    <div class="flex flex-col gap-5">
+      @for (cmd of commands(); track cmd.name) {
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-center gap-2">
+            <z-icon class="text-muted-foreground" [zType]="terminalIcon" />
+            <code class="font-mono text-sm font-semibold">{{ cmd.name }}</code>
+          </div>
+          <pre
+            class="bg-muted text-foreground overflow-x-auto rounded-md p-2 font-mono text-xs"
+          ><code>{{ cmd.syntax }}</code></pre>
+          <p class="text-muted-foreground text-sm">{{ cmd.description }}</p>
+          @if (cmd.example) {
+            <div class="text-muted-foreground text-xs">
+              <span class="font-medium">Example:</span>
+              <code class="ml-1 font-mono">{{ cmd.example }}</code>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </z-card>
+
+  <z-card zTitle="Identifiers cheat sheet">
+    <p class="text-muted-foreground mb-3 text-sm">
+      When you seed a repo, you get three different identifiers. Each has trade-offs:
+    </p>
+    <ul class="text-muted-foreground list-inside list-disc space-y-2 text-sm">
+      <li>
+        <span class="text-foreground font-medium">Repository ID</span> — short, stable across updates, but requires the
+        web app to resolve.
+      </li>
+      <li>
+        <span class="text-foreground font-medium">Magnet link</span> — works without the web app, but changes every time
+        the repo is updated.
+      </li>
+      <li>
+        <span class="text-foreground font-medium">Torrent file</span> — same as magnet link, but a file instead of a
+        string.
+      </li>
+    </ul>
+    <p class="text-muted-foreground mt-3 text-sm">
+      Day to day, use repository IDs. Fall back to magnet links if the web app is unreachable.
+    </p>
+  </z-card>
+</div>

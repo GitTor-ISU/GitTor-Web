@@ -1,0 +1,18 @@
+<div class="flex min-h-screen flex-col items-center">
+  <div class="flex w-full max-w-5xl flex-col gap-6 p-6">
+    <div class="flex items-center gap-3">
+      <z-icon class="h-6 w-6" [zType]="bookIcon" />
+      <h1 class="text-2xl font-semibold">Getting Started</h1>
+    </div>
+    <p class="text-muted-foreground">
+      GitTor is a decentralized Git platform built on top of BitTorrent. The CLI is your everyday tool for publishing,
+      leeching, and seeding repositories peer-to-peer.
+    </p>
+
+    <z-tab-group zTabsPosition="top" zActivePosition="bottom" [(zActiveTabIndex)]="activeTabIndex">
+      @for (label of tabLabels; track label) {
+        <z-tab [label]="label" [routerLink]="`docs/${label.toLowerCase()}`" />
+      }
+    </z-tab-group>
+  </div>
+</div>

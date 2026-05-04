@@ -27,9 +27,9 @@ import { ZardPopoverComponent, ZardPopoverDirective } from '@shared/components/z
 import { ZardTooltipImports } from '@shared/components/z-tooltip';
 import {
   ArrowRightIcon,
+  BookOpenIcon,
   FolderIcon,
   HouseIcon,
-  InfoIcon,
   LogInIcon,
   LucideIconData,
   MenuIcon,
@@ -107,7 +107,7 @@ export class MainLayout {
 
   protected mainMenuItems: MenuItem[] = [
     { icon: HouseIcon, label: 'Home', route: '/' },
-    { icon: InfoIcon, label: 'About', route: '/about' },
+    { icon: BookOpenIcon, label: 'Docs', route: '/docs' },
   ];
 
   protected workspaceMenuItems: MenuItem[] = [];
