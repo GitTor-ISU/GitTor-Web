@@ -134,6 +134,18 @@ public class UserService implements UserDetailsService {
     }
 
     /**
+     * Search users by username containing query string.
+     *
+     * @param username Username
+     * @param pageable {@link Pageable}
+     * @return {@link User}
+     */
+    @Transactional(readOnly = true)
+    public Page<User> searchByUsername(String username, Pageable pageable) {
+        return userRepository.findByUsernameContainingIgnoreCase(username, pageable);
+    }
+
+    /**
      * Get user.
      *
      * @param id User id

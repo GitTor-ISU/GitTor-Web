@@ -3,6 +3,8 @@ package api.repositories;
 import java.util.Optional;
 import java.util.Set;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -61,4 +63,13 @@ public interface UserRepository extends JpaRepository<User, Integer> {
      * @return {@link Set} of {@link User}
      */
     Set<User> findAllByRolesContaining(Role role);
+
+    /**
+     * Find user by username containing query string.
+     *
+     * @param username Query string
+     * @param pageable {@link Pageable}
+     * @return {@link Page} of {@link User}
+     */
+    Page<User> findByUsernameContainingIgnoreCase(String username, Pageable pageable);
 }

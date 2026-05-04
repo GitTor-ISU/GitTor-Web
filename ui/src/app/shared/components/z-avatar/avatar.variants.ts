@@ -21,10 +21,10 @@ export const avatarVariants = cva(
       zSize: 'default',
       zShape: 'circle',
     },
-  },
+  }
 );
 
-export const imageVariants = cva('relative object-cover object-center w-full h-full z-10', {
+export const imageVariants = cva('relative object-cover object-center w-full h-full', {
   variants: {
     zShape: {
       circle: 'rounded-full',

@@ -7,7 +7,7 @@ import { RepositoryList } from '@features/repositories/list/repository-list';
 import { RepositoryUpload } from '@features/repositories/upload/repository-upload';
 import { SettingsRoutes } from '@features/settings/settings-routes';
 import { guestOnlyGuard, requireAuthGuard } from '@shared/auth-guards';
-import { validUserPathGuard } from '@shared/user-path-guards';
+import { reservedPathGuard } from '@shared/user-path-guards';
 import { MainLayout } from './layouts/main-layout/main-layout';
 import { currentUserResolver, profileResolver, profileTorrentsResolver } from './shared/user-resolvers';
 
@@ -25,7 +25,7 @@ export const routes: Routes = [
       { path: 'new', component: RepositoryUpload, title: 'New repository', canActivate: [requireAuthGuard] },
       {
         path: ':owner',
-        canMatch: [validUserPathGuard],
+        canMatch: [reservedPathGuard],
         resolve: { profile: profileResolver, torrents: profileTorrentsResolver },
         component: RepositoryList,
         title: (route) => `${route.params['owner']}`,
@@ -35,5 +35,6 @@ export const routes: Routes = [
     ],
   },
   ...AuthRoutes,
-  { path: '**', component: NotFound, title: '404 Not Found' },
+  { path: '404', component: NotFound, title: '404 Not Found' },
+  { path: '**', redirectTo: '404' },
 ];

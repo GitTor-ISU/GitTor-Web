@@ -101,7 +101,6 @@ export default class SessionService {
       await firstValueFrom(this.authService.logout(''));
       this.accessToken.set(null);
       this.user.set(null);
-      this.router.navigateByUrl('');
     } catch (error) {
       this.accessToken.set(null);
       this.user.set(null);
@@ -120,7 +119,7 @@ export default class SessionService {
         this.user.set(user);
       }),
       catchError(() => {
-        void this.logout();
+        this.user.set(null);
         return of(null);
       })
     );

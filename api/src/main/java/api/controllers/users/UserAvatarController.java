@@ -136,10 +136,8 @@ public class UserAvatarController {
                 @Content(mediaType = "image/svg+xml", schema = @Schema(type = "string", format = "binary"))}),
         @ApiResponse(responseCode = "404", content = @Content(schema = @Schema(implementation = ErrorDto.class)))})
     // endregion
-    @GetMapping(path = "/{userId}/avatar",
-        produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE, MediaType.IMAGE_GIF_VALUE, "image/svg+xml",
-            MediaType.APPLICATION_JSON_VALUE})
-    @PreAuthorize("hasAuthority(@DbSetup.USER_READ)")
+    @GetMapping(path = "/{userId}/avatar", produces = {MediaType.IMAGE_PNG_VALUE, MediaType.IMAGE_JPEG_VALUE,
+        MediaType.IMAGE_GIF_VALUE, "image/svg+xml", MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Resource> getUserAvatar(@PathVariable int userId) throws IOException {
         User user = userService.get(userId);
         S3Object s3Object = user.getAvatar();

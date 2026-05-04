@@ -90,6 +90,7 @@ export class ZardPopoverDirective implements OnInit, OnDestroy {
   readonly zVisible = input<boolean>(false);
   readonly zOverlayClickable = input<boolean>(true);
   readonly zVisibleChange = output<boolean>();
+  readonly zTriggerable = input<boolean>(true);
 
   private readonly isVisible = signal(false);
 
@@ -100,7 +101,7 @@ export class ZardPopoverDirective implements OnInit, OnDestroy {
   constructor() {
     toObservable(this.zVisible)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(visible => {
+      .subscribe((visible) => {
         const currentlyVisible = this.isVisible();
         if (visible && !currentlyVisible) {
           this.show();
@@ -111,7 +112,7 @@ export class ZardPopoverDirective implements OnInit, OnDestroy {
 
     toObservable(this.zTrigger)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(trigger => {
+      .subscribe((trigger) => {
         if (this.listeners.length) {
           this.unlistenAll();
         }
@@ -172,7 +173,7 @@ export class ZardPopoverDirective implements OnInit, OnDestroy {
       const positionStrategy = this.overlayPositionBuilder
         .flexibleConnectedTo(this.nativeElement)
         .withPositions(this.getPositions())
-        .withPush(false)
+        .withPush(true)
         .withFlexibleDimensions(false)
         .withViewportMargin(8);
 
@@ -193,7 +194,7 @@ export class ZardPopoverDirective implements OnInit, OnDestroy {
     ) {
       this.overlayRefSubscription = this.overlayRef
         .outsidePointerEvents()
-        .pipe(filter(event => !this.nativeElement.contains(event.target)))
+        .pipe(filter((event) => !this.nativeElement.contains(event.target)))
         .subscribe(() => this.hide());
     }
   }
@@ -208,8 +209,10 @@ export class ZardPopoverDirective implements OnInit, OnDestroy {
       this.listeners.push(
         this.renderer.listen(this.nativeElement, 'click', (event: Event) => {
           event.stopPropagation();
-          this.toggle();
-        }),
+          if (this.zTriggerable()) {
+            this.toggle();
+          }
+        })
       );
     } else if (trigger === 'hover') {
       this.listeners.push(this.renderer.listen(this.nativeElement, 'mouseenter', () => this.show()));
@@ -240,126 +243,6 @@ export class ZardPopoverDirective implements OnInit, OnDestroy {
       offsetY: primaryConfig.offsetY ?? 0,
     });
 
-    // Fallback positions for better positioning when primary doesn't fit
-    switch (placement) {
-      case 'bottom':
-        // Try top if bottom doesn't fit
-        positions.push({
-          originX: 'center',
-          originY: 'top',
-          overlayX: 'center',
-          overlayY: 'bottom',
-          offsetX: 0,
-          offsetY: -8,
-        });
-        // If neither top nor bottom work, try right
-        positions.push({
-          originX: 'end',
-          originY: 'center',
-          overlayX: 'start',
-          overlayY: 'center',
-          offsetX: 8,
-          offsetY: 0,
-        });
-        // Finally try left
-        positions.push({
-          originX: 'start',
-          originY: 'center',
-          overlayX: 'end',
-          overlayY: 'center',
-          offsetX: -8,
-          offsetY: 0,
-        });
-        break;
-      case 'top':
-        // Try bottom if top doesn't fit
-        positions.push({
-          originX: 'center',
-          originY: 'bottom',
-          overlayX: 'center',
-          overlayY: 'top',
-          offsetX: 0,
-          offsetY: 8,
-        });
-        // If neither top nor bottom work, try right
-        positions.push({
-          originX: 'end',
-          originY: 'center',
-          overlayX: 'start',
-          overlayY: 'center',
-          offsetX: 8,
-          offsetY: 0,
-        });
-        // Finally try left
-        positions.push({
-          originX: 'start',
-          originY: 'center',
-          overlayX: 'end',
-          overlayY: 'center',
-          offsetX: -8,
-          offsetY: 0,
-        });
-        break;
-      case 'right':
-        // Try left if right doesn't fit
-        positions.push({
-          originX: 'start',
-          originY: 'center',
-          overlayX: 'end',
-          overlayY: 'center',
-          offsetX: -8,
-          offsetY: 0,
-        });
-        // If neither left nor right work, try bottom
-        positions.push({
-          originX: 'center',
-          originY: 'bottom',
-          overlayX: 'center',
-          overlayY: 'top',
-          offsetX: 0,
-          offsetY: 8,
-        });
-        // Finally try top
-        positions.push({
-          originX: 'center',
-          originY: 'top',
-          overlayX: 'center',
-          overlayY: 'bottom',
-          offsetX: 0,
-          offsetY: -8,
-        });
-        break;
-      case 'left':
-        // Try right if left doesn't fit
-        positions.push({
-          originX: 'end',
-          originY: 'center',
-          overlayX: 'start',
-          overlayY: 'center',
-          offsetX: 8,
-          offsetY: 0,
-        });
-        // If neither left nor right work, try bottom
-        positions.push({
-          originX: 'center',
-          originY: 'bottom',
-          overlayX: 'center',
-          overlayY: 'top',
-          offsetX: 0,
-          offsetY: 8,
-        });
-        // Finally try top
-        positions.push({
-          originX: 'center',
-          originY: 'top',
-          overlayX: 'center',
-          overlayY: 'bottom',
-          offsetX: 0,
-          offsetY: -8,
-        });
-        break;
-    }
-
     return positions;
   }
 }
@@ -368,9 +251,7 @@ export class ZardPopoverDirective implements OnInit, OnDestroy {
   selector: 'z-popover',
   imports: [],
   standalone: true,
-  template: `
-    <ng-content />
-  `,
+  template: ` <ng-content /> `,
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     '[class]': 'classes()',
