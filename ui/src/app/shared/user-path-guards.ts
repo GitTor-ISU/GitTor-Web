@@ -4,7 +4,7 @@ import { CanMatchFn } from '@angular/router';
 import { UsersService } from '@generated/openapi/services/users';
 import { firstValueFrom } from 'rxjs';
 
-const reservedPaths = ['new', 'login', 'register', 'about', 'help', 'contact', 'settings', 'logout', '404'];
+const reservedPaths = ['new', 'login', 'register', 'docs', 'help', 'contact', 'settings', 'logout', '404'];
 
 export const reservedPathGuard: CanMatchFn = (_route, segments) => {
   if (reservedPaths.includes(segments[0].path)) {

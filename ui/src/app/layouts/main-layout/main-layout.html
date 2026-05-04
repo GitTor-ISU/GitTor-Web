@@ -131,7 +131,7 @@
               zPosition="right"
               class="h-9 min-w-9 justify-start"
               routerLinkActive="bg-muted text-accent-foreground"
-              [routerLinkActiveOptions]="{ exact: true }"
+              [routerLinkActiveOptions]="{ exact: item.route === '/' }"
               [zTooltip]="sidebarCollapsed() ? item.label : ''"
               [routerLink]="item.route"
               (click)="closeNav()"
